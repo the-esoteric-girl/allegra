@@ -9,6 +9,13 @@ export default function MoveDetail() {
   const [editing, setEditing] = useState(false);
   const [editNotes, setEditNotes] = useState('');
   const [editStatus, setEditStatus] = useState('');
+  const [editAliases, setEditAliases] = useState([]);
+  const [newAlias, setNewAlias] = useState('');
+  const [aliasError, setAliasError] = useState('');
+
+  function toTitleCase(str) {
+    return str.replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+  }
 
   if (loading) return <p>Loading...</p>;
 
@@ -19,11 +26,31 @@ export default function MoveDetail() {
   function handleEditClick() {
     setEditNotes(move.notes || '');
     setEditStatus(move.status);
+    setEditAliases(move.aliases ? [...move.aliases] : []);
+    setNewAlias('');
+    setAliasError('');
     setEditing(true);
   }
 
+  function handleAddAlias() {
+    const trimmed = newAlias.trim();
+    if (!trimmed) return;
+    const titled = toTitleCase(trimmed);
+    if (editAliases.some((a) => a.toLowerCase() === trimmed.toLowerCase())) {
+      setAliasError('Alias already exists');
+      return;
+    }
+    setEditAliases([...editAliases, titled]);
+    setNewAlias('');
+    setAliasError('');
+  }
+
+  function handleRemoveAlias(index) {
+    setEditAliases(editAliases.filter((_, i) => i !== index));
+  }
+
   async function handleSave() {
-    await updateMove(move.id, { notes: editNotes, status: editStatus });
+    await updateMove(move.id, { notes: editNotes, status: editStatus, aliases: editAliases });
     setEditing(false);
   }
 
@@ -52,8 +79,27 @@ export default function MoveDetail() {
             </select>
           </div>
           <div>
+            <strong>Alternate names:</strong>
+            <div>
+              {editAliases.map((alias, i) => (
+                <span key={i}>
+                  {alias}{' '}
+                  <button onClick={() => handleRemoveAlias(i)}>x</button>{' '}
+                </span>
+              ))}
+            </div>
+            <input
+              value={newAlias}
+              onChange={(e) => { setNewAlias(e.target.value); setAliasError(''); }}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddAlias()}
+              placeholder="Add alias"
+            />
+            <button onClick={handleAddAlias}>Add</button>
+            {aliasError && <p style={{color: 'red'}}>{aliasError}</p>}
+          </div>
+          <div>
             <strong>Notes:</strong>
-            <textarea value={editNotes} onChange={(e) => setEditNotes(e.target.value)} />
+            <textarea value={editNotes} onChange={(e) => setEditNotes(e.target.value)} rows={6} style={{width: '100%'}} />
           </div>
           <button onClick={handleSave}>Save</button>
           <button onClick={handleCancel}>Cancel</button>
