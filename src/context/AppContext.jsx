@@ -1,7 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-
-const AppContext = createContext(null);
+import { AppContext } from './appContextInstance';
 
 export function AppProvider({ children }) {
   const [moves, setMoves] = useState([]);
@@ -72,10 +71,6 @@ export function AppProvider({ children }) {
       {children}
     </AppContext.Provider>
   );
-}
-
-export function useApp() {
-  return useContext(AppContext);
 }
 
 export default AppProvider;
