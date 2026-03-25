@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/useApp';
+import { Trash2, X, ChevronDown, ChevronUp, Check, Circle } from 'lucide-react';
 
 const STATUS_OPTIONS = ['want to try', 'working on', 'achieved'];
 const STATUS_LABELS = {
@@ -17,55 +18,33 @@ function formatDatestamp(date) {
   return y === new Date().getFullYear() ? `${m} ${d}` : `${m} ${d}, ${y}`;
 }
 
-function EmptyCircle() {
-  return (
-    <svg width={18} height={18} viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0 }}>
-      <circle cx="9" cy="9" r="7.5" stroke="#d1d5db" strokeWidth="1.5" />
-    </svg>
-  );
-}
-
-function FilledCheckmark() {
-  return (
-    <svg width={18} height={18} viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0 }}>
-      <circle cx="9" cy="9" r="9" fill="#22c55e" />
-      <path d="M4.5 9l3 3 6-6" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function SmallCheckmark() {
-  return (
-    <svg width={13} height={11} viewBox="0 0 13 11" fill="none" style={{ flexShrink: 0 }}>
-      <path d="M1 5.5l4 4L12 1" stroke="#22c55e" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
+function formatReviewDate(date) {
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }
 
 export default function LogModal({ isOpen, onClose }) {
-  const { moves, updateMove } = useApp();
+  const { moves, updateMove, createSession, addSessionEntry } = useApp();
   const navigate = useNavigate();
 
-  const [searchQuery, setSearchQuery]               = useState('');
-  const [sessionLog, setSessionLog]                 = useState([]);
-  // sessionLog entries: { moveId, status, notes, isPending, hasNote }
-  const [expandedNoteEntryId, setExpandedNoteEntryId]         = useState(null);
-  const [expandedPreviousNotesId, setExpandedPreviousNotesId] = useState(null);
-  const [noteText, setNoteText]                     = useState('');
-  const [saveSuccess, setSaveSuccess]               = useState(false);
-  const [saveError, setSaveError]                   = useState(null);
+  const [mode, setMode] = useState('logging');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sessionEntries, setSessionEntries] = useState([]);
+  // sessionEntries: { moveId, previousStatus, currentStatus, notes, hasNote, expandedNote, expandedPreviousNotes }
+  const [sessionNotes, setSessionNotes] = useState('');
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  const [expandedReviewNote, setExpandedReviewNote] = useState([]);
 
   const entryRefs = useRef({});
 
   useEffect(() => {
     if (isOpen) {
+      setMode('logging');
       setSearchQuery('');
-      setSessionLog([]);
-      setExpandedNoteEntryId(null);
-      setExpandedPreviousNotesId(null);
-      setNoteText('');
-      setSaveSuccess(false);
-      setSaveError(null);
+      setSessionEntries([]);
+      setSessionNotes('');
+      setShowCloseConfirm(false);
+      setExpandedReviewNote([]);
     }
   }, [isOpen]);
 
@@ -80,99 +59,110 @@ export default function LogModal({ isOpen, onClose }) {
       })
     : [];
 
-  function flash() {
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 2000);
+  const anyNoteExpanded = sessionEntries.some(e => e.expandedNote);
+  const reviewButtonVisible = sessionEntries.length > 0 && !anyNoteExpanded;
+
+  function handleCloseAttempt() {
+    if (sessionEntries.length > 0) {
+      setShowCloseConfirm(true);
+    } else {
+      onClose();
+    }
   }
 
   function handleSearchResultClick(move) {
-    const existing = sessionLog.find(e => e.moveId === move.id);
+    const existing = sessionEntries.find(e => e.moveId === move.id);
     if (existing) {
       const el = entryRefs.current[move.id];
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       return;
     }
-    setSessionLog(prev => [...prev, {
+    setSessionEntries(prev => [...prev, {
       moveId: move.id,
-      status: move.status,
+      previousStatus: move.status,
+      currentStatus: move.status,
       notes: '',
-      isPending: true,
+      savedNoteText: '',
       hasNote: false,
+      expandedNote: false,
+      expandedPreviousNotes: false,
     }]);
   }
 
-  function handleStatusChange(moveId, newStatus) {
-    setSessionLog(prev => prev.map(e =>
-      e.moveId === moveId ? { ...e, status: newStatus } : e
+  async function handleStatusChange(moveId, newStatus) {
+    setSessionEntries(prev => prev.map(e =>
+      e.moveId === moveId ? { ...e, currentStatus: newStatus } : e
+    ));
+    await updateMove(moveId, { status: newStatus });
+  }
+
+  async function handleRemoveEntry(moveId) {
+    const entry = sessionEntries.find(e => e.moveId === moveId);
+    setSessionEntries(prev => prev.filter(e => e.moveId !== moveId));
+    if (entry) {
+      await updateMove(moveId, { status: entry.previousStatus });
+    }
+  }
+
+  function handleToggleNote(moveId) {
+    setSessionEntries(prev => prev.map(e =>
+      e.moveId === moveId ? { ...e, expandedNote: !e.expandedNote } : e
     ));
   }
 
-  function handleRemoveEntry(moveId) {
-    setSessionLog(prev => prev.filter(e => e.moveId !== moveId));
-    if (expandedNoteEntryId === moveId) {
-      setExpandedNoteEntryId(null);
-      setNoteText('');
-    }
-    if (expandedPreviousNotesId === moveId) {
-      setExpandedPreviousNotesId(null);
-    }
+  function handleNoteChange(moveId, value) {
+    setSessionEntries(prev => prev.map(e =>
+      e.moveId === moveId ? { ...e, notes: value } : e
+    ));
   }
 
-  function handleAddNote(moveId) {
-    if (expandedNoteEntryId === moveId) {
-      setExpandedNoteEntryId(null);
-      setNoteText('');
-      setExpandedPreviousNotesId(null);
-    } else {
-      setExpandedNoteEntryId(moveId);
-      setNoteText('');
-      setExpandedPreviousNotesId(null);
-    }
+  function handleTogglePreviousNotes(moveId) {
+    setSessionEntries(prev => prev.map(e =>
+      e.moveId === moveId ? { ...e, expandedPreviousNotes: !e.expandedPreviousNotes } : e
+    ));
   }
 
   async function handleSaveNote(entry) {
-    setSaveError(null);
-    if (!noteText.trim()) {
-      setExpandedNoteEntryId(null);
-      setExpandedPreviousNotesId(null);
+    if (!entry.notes.trim()) {
+      setSessionEntries(prev => prev.map(e =>
+        e.moveId === entry.moveId
+          ? { ...e, expandedNote: false, expandedPreviousNotes: false }
+          : e
+      ));
       return;
     }
     const move = moves.find(m => m.id === entry.moveId);
     const existingNotes = move?.notes || '';
     const stamp = formatDatestamp(new Date());
-    const notesToSave = `[${stamp}] ${noteText.trim()}${existingNotes ? '\n' + existingNotes : ''}`;
-    try {
-      await updateMove(entry.moveId, { notes: notesToSave });
-      setSessionLog(prev => prev.map(e =>
-        e.moveId === entry.moveId ? { ...e, hasNote: true } : e
-      ));
-      setExpandedNoteEntryId(null);
-      setNoteText('');
-      setExpandedPreviousNotesId(null);
-      flash();
-    } catch {
-      setSaveError('Failed to save. Please try again.');
-    }
+    const notesToSave = `[${stamp}] ${entry.notes.trim()}${existingNotes ? '\n' + existingNotes : ''}`;
+    await updateMove(entry.moveId, { notes: notesToSave });
+    setSessionEntries(prev => prev.map(e =>
+      e.moveId === entry.moveId
+        ? { ...e, hasNote: true, savedNoteText: entry.notes.trim(), expandedNote: false, notes: '', expandedPreviousNotes: false }
+        : e
+    ));
   }
 
-  async function handleDone() {
-    setSaveError(null);
-    const pending = sessionLog.filter(e => e.isPending);
-    if (pending.length === 0) {
-      onClose();
-      return;
-    }
-    try {
-      await Promise.all(pending.map(e => updateMove(e.moveId, { status: e.status })));
-      setSessionLog(prev => prev.map(e => e.isPending ? { ...e, isPending: false } : e));
-      setSearchQuery('');
-      flash();
-    } catch {
-      setSaveError('Failed to save. Please try again.');
-    }
+  function handleCancelNote(moveId) {
+    setSessionEntries(prev => prev.map(e =>
+      e.moveId === moveId
+        ? { ...e, expandedNote: false, notes: '', expandedPreviousNotes: false }
+        : e
+    ));
   }
 
-  // ── Styles ────────────────────────────────────────────────────────────────────
+  async function handleSaveSession() {
+    const session = await createSession(sessionNotes);
+    if (!session) return;
+    await Promise.all(
+      sessionEntries.map(e =>
+        addSessionEntry(session.id, e.moveId, e.previousStatus, e.currentStatus, e.hasNote)
+      )
+    );
+    onClose();
+  }
+
+  // ── Styles ──────────────────────────────────────────────────────────────────
 
   const s = {
     overlay: {
@@ -187,6 +177,7 @@ export default function LogModal({ isOpen, onClose }) {
       borderRadius: '20px 20px 0 0',
       display: 'flex', flexDirection: 'column',
       overflow: 'hidden',
+      position: 'relative',
     },
     dragHandle: {
       display: 'flex', justifyContent: 'center',
@@ -203,17 +194,14 @@ export default function LogModal({ isOpen, onClose }) {
     title: { margin: 0, fontSize: '20px', fontWeight: 700, color: '#111' },
     closeBtn: {
       background: 'none', border: 'none',
-      fontSize: '24px', lineHeight: 1,
       cursor: 'pointer', color: '#6b7280',
-      padding: '2px 4px',
+      padding: '4px', display: 'flex', alignItems: 'center',
     },
-
     contentArea: {
       flex: 1, minHeight: 0,
       display: 'flex', flexDirection: 'column',
       overflow: 'hidden',
     },
-
     searchWrap: {
       padding: '0 16px 10px', flexShrink: 0,
       position: 'relative',
@@ -229,13 +217,15 @@ export default function LogModal({ isOpen, onClose }) {
       top: '50%', transform: 'translateY(-60%)',
       background: 'none', border: 'none',
       cursor: 'pointer', color: '#9ca3af',
-      fontSize: '20px', lineHeight: 1,
-      padding: '0',
+      display: 'flex', alignItems: 'center', padding: '0',
     },
-
-    moveList: { flex: 1, minHeight: 0, overflowY: 'auto' },
+    moveList: {
+      flexShrink: 0,
+      maxHeight: 'calc(85vh * 0.35)',
+      overflowY: 'auto',
+    },
     emptyState: {
-      padding: '32px 16px', textAlign: 'center',
+      padding: '24px 16px', textAlign: 'center',
       color: '#9ca3af', fontSize: '14px',
     },
     moveItem: (inSession) => ({
@@ -251,12 +241,10 @@ export default function LogModal({ isOpen, onClose }) {
       color: inSession ? '#9ca3af' : '#111',
     }),
     moveStatusText: { fontSize: '12px', color: '#9ca3af' },
-
     sessionSection: {
-      flexShrink: 0,
+      flex: 1, minHeight: 0,
       borderTop: '2px solid #f0f0f0',
       display: 'flex', flexDirection: 'column',
-      maxHeight: '45%',
     },
     sessionHeader: {
       display: 'flex', alignItems: 'center', gap: '6px',
@@ -270,42 +258,36 @@ export default function LogModal({ isOpen, onClose }) {
       padding: '1px 7px', borderRadius: '99px',
     },
     sessionList: { overflowY: 'auto', flex: 1 },
-
     sessionEntry: {
       display: 'flex', alignItems: 'center',
       padding: '9px 12px 9px 16px', gap: '8px',
       borderBottom: '1px solid #f5f5f5',
     },
-    entryMain: { flex: 1, display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 },
+    entryMain: { flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 },
     entryMoveName: {
-      fontSize: '14px', color: '#374151', fontWeight: 500,
+      fontSize: '14px', color: '#374151', fontWeight: 600,
       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
     },
-    pendingText: { fontSize: '11px', color: '#9ca3af' },
-    confirmedRow: { display: 'flex', alignItems: 'center', gap: '3px' },
-    confirmedText: { fontSize: '11px', color: '#22c55e' },
-
+    entryControls: { display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' },
     statusSelect: {
       fontSize: '12px', padding: '4px 6px',
       border: '1px solid #e5e7eb', borderRadius: '6px',
       backgroundColor: '#fff', color: '#374151',
-      cursor: 'pointer', flexShrink: 0,
-      outline: 'none',
+      cursor: 'pointer', flexShrink: 0, outline: 'none',
     },
-    addNoteBtn: {
+    addNoteBtn: (hasNote) => ({
       fontSize: '12px', padding: '4px 8px',
       border: '1px solid #e5e7eb', borderRadius: '6px',
-      backgroundColor: '#fff', color: '#6b7280',
-      cursor: 'pointer', flexShrink: 0,
-      whiteSpace: 'nowrap',
-    },
-    removeBtn: {
+      backgroundColor: hasNote ? '#f0fdf4' : '#fff',
+      color: hasNote ? '#16a34a' : '#6b7280',
+      cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap',
+    }),
+    trashBtn: {
       background: 'none', border: 'none',
-      fontSize: '20px', lineHeight: 1,
       cursor: 'pointer', color: '#d1d5db',
-      padding: '0 2px', flexShrink: 0,
+      padding: '2px', flexShrink: 0,
+      display: 'flex', alignItems: 'center',
     },
-
     expandedForm: {
       padding: '10px 16px 12px',
       backgroundColor: '#f9fafb',
@@ -324,7 +306,7 @@ export default function LogModal({ isOpen, onClose }) {
       background: 'none', border: 'none',
       padding: '2px 0', fontSize: '13px',
       color: '#6b7280', cursor: 'pointer',
-      textAlign: 'left',
+      textAlign: 'left', display: 'flex', alignItems: 'center', gap: '4px',
     },
     prevNotesContent: {
       marginTop: '6px', padding: '8px 10px',
@@ -344,17 +326,6 @@ export default function LogModal({ isOpen, onClose }) {
       border: '1px solid #e5e7eb', borderRadius: '8px',
       cursor: 'pointer', backgroundColor: '#fff', color: '#374151',
     },
-
-    banner: (type) => ({
-      margin: '0 16px 4px',
-      padding: '7px 12px',
-      borderRadius: '8px',
-      fontSize: '13px', fontWeight: 500,
-      textAlign: 'center', flexShrink: 0,
-      backgroundColor: type === 'success' ? '#dcfce7' : '#fee2e2',
-      color: type === 'success' ? '#16a34a' : '#dc2626',
-    }),
-
     bottomBar: {
       borderTop: '1px solid #f0f0f0',
       padding: '10px 16px',
@@ -362,37 +333,204 @@ export default function LogModal({ isOpen, onClose }) {
       backgroundColor: '#fafafa',
       display: 'flex', gap: '8px',
     },
-    doneBtn: {
+    reviewBtn: {
       flex: 1, padding: '11px', fontSize: '14px',
       border: 'none', borderRadius: '10px', cursor: 'pointer',
       backgroundColor: '#3b82f6', color: '#fff', fontWeight: 600,
     },
     newComboBtn: {
-      flex: 1, padding: '11px',
+      padding: '11px 16px',
       border: '1px solid #e5e7eb', borderRadius: '10px',
       cursor: 'pointer', backgroundColor: '#fff',
       fontSize: '14px', color: '#374151', fontWeight: 500,
+      flexShrink: 0,
+    },
+    confirmOverlay: {
+      position: 'absolute', inset: 0,
+      backgroundColor: 'rgba(0,0,0,0.4)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 10,
+    },
+    confirmBox: {
+      backgroundColor: '#fff', borderRadius: '12px',
+      padding: '20px', margin: '0 24px',
+      display: 'flex', flexDirection: 'column', gap: '12px',
+    },
+    confirmText: {
+      fontSize: '15px', color: '#111',
+      margin: 0, textAlign: 'center',
+    },
+    confirmActions: { display: 'flex', gap: '8px' },
+    confirmCloseBtn: {
+      flex: 1, padding: '10px', fontSize: '14px',
+      border: 'none', borderRadius: '8px', cursor: 'pointer',
+      backgroundColor: '#ef4444', color: '#fff', fontWeight: 600,
+    },
+    confirmCancelBtn: {
+      flex: 1, padding: '10px', fontSize: '14px',
+      border: '1px solid #e5e7eb', borderRadius: '8px',
+      cursor: 'pointer', backgroundColor: '#fff', color: '#374151',
+    },
+    reviewContent: {
+      flex: 1, minHeight: 0, overflowY: 'auto',
+      padding: '0 16px 16px',
+    },
+    reviewDate: {
+      fontSize: '14px', color: '#9ca3af',
+      padding: '12px 0 8px',
+    },
+    reviewEntry: {
+      padding: '10px 0',
+      borderBottom: '1px solid #f5f5f5',
+      display: 'flex', flexDirection: 'column', gap: '4px',
+    },
+    reviewMoveName: { fontSize: '15px', fontWeight: 600, color: '#111' },
+    reviewStatusRow: {
+      display: 'flex', alignItems: 'center', gap: '6px',
+      fontSize: '13px', color: '#6b7280',
+    },
+    reviewNoteText: (expanded) => ({
+      fontSize: '13px', color: '#6b7280',
+      lineHeight: 1.5,
+      display: '-webkit-box',
+      WebkitBoxOrient: 'vertical',
+      WebkitLineClamp: expanded ? 'unset' : 2,
+      overflow: expanded ? 'visible' : 'hidden',
+    }),
+    reviewNoteToggle: {
+      background: 'none', border: 'none',
+      padding: '2px 0 0', fontSize: '13px',
+      color: '#3b82f6', cursor: 'pointer',
+      textAlign: 'left',
+    },
+    sessionNotesTextarea: {
+      width: '100%', boxSizing: 'border-box',
+      padding: '10px 12px', fontSize: '14px',
+      border: '1px solid #e5e7eb', borderRadius: '8px',
+      resize: 'vertical', outline: 'none',
+      fontFamily: 'inherit', color: '#111',
+      marginTop: '12px',
+    },
+    backBtn: {
+      padding: '11px 16px', fontSize: '14px',
+      border: '1px solid #e5e7eb', borderRadius: '10px',
+      cursor: 'pointer', backgroundColor: '#fff',
+      color: '#374151', fontWeight: 500, flexShrink: 0,
+    },
+    saveSessionBtn: {
+      flex: 1, padding: '11px', fontSize: '14px',
+      border: 'none', borderRadius: '10px', cursor: 'pointer',
+      backgroundColor: '#3b82f6', color: '#fff', fontWeight: 600,
     },
   };
 
-  // ── Render ────────────────────────────────────────────────────────────────────
+  // ── Review mode ──────────────────────────────────────────────────────────────
+
+  if (mode === 'review') {
+    return (
+      <div style={s.overlay}>
+        <div style={s.sheet}>
+          <div style={s.dragHandle}><div style={s.dragBar} /></div>
+
+          <div style={s.header}>
+            <h2 style={s.title}>Session summary</h2>
+          </div>
+
+          <div style={s.reviewContent}>
+            <div style={s.reviewDate}>{formatReviewDate(new Date())}</div>
+
+            {sessionEntries.map(entry => {
+              const move = moves.find(m => m.id === entry.moveId);
+              const statusChanged = entry.previousStatus !== entry.currentStatus;
+              const showNote = entry.hasNote && entry.savedNoteText;
+              const isNoteExpanded = expandedReviewNote.includes(entry.moveId);
+              const noteLong = showNote && (
+                entry.savedNoteText.length > 100 || entry.savedNoteText.includes('\n')
+              );
+              return (
+                <div key={entry.moveId} style={s.reviewEntry}>
+                  <span style={s.reviewMoveName}>{move?.name ?? 'Unknown'}</span>
+                  <div style={s.reviewStatusRow}>
+                    {statusChanged ? (
+                      <>
+                        <span>{STATUS_LABELS[entry.previousStatus] ?? entry.previousStatus}</span>
+                        <span>→</span>
+                        <span style={{ color: '#374151', fontWeight: 500 }}>
+                          {STATUS_LABELS[entry.currentStatus] ?? entry.currentStatus}
+                        </span>
+                      </>
+                    ) : (
+                      <span>{STATUS_LABELS[entry.currentStatus] ?? entry.currentStatus}</span>
+                    )}
+                  </div>
+                  {showNote && (
+                    <>
+                      <p style={{ ...s.reviewNoteText(isNoteExpanded), margin: '2px 0 0' }}>
+                        {entry.savedNoteText}
+                      </p>
+                      {noteLong && (
+                        <button
+                          style={s.reviewNoteToggle}
+                          onClick={() => setExpandedReviewNote(prev =>
+                            isNoteExpanded
+                              ? prev.filter(id => id !== entry.moveId)
+                              : [...prev, entry.moveId]
+                          )}
+                        >
+                          {isNoteExpanded ? 'Show less' : 'Read more'}
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+              );
+            })}
+
+            <textarea
+              rows={4}
+              style={s.sessionNotesTextarea}
+              value={sessionNotes}
+              onChange={e => setSessionNotes(e.target.value)}
+              placeholder="How did it go? Any overall notes..."
+            />
+          </div>
+
+          <div style={s.bottomBar}>
+            <button style={s.backBtn} onClick={() => setMode('logging')}>← Back</button>
+            <button style={s.saveSessionBtn} onClick={handleSaveSession}>Save session</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Logging mode ─────────────────────────────────────────────────────────────
 
   return (
-    <div style={s.overlay} onClick={onClose}>
+    <div style={s.overlay} onClick={handleCloseAttempt}>
       <div style={s.sheet} onClick={e => e.stopPropagation()}>
 
-        {/* Drag handle */}
-        <div style={s.dragHandle}>
-          <div style={s.dragBar} />
-        </div>
+        {showCloseConfirm && (
+          <div style={s.confirmOverlay}>
+            <div style={s.confirmBox}>
+              <p style={s.confirmText}>You have unsaved moves. Close anyway?</p>
+              <div style={s.confirmActions}>
+                <button style={s.confirmCloseBtn} onClick={onClose}>Close</button>
+                <button style={s.confirmCancelBtn} onClick={() => setShowCloseConfirm(false)}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
 
-        {/* Header */}
+        <div style={s.dragHandle}><div style={s.dragBar} /></div>
+
         <div style={s.header}>
           <h2 style={s.title}>Log</h2>
-          <button style={s.closeBtn} onClick={onClose}>&times;</button>
+          <button style={s.closeBtn} onClick={handleCloseAttempt}>
+            <X size={20} />
+          </button>
         </div>
 
-        {/* Content area */}
         <div style={s.contentArea}>
 
           {/* Search */}
@@ -406,12 +544,12 @@ export default function LogModal({ isOpen, onClose }) {
             />
             {searchQuery && (
               <button style={s.searchClear} onClick={() => setSearchQuery('')}>
-                &times;
+                <X size={16} />
               </button>
             )}
           </div>
 
-          {/* Move list */}
+          {/* Move results */}
           <div style={s.moveList}>
             {q === '' ? (
               <div style={s.emptyState}>Search for a move to log</div>
@@ -419,19 +557,20 @@ export default function LogModal({ isOpen, onClose }) {
               <div style={s.emptyState}>No moves found</div>
             ) : (
               filteredMoves.map(move => {
-                const inSession = !!sessionLog.find(e => e.moveId === move.id);
+                const inSession = !!sessionEntries.find(e => e.moveId === move.id);
                 return (
                   <div
                     key={move.id}
                     style={s.moveItem(inSession)}
                     onClick={() => handleSearchResultClick(move)}
                   >
-                    {inSession ? <FilledCheckmark /> : <EmptyCircle />}
+                    {inSession
+                      ? <Check size={18} color="#22c55e" strokeWidth={2.5} style={{ flexShrink: 0 }} />
+                      : <Circle size={18} color="#d1d5db" style={{ flexShrink: 0 }} />
+                    }
                     <div style={s.moveInfo}>
                       <span style={s.moveName(inSession)}>{move.name}</span>
-                      <span style={s.moveStatusText}>
-                        {STATUS_LABELS[move.status] ?? move.status}
-                      </span>
+                      <span style={s.moveStatusText}>{STATUS_LABELS[move.status] ?? move.status}</span>
                     </div>
                   </div>
                 );
@@ -440,17 +579,15 @@ export default function LogModal({ isOpen, onClose }) {
           </div>
 
           {/* This session */}
-          {sessionLog.length > 0 && (
+          {sessionEntries.length > 0 && (
             <div style={s.sessionSection}>
               <div style={s.sessionHeader}>
                 <span style={s.sessionTitle}>This session</span>
-                <span style={s.sessionCount}>{sessionLog.length}</span>
+                <span style={s.sessionCount}>{sessionEntries.length}</span>
               </div>
               <div style={s.sessionList}>
-                {sessionLog.map(entry => {
+                {sessionEntries.map(entry => {
                   const move = moves.find(m => m.id === entry.moveId);
-                  const isNoteExpanded = expandedNoteEntryId === entry.moveId;
-                  const isPrevExpanded = expandedPreviousNotesId === entry.moveId;
                   return (
                     <div
                       key={entry.moveId}
@@ -459,63 +596,54 @@ export default function LogModal({ isOpen, onClose }) {
                       <div style={s.sessionEntry}>
                         <div style={s.entryMain}>
                           <span style={s.entryMoveName}>{move?.name ?? 'Unknown'}</span>
-                          {entry.isPending ? (
-                            <span style={s.pendingText}>pending</span>
-                          ) : (
-                            <div style={s.confirmedRow}>
-                              <SmallCheckmark />
-                            </div>
-                          )}
+                          <div style={s.entryControls}>
+                            <select
+                              style={s.statusSelect}
+                              value={entry.currentStatus}
+                              onChange={e => handleStatusChange(entry.moveId, e.target.value)}
+                            >
+                              {STATUS_OPTIONS.map(st => (
+                                <option key={st} value={st}>{STATUS_LABELS[st]}</option>
+                              ))}
+                            </select>
+                            <button
+                              style={s.addNoteBtn(entry.hasNote)}
+                              onClick={() => handleToggleNote(entry.moveId)}
+                            >
+                              {entry.hasNote ? 'Note saved ✓' : 'Add note'}
+                            </button>
+                          </div>
                         </div>
-
-                        <select
-                          style={s.statusSelect}
-                          value={entry.status}
-                          onChange={e => handleStatusChange(entry.moveId, e.target.value)}
-                        >
-                          {STATUS_OPTIONS.map(st => (
-                            <option key={st} value={st}>{STATUS_LABELS[st]}</option>
-                          ))}
-                        </select>
-
                         <button
-                          style={s.addNoteBtn}
-                          onClick={() => handleAddNote(entry.moveId)}
+                          style={s.trashBtn}
+                          onClick={() => handleRemoveEntry(entry.moveId)}
                         >
-                          Add note
+                          <Trash2 size={16} />
                         </button>
-
-                        {entry.isPending && (
-                          <button
-                            style={s.removeBtn}
-                            onClick={() => handleRemoveEntry(entry.moveId)}
-                          >
-                            &times;
-                          </button>
-                        )}
                       </div>
 
-                      {isNoteExpanded && (
+                      {entry.expandedNote && (
                         <div style={s.expandedForm}>
                           <textarea
                             rows={3}
                             style={s.textarea}
-                            value={noteText}
-                            onChange={e => setNoteText(e.target.value)}
+                            value={entry.notes}
+                            onChange={e => handleNoteChange(entry.moveId, e.target.value)}
                             placeholder="Add a note..."
                             autoFocus
                           />
-
                           <div>
                             <button
                               style={s.prevNotesToggle}
-                              onClick={() => setExpandedPreviousNotesId(
-                                isPrevExpanded ? null : entry.moveId
-                              )}
+                              onClick={() => handleTogglePreviousNotes(entry.moveId)}
                             >
-                              Previous notes {isPrevExpanded ? '▴' : '▾'}
+                              Previous notes{' '}
+                              {entry.expandedPreviousNotes
+                                ? <ChevronUp size={14} />
+                                : <ChevronDown size={14} />
+                              }
                             </button>
-                            {isPrevExpanded && (
+                            {entry.expandedPreviousNotes && (
                               <div style={s.prevNotesContent}>
                                 {move?.notes
                                   ? move.notes
@@ -524,19 +652,11 @@ export default function LogModal({ isOpen, onClose }) {
                               </div>
                             )}
                           </div>
-
                           <div style={s.noteActions}>
                             <button style={s.saveNoteBtn} onClick={() => handleSaveNote(entry)}>
                               Save note
                             </button>
-                            <button
-                              style={s.cancelNoteBtn}
-                              onClick={() => {
-                                setExpandedNoteEntryId(null);
-                                setNoteText('');
-                                setExpandedPreviousNotesId(null);
-                              }}
-                            >
+                            <button style={s.cancelNoteBtn} onClick={() => handleCancelNote(entry.moveId)}>
                               Cancel
                             </button>
                           </div>
@@ -550,13 +670,13 @@ export default function LogModal({ isOpen, onClose }) {
           )}
         </div>
 
-        {/* Banners */}
-        {saveSuccess && <div style={s.banner('success')}>Saved ✓</div>}
-        {saveError   && <div style={s.banner('error')}>{saveError}</div>}
-
         {/* Bottom bar */}
         <div style={s.bottomBar}>
-          <button style={s.doneBtn} onClick={handleDone}>Done</button>
+          {reviewButtonVisible && (
+            <button style={s.reviewBtn} onClick={() => setMode('review')}>
+              Review session →
+            </button>
+          )}
           <button
             style={s.newComboBtn}
             onClick={() => { onClose(); navigate('/combos'); }}
