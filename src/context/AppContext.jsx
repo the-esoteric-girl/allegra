@@ -4,6 +4,7 @@ import { AppContext } from './appContextInstance';
 
 export function AppProvider({ children }) {
   const [moves, setMoves] = useState([]);
+  const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -21,9 +22,36 @@ export function AppProvider({ children }) {
     setLoading(false);
   }
 
+  async function loadSessions() {
+    const { data: sessionData, error: sessionError } = await supabase
+      .from('sessions')
+      .select('*')
+      .order('date', { ascending: false });
+    if (sessionError) {
+      console.error(sessionError);
+      setError(sessionError);
+      return;
+    }
+    const sessionIds = sessionData.map(s => s.id);
+    const { data: entryData, error: entryError } = await supabase
+      .from('session_entries')
+      .select('*')
+      .in('session_id', sessionIds);
+    if (entryError) {
+      console.error(entryError);
+      setError(entryError);
+      return;
+    }
+    const sessionsWithEntries = sessionData.map(session => ({
+      ...session,
+      entries: entryData.filter(e => e.session_id === session.id),
+    }));
+    setSessions(sessionsWithEntries);
+  }
+
   useEffect(() => {
     async function load() {
-      await fetchMoves();
+      await Promise.all([fetchMoves(), loadSessions()]);
     }
     load();
   }, []);
@@ -66,8 +94,58 @@ export function AppProvider({ children }) {
     }
   }
 
+  async function createSession(notes = '') {
+    const today = new Date().toISOString().slice(0, 10);
+    const { data, error } = await supabase
+      .from('sessions')
+      .insert({ date: today, notes })
+      .select()
+      .single();
+    if (error) {
+      console.error(error);
+      setError(error);
+      return null;
+    }
+    await loadSessions();
+    return data;
+  }
+
+  async function addSessionEntry(sessionId, moveId, previousStatus, newStatus, notesAdded) {
+    const { data, error } = await supabase
+      .from('session_entries')
+      .insert({ session_id: sessionId, move_id: moveId, previous_status: previousStatus, new_status: newStatus, notes_added: notesAdded })
+      .select()
+      .single();
+    if (error) {
+      console.error(error);
+      setError(error);
+      return null;
+    }
+    await loadSessions();
+    return data;
+  }
+
+  async function deleteSessionEntry(sessionId, moveId) {
+    const { error } = await supabase
+      .from('session_entries')
+      .delete()
+      .eq('session_id', sessionId)
+      .eq('move_id', moveId);
+    if (error) {
+      console.error(error);
+      setError(error);
+    } else {
+      await loadSessions();
+    }
+  }
+
   return (
-    <AppContext.Provider value={{ moves, loading, error, addMove, updateMove, deleteMove }}>
+    <AppContext.Provider value={{
+      moves, loading, error,
+      addMove, updateMove, deleteMove,
+      sessions, loadSessions,
+      createSession, addSessionEntry, deleteSessionEntry,
+    }}>
       {children}
     </AppContext.Provider>
   );
