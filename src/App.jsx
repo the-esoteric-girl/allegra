@@ -1,20 +1,7 @@
-import { useEffect, useState } from 'react';
-import { supabase } from './lib/supabase';
+import { useApp } from './context/AppContext';
 
 function App() {
-  const [moves, setMoves] = useState([]);
-
-  useEffect(() => {
-    async function fetchMoves() {
-      const { data, error } = await supabase.from('moves').select('*');
-      if (error) {
-        console.error(error);
-      } else {
-        setMoves(data);
-      }
-    }
-    fetchMoves();
-  }, []);
+  const { moves } = useApp();
 
   return (
     <div>
