@@ -12,6 +12,7 @@ export default function MoveDetail() {
   const [editAliases, setEditAliases] = useState([]);
   const [newAlias, setNewAlias] = useState('');
   const [aliasError, setAliasError] = useState('');
+  const [aliasConflict, setAliasConflict] = useState(null);
 
   function toTitleCase(str) {
     return str.replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
@@ -29,7 +30,15 @@ export default function MoveDetail() {
     setEditAliases(move.aliases ? [...move.aliases] : []);
     setNewAlias('');
     setAliasError('');
+    setAliasConflict(null);
     setEditing(true);
+  }
+
+  function addAlias(titled) {
+    setEditAliases((prev) => [...prev, titled]);
+    setNewAlias('');
+    setAliasError('');
+    setAliasConflict(null);
   }
 
   function handleAddAlias() {
@@ -40,9 +49,21 @@ export default function MoveDetail() {
       setAliasError('Alias already exists');
       return;
     }
-    setEditAliases([...editAliases, titled]);
-    setNewAlias('');
-    setAliasError('');
+    const nameConflict = moves.find(
+      (m) => String(m.id) !== id && m.name.toLowerCase() === titled.toLowerCase()
+    );
+    if (nameConflict) {
+      setAliasConflict({ titled, message: `${titled} already exists as a move in your library. Are you sure you want to add it as an alias?` });
+      return;
+    }
+    const aliasConflictMove = moves.find(
+      (m) => String(m.id) !== id && m.aliases && m.aliases.some((a) => a.toLowerCase() === titled.toLowerCase())
+    );
+    if (aliasConflictMove) {
+      setAliasConflict({ titled, message: `${titled} already exists as an alias for ${aliasConflictMove.name}. Are you sure you want to add it as an alias?` });
+      return;
+    }
+    addAlias(titled);
   }
 
   function handleRemoveAlias(index) {
@@ -96,6 +117,13 @@ export default function MoveDetail() {
             />
             <button onClick={handleAddAlias}>Add</button>
             {aliasError && <p style={{color: 'red'}}>{aliasError}</p>}
+            {aliasConflict && (
+              <div>
+                <p style={{color: 'orange'}}>{aliasConflict.message}</p>
+                <button onClick={() => addAlias(aliasConflict.titled)}>Add Anyway</button>
+                <button onClick={() => { setAliasConflict(null); setNewAlias(''); }}>Cancel</button>
+              </div>
+            )}
           </div>
           <div>
             <strong>Notes:</strong>
