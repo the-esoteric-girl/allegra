@@ -1,13 +1,11 @@
-import { useApp } from './context/AppContext';
+import { Routes, Route } from 'react-router-dom';
+import Library from './pages/Library';
 
 function App() {
-  const { moves } = useApp();
-
   return (
-    <div>
-      <h1>Allegra</h1>
-      <p>Moves loaded: {moves.length}</p>
-    </div>
+    <Routes>
+      <Route path="/" element={<Library />} />
+    </Routes>
   );
 }
 
