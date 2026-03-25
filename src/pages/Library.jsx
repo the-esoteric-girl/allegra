@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 
 const STATUS_FILTERS = ['All', 'Achieved', 'Working On', 'Want To Try'];
 
 export default function Library() {
   const { moves } = useApp();
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
 
@@ -44,7 +46,7 @@ export default function Library() {
 
       <ul>
         {filtered.map((move) => (
-          <li key={move.id} onClick={() => console.log(move.id)} style={{ cursor: 'pointer' }}>
+          <li key={move.id} onClick={() => navigate(`/move/${move.id}`)} style={{ cursor: 'pointer' }}>
             <strong>{move.name}</strong> — {move.status}
           </li>
         ))}
