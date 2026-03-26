@@ -158,51 +158,12 @@ export function AppProvider({ children }) {
     }
   }
 
-  async function fetchMoveNotes(moveId) {
-    const { data, error } = await supabase
-      .from('move_notes')
-      .select('*')
-      .eq('move_id', moveId)
-      .order('created_at', { ascending: false });
-    if (error) {
-      console.error(error);
-      return [];
-    }
-    return data;
-  }
-
-  async function addMoveNote(moveId, text, sessionId = null) {
-    const { data, error } = await supabase
-      .from('move_notes')
-      .insert({ move_id: moveId, text, session_id: sessionId })
-      .select()
-      .single();
-    if (error) {
-      console.error(error);
-      return null;
-    }
-    return data;
-  }
-
-  async function deleteMoveNote(noteId) {
-    const { error } = await supabase
-      .from('move_notes')
-      .delete()
-      .eq('id', noteId);
-    if (error) {
-      console.error(error);
-      return false;
-    }
-    return true;
-  }
-
   return (
     <AppContext.Provider value={{
       moves, loading, error,
       addMove, updateMove, deleteMove,
       sessions, loadSessions,
       createSession, addSessionEntry, deleteSessionEntry, deleteSession,
-      fetchMoveNotes, addMoveNote, deleteMoveNote,
       librarySearch, setLibrarySearch, libraryFilter, setLibraryFilter,
     }}>
       {children}

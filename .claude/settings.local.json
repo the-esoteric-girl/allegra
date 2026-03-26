@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Skill(gsd:discuss-phase)",
-      "Skill(gsd:discuss-phase:*)"
+      "Skill(gsd:discuss-phase:*)",
+      "Bash(claude mcp:*)"
     ]
   }
 }

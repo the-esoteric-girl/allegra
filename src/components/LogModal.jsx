@@ -17,7 +17,7 @@ function formatReviewDate(date) {
 }
 
 export default function LogModal({ isOpen, onClose }) {
-  const { moves, updateMove, addMoveNote, createSession, addSessionEntry } = useApp();
+  const { moves, updateMove, createSession, addSessionEntry } = useApp();
   const navigate = useNavigate();
 
   const [mode, setMode] = useState('logging');
@@ -74,11 +74,10 @@ export default function LogModal({ isOpen, onClose }) {
       moveId: move.id,
       previousStatus: move.status,
       currentStatus: move.status,
-      notes: '',
-      savedNoteText: '',
-      hasNote: false,
+      notes: move.note || '',
+      savedNoteText: move.note || '',
+      hasNote: !!move.note,
       expandedNote: false,
-      expandedPreviousNotes: false,
     }]);
   }
 
@@ -109,35 +108,25 @@ export default function LogModal({ isOpen, onClose }) {
     ));
   }
 
-  function handleTogglePreviousNotes(moveId) {
-    setSessionEntries(prev => prev.map(e =>
-      e.moveId === moveId ? { ...e, expandedPreviousNotes: !e.expandedPreviousNotes } : e
-    ));
-  }
-
   async function handleSaveNote(entry) {
     const trimmed = entry.notes.trim();
     if (!trimmed) {
       setSessionEntries(prev => prev.map(e =>
-        e.moveId === entry.moveId
-          ? { ...e, expandedNote: false, expandedPreviousNotes: false }
-          : e
+        e.moveId === entry.moveId ? { ...e, expandedNote: false } : e
       ));
       return;
     }
-    await addMoveNote(entry.moveId, trimmed, null);
+    await updateMove(entry.moveId, { note: trimmed });
     setSessionEntries(prev => prev.map(e =>
       e.moveId === entry.moveId
-        ? { ...e, hasNote: true, savedNoteText: trimmed, expandedNote: false, notes: '', expandedPreviousNotes: false }
+        ? { ...e, hasNote: true, savedNoteText: trimmed, expandedNote: false }
         : e
     ));
   }
 
   function handleCancelNote(moveId) {
     setSessionEntries(prev => prev.map(e =>
-      e.moveId === moveId
-        ? { ...e, expandedNote: false, notes: '', expandedPreviousNotes: false }
-        : e
+      e.moveId === moveId ? { ...e, expandedNote: false } : e
     ));
   }
 
@@ -338,7 +327,7 @@ export default function LogModal({ isOpen, onClose }) {
                               className={entry.hasNote ? styles.addNoteBtnSaved : styles.addNoteBtn}
                               onClick={() => handleToggleNote(entry.moveId)}
                             >
-                              {entry.hasNote ? 'Note saved ✓' : 'Add note'}
+                              {entry.hasNote ? 'Edit note' : 'Add note'}
                             </button>
                           </div>
                         </div>
