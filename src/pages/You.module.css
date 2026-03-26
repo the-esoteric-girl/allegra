@@ -1,0 +1,255 @@
+.page {
+  padding: 24px 16px 80px;
+}
+
+.heading {
+  font-size: 28px;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0.05em;
+  color: var(--color-text-primary);
+  margin-bottom: 24px;
+}
+
+.statsRow {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 40px;
+}
+
+.statCard {
+  flex: 1;
+  border-radius: var(--radius-lg);
+  padding: 14px 8px;
+  text-align: center;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.statCount {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.1;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.sectionTitle {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.sortSelect {
+  font-size: 13px;
+  font-family: var(--font-main);
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  cursor: pointer;
+  outline: none;
+}
+
+.emptyText {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.sessionList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sessionCard {
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  text-align: left;
+}
+
+.sessionCardHeader {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.sessionCardLeft {
+  flex: 1;
+  min-width: 0;
+}
+
+.sessionDateRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.sessionDate {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: 15px;
+}
+
+.sessionMoveCount {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.sessionPreviewMoves {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0 0 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sessionPreviewNotes {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+.sessionChevron {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  padding-top: 2px;
+}
+
+.sessionExpanded {
+  margin-top: 12px;
+}
+
+.sessionNotes {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0 0 12px;
+}
+
+.noMoves {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.entryList {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+}
+
+.entryItem {
+  padding: 10px 0;
+  border-top: 1px solid var(--color-border-subtle);
+  font-size: 14px;
+}
+
+.entryRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.entryMoveName {
+  color: var(--color-blue);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.entryStatusChange {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.entryNoteAdded {
+  font-size: 12px;
+  color: var(--color-blue);
+  background: var(--color-surface-blue);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.entryNoteText {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 6px 0 0;
+  padding-left: 2px;
+}
+
+.deleteZone {
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: 12px;
+}
+
+.deleteConfirmRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.deleteConfirmText {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.deleteConfirmButton {
+  font-size: 13px;
+  font-family: var(--font-main);
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: #c0392b;
+  color: #fff;
+  cursor: pointer;
+}
+
+.deleteCancelButton {
+  font-size: 13px;
+  font-family: var(--font-main);
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-subtle);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.deleteButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-family: var(--font-main);
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-subtle);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}

@@ -4,9 +4,9 @@ import { useApp } from '../context/useApp';
 import styles from './MoveDetail.module.css';
 
 const STATUS_DOT_COLORS = {
-  'achieved': 'var(--color-achieved)',
-  'working on': 'var(--color-working)',
-  'want to try': 'var(--color-want)',
+  'achieved': 'var(--color-green)',
+  'working on': 'var(--color-blue)',
+  'want to try': 'var(--color-pink)',
 };
 
 function formatNoteDate(createdAt) {

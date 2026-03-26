@@ -1,0 +1,553 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+}
+
+.sheet {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  height: 85vh;
+  background: var(--color-surface);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.dragHandle {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 4px;
+  flex-shrink: 0;
+}
+
+.dragBar {
+  width: 40px;
+  height: 4px;
+  background: var(--color-text-muted);
+  border-radius: 99px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 16px 12px;
+  flex-shrink: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.contentArea {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.searchWrap {
+  padding: 0 16px 10px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.searchInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 36px 10px 14px;
+  font-size: 15px;
+  border: none;
+  border-radius: var(--radius-md);
+  outline: none;
+  background: var(--color-surface-blue);
+  color: var(--color-text-primary);
+  font-family: var(--font-main);
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-muted);
+}
+
+.searchClear {
+  position: absolute;
+  right: 26px;
+  top: 50%;
+  transform: translateY(-60%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.moveList {
+  flex-shrink: 0;
+  max-height: calc(85vh * 0.35);
+  overflow-y: auto;
+}
+
+.emptyState {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.moveItem {
+  display: flex;
+  align-items: center;
+  padding: 11px 16px;
+  gap: 10px;
+  cursor: pointer;
+  background: transparent;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.moveItemInSession {
+  composes: moveItem;
+  background: var(--color-surface-blue);
+}
+
+.moveInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.moveName {
+  font-size: 15px;
+  color: var(--color-text-primary);
+}
+
+.moveNameInSession {
+  composes: moveName;
+  color: var(--color-text-muted);
+}
+
+.moveStatusText {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.sessionSection {
+  flex: 1;
+  min-height: 0;
+  border-top: 2px solid var(--color-border-subtle);
+  display: flex;
+  flex-direction: column;
+}
+
+.sessionHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: var(--color-bg);
+  flex-shrink: 0;
+}
+
+.sessionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.sessionCount {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  background: var(--color-border-subtle);
+  padding: 1px 7px;
+  border-radius: 99px;
+}
+
+.sessionList {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.sessionEntry {
+  display: flex;
+  align-items: center;
+  padding: 9px 12px 9px 16px;
+  gap: 8px;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.entryMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.entryMoveName {
+  font-size: 14px;
+  color: var(--color-text-primary);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entryControls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.statusSelect {
+  font-size: 12px;
+  padding: 4px 6px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  outline: none;
+  font-family: var(--font-main);
+}
+
+.addNoteBtn {
+  font-size: 12px;
+  padding: 4px 8px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-family: var(--font-main);
+}
+
+.addNoteBtnSaved {
+  composes: addNoteBtn;
+  background: var(--color-surface-blue);
+  color: var(--color-green);
+  border-color: transparent;
+}
+
+.trashBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  padding: 2px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.expandedForm {
+  padding: 10px 16px 12px;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  font-size: 14px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  resize: vertical;
+  outline: none;
+  font-family: var(--font-main);
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+}
+
+.textarea:focus {
+  border-color: var(--color-blue);
+}
+
+.prevNotesToggle {
+  background: none;
+  border: none;
+  padding: 2px 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-main);
+}
+
+.prevNotesContent {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.noteActions {
+  display: flex;
+  gap: 8px;
+}
+
+.saveNoteBtn {
+  flex: 1;
+  padding: 8px;
+  font-size: 13px;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: var(--color-blue-btn);
+  color: #fff;
+  font-weight: 600;
+  font-family: var(--font-main);
+}
+
+.cancelNoteBtn {
+  flex: 1;
+  padding: 8px;
+  font-size: 13px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-family: var(--font-main);
+}
+
+.bottomBar {
+  border-top: 1px solid var(--color-border-subtle);
+  padding: 10px 16px;
+  flex-shrink: 0;
+  background: var(--color-bg);
+  display: flex;
+  gap: 8px;
+}
+
+.reviewBtn {
+  flex: 1;
+  padding: 11px;
+  font-size: 14px;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: var(--color-blue-btn);
+  color: #fff;
+  font-weight: 600;
+  font-family: var(--font-main);
+}
+
+.newComboBtn {
+  padding: 11px 16px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: var(--color-surface);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  flex-shrink: 0;
+  font-family: var(--font-main);
+}
+
+.confirmOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.confirmBox {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.confirmText {
+  font-size: 15px;
+  color: var(--color-text-primary);
+  margin: 0;
+  text-align: center;
+}
+
+.confirmActions {
+  display: flex;
+  gap: 8px;
+}
+
+.confirmCloseBtn {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: #ef4444;
+  color: #fff;
+  font-weight: 600;
+  font-family: var(--font-main);
+}
+
+.confirmCancelBtn {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-family: var(--font-main);
+}
+
+.reviewContent {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 16px 16px;
+}
+
+.reviewDate {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  padding: 12px 0 8px;
+}
+
+.reviewEntry {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reviewMoveName {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.reviewStatusRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.reviewStatusNew {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.reviewNoteText {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 2px 0 0;
+}
+
+.reviewNoteTextClamped {
+  composes: reviewNoteText;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.reviewNoteToggle {
+  background: none;
+  border: none;
+  padding: 2px 0 0;
+  font-size: 13px;
+  color: var(--color-blue);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-main);
+}
+
+.sessionNotesTextarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  resize: vertical;
+  outline: none;
+  font-family: var(--font-main);
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  margin-top: 12px;
+}
+
+.sessionNotesTextarea:focus {
+  border-color: var(--color-blue);
+}
+
+.backBtn {
+  padding: 11px 16px;
+  font-size: 14px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  flex-shrink: 0;
+  font-family: var(--font-main);
+}
+
+.saveSessionBtn {
+  flex: 1;
+  padding: 11px;
+  font-size: 14px;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: var(--color-blue-btn);
+  color: #fff;
+  font-weight: 600;
+  font-family: var(--font-main);
+}

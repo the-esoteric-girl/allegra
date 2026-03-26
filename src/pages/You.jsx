@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { useApp } from '../context/useApp';
+import styles from './You.module.css';
 
 function formatDate(isoString) {
   const [year, month, day] = isoString.split('-').map(Number);
@@ -46,54 +47,31 @@ export default function You() {
   }
 
   return (
-    <div style={{ padding: '0 16px 80px' }}>
-      <h1 style={{ textAlign: 'left' }}>You</h1>
+    <div className={styles.page}>
+      <h1 className={styles.heading}>You</h1>
 
       {/* Stats */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '40px' }}>
+      <div className={styles.statsRow}>
         {[
           { label: 'Achieved', count: achievedCount },
           { label: 'Working on', count: workingOnCount },
           { label: 'Want to try', count: wantToTryCount },
         ].map(({ label, count }) => (
-          <div
-            key={label}
-            style={{
-              flex: 1,
-              border: '1px solid var(--border)',
-              borderRadius: '10px',
-              padding: '14px 8px',
-              textAlign: 'center',
-              background: 'var(--bg)',
-            }}
-          >
-            <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--text-h)', lineHeight: 1.1 }}>
-              {count}
-            </div>
-            <div style={{ fontSize: '12px', color: 'var(--text)', marginTop: '4px' }}>
-              {label}
-            </div>
+          <div key={label} className={styles.statCard}>
+            <div className={styles.statCount}>{count}</div>
+            <div className={styles.statLabel}>{label}</div>
           </div>
         ))}
       </div>
 
       {/* Sessions */}
       <section>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-          <h2 style={{ margin: 0 }}>Sessions</h2>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Sessions</h2>
           <select
             value={sortOrder}
             onChange={e => setSortOrder(e.target.value)}
-            style={{
-              fontSize: '13px',
-              fontFamily: 'var(--sans)',
-              color: 'var(--text)',
-              background: 'var(--bg)',
-              border: '1px solid var(--border)',
-              borderRadius: '6px',
-              padding: '4px 8px',
-              cursor: 'pointer',
-            }}
+            className={styles.sortSelect}
           >
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
@@ -101,15 +79,14 @@ export default function You() {
         </div>
 
         {sortedSessions.length === 0 ? (
-          <p style={{ color: 'var(--text)', fontSize: '14px' }}>No sessions logged yet.</p>
+          <p className={styles.emptyText}>No sessions logged yet.</p>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div className={styles.sessionList}>
             {sortedSessions.map(session => {
               const isExpanded = expandedSessionId === session.id;
               const entries = session.entries || [];
               const moveCount = entries.length;
 
-              // Move names for collapsed preview
               const visibleEntries = entries.slice(0, 3);
               const extraCount = moveCount - 3;
               const moveNamesPreview = visibleEntries
@@ -117,86 +94,44 @@ export default function You() {
                 .join(' · ') + (extraCount > 0 ? ` +${extraCount} more` : '');
 
               return (
-                <div
-                  key={session.id}
-                  style={{
-                    border: '1px solid var(--border)',
-                    borderRadius: '10px',
-                    padding: '14px',
-                    background: 'var(--bg)',
-                    textAlign: 'left',
-                  }}
-                >
-                  {/* Card header — always shown, tappable */}
-                  <div
-                    onClick={() => toggleSession(session.id)}
-                    style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}
-                  >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
-                        <span style={{ fontWeight: 600, color: 'var(--text-h)', fontSize: '15px' }}>
-                          {formatDate(session.date)}
-                        </span>
-                        <span style={{ fontSize: '13px', color: 'var(--text)', flexShrink: 0, marginLeft: '8px' }}>
+                <div key={session.id} className={styles.sessionCard}>
+                  <div className={styles.sessionCardHeader} onClick={() => toggleSession(session.id)}>
+                    <div className={styles.sessionCardLeft}>
+                      <div className={styles.sessionDateRow}>
+                        <span className={styles.sessionDate}>{formatDate(session.date)}</span>
+                        <span className={styles.sessionMoveCount}>
                           {moveCount} {moveCount === 1 ? 'move' : 'moves'}
                         </span>
                       </div>
 
-                      {/* Collapsed: move names */}
                       {!isExpanded && moveCount > 0 && (
-                        <p style={{
-                          fontSize: '13px',
-                          color: 'var(--text)',
-                          margin: '0 0 4px',
-                          overflow: 'hidden',
-                          whiteSpace: 'nowrap',
-                          textOverflow: 'ellipsis',
-                        }}>
-                          {moveNamesPreview}
-                        </p>
+                        <p className={styles.sessionPreviewMoves}>{moveNamesPreview}</p>
                       )}
 
-                      {/* Collapsed: notes preview or FileText icon */}
                       {!isExpanded && (
                         session.notes ? (
-                          <p style={{
-                            fontSize: '13px',
-                            color: 'var(--text)',
-                            margin: 0,
-                            overflow: 'hidden',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 1,
-                            WebkitBoxOrient: 'vertical',
-                          }}>
-                            {session.notes}
-                          </p>
+                          <p className={styles.sessionPreviewNotes}>{session.notes}</p>
                         ) : (
-                          <FileText size={14} color="var(--text)" style={{ opacity: 0.4, marginTop: '2px' }} />
+                          <FileText size={14} color="var(--color-text-muted)" style={{ opacity: 0.4, marginTop: '2px' }} />
                         )
                       )}
                     </div>
 
-                    <div style={{ flexShrink: 0, color: 'var(--text)', paddingTop: '2px' }}>
-                      {isExpanded
-                        ? <ChevronUp size={16} />
-                        : <ChevronDown size={16} />
-                      }
+                    <div className={styles.sessionChevron}>
+                      {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </div>
                   </div>
 
-                  {/* Expanded detail */}
                   {isExpanded && (
-                    <div style={{ marginTop: '12px' }}>
+                    <div className={styles.sessionExpanded}>
                       {session.notes && (
-                        <p style={{ fontSize: '14px', color: 'var(--text)', margin: '0 0 12px' }}>
-                          {session.notes}
-                        </p>
+                        <p className={styles.sessionNotes}>{session.notes}</p>
                       )}
 
                       {entries.length === 0 ? (
-                        <p style={{ fontSize: '13px', color: 'var(--text)' }}>No moves logged.</p>
+                        <p className={styles.noMoves}>No moves logged.</p>
                       ) : (
-                        <ul style={{ listStyle: 'none', margin: '0 0 16px', padding: 0 }}>
+                        <ul className={styles.entryList}>
                           {entries.map(entry => {
                             const move = getMoveById(entry.move_id);
                             const statusChanged =
@@ -204,45 +139,31 @@ export default function You() {
                               entry.new_status &&
                               entry.previous_status !== entry.new_status;
                             return (
-                              <li
-                                key={entry.move_id}
-                                style={{
-                                  padding: '10px 0',
-                                  borderTop: '1px solid var(--border)',
-                                  fontSize: '14px',
-                                }}
-                              >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: entry.notes_added && move?.notes ? '6px' : 0 }}>
+                              <li key={entry.move_id} className={styles.entryItem}>
+                                <div
+                                  className={styles.entryRow}
+                                  style={{ marginBottom: entry.notes_added && move?.notes ? '6px' : 0 }}
+                                >
                                   <span
-                                    style={{ color: 'var(--accent)', fontWeight: 500, cursor: 'pointer' }}
+                                    className={styles.entryMoveName}
                                     onClick={() => navigate(`/move/${entry.move_id}`)}
                                   >
                                     {move?.name ?? 'Unknown move'}
                                   </span>
 
                                   {statusChanged && (
-                                    <span style={{ color: 'var(--text)', fontSize: '13px' }}>
+                                    <span className={styles.entryStatusChange}>
                                       {capitalize(entry.previous_status)} → {capitalize(entry.new_status)}
                                     </span>
                                   )}
 
                                   {entry.notes_added && (
-                                    <span style={{
-                                      fontSize: '12px',
-                                      color: 'var(--accent)',
-                                      background: 'var(--accent-bg)',
-                                      padding: '2px 6px',
-                                      borderRadius: '4px',
-                                    }}>
-                                      note added
-                                    </span>
+                                    <span className={styles.entryNoteAdded}>note added</span>
                                   )}
                                 </div>
 
                                 {entry.notes_added && move?.notes && (
-                                  <p style={{ fontSize: '13px', color: 'var(--text)', margin: 0, paddingLeft: '2px' }}>
-                                    {move.notes}
-                                  </p>
+                                  <p className={styles.entryNoteText}>{move.notes}</p>
                                 )}
                               </li>
                             );
@@ -250,38 +171,19 @@ export default function You() {
                         </ul>
                       )}
 
-                      {/* Delete controls */}
-                      <div style={{ borderTop: '1px solid var(--border)', paddingTop: '12px' }}>
+                      <div className={styles.deleteZone}>
                         {deletingSessionId === session.id ? (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <span style={{ fontSize: '13px', color: 'var(--text)' }}>Delete this session?</span>
+                          <div className={styles.deleteConfirmRow}>
+                            <span className={styles.deleteConfirmText}>Delete this session?</span>
                             <button
                               onClick={() => handleDeleteSession(session.id)}
-                              style={{
-                                fontSize: '13px',
-                                fontFamily: 'var(--sans)',
-                                padding: '5px 12px',
-                                borderRadius: '6px',
-                                border: 'none',
-                                background: '#c0392b',
-                                color: '#fff',
-                                cursor: 'pointer',
-                              }}
+                              className={styles.deleteConfirmButton}
                             >
                               Confirm
                             </button>
                             <button
                               onClick={() => setDeletingSessionId(null)}
-                              style={{
-                                fontSize: '13px',
-                                fontFamily: 'var(--sans)',
-                                padding: '5px 12px',
-                                borderRadius: '6px',
-                                border: '1px solid var(--border)',
-                                background: 'transparent',
-                                color: 'var(--text)',
-                                cursor: 'pointer',
-                              }}
+                              className={styles.deleteCancelButton}
                             >
                               Cancel
                             </button>
@@ -289,19 +191,7 @@ export default function You() {
                         ) : (
                           <button
                             onClick={() => setDeletingSessionId(session.id)}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              fontSize: '13px',
-                              fontFamily: 'var(--sans)',
-                              padding: '5px 12px',
-                              borderRadius: '6px',
-                              border: '1px solid var(--border)',
-                              background: 'transparent',
-                              color: 'var(--text)',
-                              cursor: 'pointer',
-                            }}
+                            className={styles.deleteButton}
                           >
                             <Trash2 size={14} />
                             Delete session

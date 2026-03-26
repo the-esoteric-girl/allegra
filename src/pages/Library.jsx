@@ -6,9 +6,9 @@ import styles from './Library.module.css';
 const STATUS_FILTERS = ['All', 'Achieved', 'Working On', 'Want To Try'];
 
 const STATUS_DOT_COLORS = {
-  'achieved': 'var(--color-achieved)',
-  'working on': 'var(--color-working)',
-  'want to try': 'var(--color-want)',
+  'achieved': 'var(--color-green)',
+  'working on': 'var(--color-blue)',
+  'want to try': 'var(--color-pink)',
 };
 
 export default function Library() {

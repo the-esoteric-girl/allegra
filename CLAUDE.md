@@ -119,6 +119,35 @@ achieved — can do this move
 - Encouraging — language should feel positive
   (working on not attempted)
 
+## Design system
+Font: Plus Jakarta Sans (Google Fonts)
+Import: @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap')
+
+Colours:
+--color-bg: #F4F5FA (page background)
+--color-surface: #FFFFFF (card background)
+--color-surface-blue: #E8EEFF (airy blue surface, search bars, selected states)
+--color-blue: #6B7AE8 (primary accent — active nav, status dots, decorative)
+--color-blue-btn: #4D5EC7 (buttons with white text — AA contrast ~4.8:1)
+--color-pink: #EE90CC (secondary accent — want to try, subtle highlights)
+--color-green: #5DC48A (achieved status only)
+--color-text-primary: #1A1B2E
+--color-text-secondary: #6E708E (AA compliant ~4.6:1 on light bg)
+--color-text-muted: #B8BAD0
+
+Dark mode: handled via @media (prefers-color-scheme: dark) in index.css
+Dark mode text-secondary: #8B8DAA (AA compliant on dark bg)
+
+Status colours:
+achieved → --color-green
+working on → --color-blue
+want to try → --color-pink
+
+Buttons with white text → use --color-blue-btn (not --color-blue)
+Decorative/surface uses (dots, pills, active state rings) → use --color-blue
+
+Cards: white surface, var(--shadow-card), no border, border-radius var(--radius-lg)
+
 ## What is NOT in v1
 
 - User accounts / auth
