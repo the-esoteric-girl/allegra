@@ -140,10 +140,7 @@ export default function You() {
                               entry.previous_status !== entry.new_status;
                             return (
                               <li key={entry.move_id} className={styles.entryItem}>
-                                <div
-                                  className={styles.entryRow}
-                                  style={{ marginBottom: entry.notes_added && move?.notes ? '6px' : 0 }}
-                                >
+                                <div className={styles.entryRow}>
                                   <span
                                     className={styles.entryMoveName}
                                     onClick={() => navigate(`/move/${entry.move_id}`)}
@@ -162,9 +159,6 @@ export default function You() {
                                   )}
                                 </div>
 
-                                {entry.notes_added && move?.notes && (
-                                  <p className={styles.entryNoteText}>{move.notes}</p>
-                                )}
                               </li>
                             );
                           })}

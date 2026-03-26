@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/useApp';
 import styles from './Library.module.css';
@@ -12,10 +11,8 @@ const STATUS_DOT_COLORS = {
 };
 
 export default function Library() {
-  const { moves } = useApp();
+  const { moves, librarySearch: search, setLibrarySearch: setSearch, libraryFilter: statusFilter, setLibraryFilter: setStatusFilter } = useApp();
   const navigate = useNavigate();
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('All');
 
   const filtered = moves.filter((move) => {
     const query = search.toLowerCase();

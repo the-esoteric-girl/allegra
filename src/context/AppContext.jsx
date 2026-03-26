@@ -7,6 +7,8 @@ export function AppProvider({ children }) {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [librarySearch, setLibrarySearch] = useState('');
+  const [libraryFilter, setLibraryFilter] = useState('All');
 
   async function fetchMoves() {
     const { data, error } = await supabase
@@ -56,10 +58,10 @@ export function AppProvider({ children }) {
     load();
   }, []);
 
-  async function addMove({ name, aliases = [], status = 'want to try', notes = '', parent_move_id = null }) {
+  async function addMove({ name, aliases = [], status = 'want to try', parent_move_id = null }) {
     const { error } = await supabase
       .from('moves')
-      .insert({ name, aliases, status, notes, parent_move_id });
+      .insert({ name, aliases, status, parent_move_id });
     if (error) {
       console.error(error);
       setError(error);
@@ -201,6 +203,7 @@ export function AppProvider({ children }) {
       sessions, loadSessions,
       createSession, addSessionEntry, deleteSessionEntry, deleteSession,
       fetchMoveNotes, addMoveNote, deleteMoveNote,
+      librarySearch, setLibrarySearch, libraryFilter, setLibraryFilter,
     }}>
       {children}
     </AppContext.Provider>

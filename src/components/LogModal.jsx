@@ -360,26 +360,6 @@ export default function LogModal({ isOpen, onClose }) {
                             placeholder="Add a note..."
                             autoFocus
                           />
-                          <div>
-                            <button
-                              className={styles.prevNotesToggle}
-                              onClick={() => handleTogglePreviousNotes(entry.moveId)}
-                            >
-                              Previous notes{' '}
-                              {entry.expandedPreviousNotes
-                                ? <ChevronUp size={14} />
-                                : <ChevronDown size={14} />
-                              }
-                            </button>
-                            {entry.expandedPreviousNotes && (
-                              <div className={styles.prevNotesContent}>
-                                {move?.notes
-                                  ? move.notes
-                                  : <span style={{ color: 'var(--color-text-muted)' }}>No previous notes</span>
-                                }
-                              </div>
-                            )}
-                          </div>
                           <div className={styles.noteActions}>
                             <button className={styles.saveNoteBtn} onClick={() => handleSaveNote(entry)}>
                               Save note
