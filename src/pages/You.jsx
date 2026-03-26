@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FileText, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { useApp } from '../context/useApp';
 
 function formatDate(isoString) {
@@ -18,7 +19,7 @@ export default function You() {
   const navigate = useNavigate();
   const [sortOrder, setSortOrder] = useState('newest');
   const [expandedSessionId, setExpandedSessionId] = useState(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [deletingSessionId, setDeletingSessionId] = useState(null);
 
   const achievedCount = moves.filter(m => m.status === 'achieved').length;
   const workingOnCount = moves.filter(m => m.status === 'working on').length;
@@ -35,13 +36,13 @@ export default function You() {
 
   function toggleSession(id) {
     setExpandedSessionId(prev => (prev === id ? null : id));
-    setConfirmDeleteId(null);
+    setDeletingSessionId(null);
   }
 
   async function handleDeleteSession(id) {
     await deleteSession(id);
     setExpandedSessionId(null);
-    setConfirmDeleteId(null);
+    setDeletingSessionId(null);
   }
 
   return (
@@ -61,7 +62,7 @@ export default function You() {
               flex: 1,
               border: '1px solid var(--border)',
               borderRadius: '10px',
-              padding: '14px 10px',
+              padding: '14px 8px',
               textAlign: 'center',
               background: 'var(--bg)',
             }}
@@ -105,7 +106,15 @@ export default function You() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {sortedSessions.map(session => {
               const isExpanded = expandedSessionId === session.id;
-              const moveCount = session.entries?.length ?? 0;
+              const entries = session.entries || [];
+              const moveCount = entries.length;
+
+              // Move names for collapsed preview
+              const visibleEntries = entries.slice(0, 3);
+              const extraCount = moveCount - 3;
+              const moveNamesPreview = visibleEntries
+                .map(e => getMoveById(e.move_id)?.name ?? 'Unknown move')
+                .join(' · ') + (extraCount > 0 ? ` +${extraCount} more` : '');
 
               return (
                 <div
@@ -118,48 +127,77 @@ export default function You() {
                     textAlign: 'left',
                   }}
                 >
-                  {/* Header row — always shown */}
+                  {/* Card header — always shown, tappable */}
                   <div
                     onClick={() => toggleSession(session.id)}
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
-                      <span style={{ fontWeight: 500, color: 'var(--text-h)', fontSize: '15px' }}>
-                        {formatDate(session.date)}
-                      </span>
-                      <span style={{ fontSize: '13px', color: 'var(--text)' }}>
-                        {moveCount} {moveCount === 1 ? 'move' : 'moves'}
-                      </span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
+                        <span style={{ fontWeight: 600, color: 'var(--text-h)', fontSize: '15px' }}>
+                          {formatDate(session.date)}
+                        </span>
+                        <span style={{ fontSize: '13px', color: 'var(--text)', flexShrink: 0, marginLeft: '8px' }}>
+                          {moveCount} {moveCount === 1 ? 'move' : 'moves'}
+                        </span>
+                      </div>
+
+                      {/* Collapsed: move names */}
+                      {!isExpanded && moveCount > 0 && (
+                        <p style={{
+                          fontSize: '13px',
+                          color: 'var(--text)',
+                          margin: '0 0 4px',
+                          overflow: 'hidden',
+                          whiteSpace: 'nowrap',
+                          textOverflow: 'ellipsis',
+                        }}>
+                          {moveNamesPreview}
+                        </p>
+                      )}
+
+                      {/* Collapsed: notes preview or FileText icon */}
+                      {!isExpanded && (
+                        session.notes ? (
+                          <p style={{
+                            fontSize: '13px',
+                            color: 'var(--text)',
+                            margin: 0,
+                            overflow: 'hidden',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 1,
+                            WebkitBoxOrient: 'vertical',
+                          }}>
+                            {session.notes}
+                          </p>
+                        ) : (
+                          <FileText size={14} color="var(--text)" style={{ opacity: 0.4, marginTop: '2px' }} />
+                        )
+                      )}
                     </div>
 
-                    {!isExpanded && session.notes && (
-                      <p style={{
-                        fontSize: '13px',
-                        color: 'var(--text)',
-                        margin: 0,
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        textOverflow: 'ellipsis',
-                      }}>
-                        {session.notes}
-                      </p>
-                    )}
+                    <div style={{ flexShrink: 0, color: 'var(--text)', paddingTop: '2px' }}>
+                      {isExpanded
+                        ? <ChevronUp size={16} />
+                        : <ChevronDown size={16} />
+                      }
+                    </div>
                   </div>
 
                   {/* Expanded detail */}
                   {isExpanded && (
-                    <div style={{ marginTop: '8px' }}>
+                    <div style={{ marginTop: '12px' }}>
                       {session.notes && (
-                        <p style={{ fontSize: '14px', color: 'var(--text)', marginBottom: '12px', marginTop: 0 }}>
+                        <p style={{ fontSize: '14px', color: 'var(--text)', margin: '0 0 12px' }}>
                           {session.notes}
                         </p>
                       )}
 
-                      {(session.entries || []).length === 0 ? (
+                      {entries.length === 0 ? (
                         <p style={{ fontSize: '13px', color: 'var(--text)' }}>No moves logged.</p>
                       ) : (
-                        <ul style={{ listStyle: 'none', margin: '0 0 12px', padding: 0 }}>
-                          {(session.entries || []).map(entry => {
+                        <ul style={{ listStyle: 'none', margin: '0 0 16px', padding: 0 }}>
+                          {entries.map(entry => {
                             const move = getMoveById(entry.move_id);
                             const statusChanged =
                               entry.previous_status &&
@@ -169,38 +207,42 @@ export default function You() {
                               <li
                                 key={entry.move_id}
                                 style={{
-                                  padding: '8px 0',
+                                  padding: '10px 0',
                                   borderTop: '1px solid var(--border)',
                                   fontSize: '14px',
-                                  display: 'flex',
-                                  flexWrap: 'wrap',
-                                  alignItems: 'center',
-                                  gap: '6px',
                                 }}
                               >
-                                <span
-                                  style={{ color: 'var(--accent)', fontWeight: 500, cursor: 'pointer' }}
-                                  onClick={() => navigate(`/move/${entry.move_id}`)}
-                                >
-                                  {move?.name ?? 'Unknown move'}
-                                </span>
-
-                                {statusChanged && (
-                                  <span style={{ color: 'var(--text)', fontSize: '13px' }}>
-                                    {capitalize(entry.previous_status)} → {capitalize(entry.new_status)}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: entry.notes_added && move?.notes ? '6px' : 0 }}>
+                                  <span
+                                    style={{ color: 'var(--accent)', fontWeight: 500, cursor: 'pointer' }}
+                                    onClick={() => navigate(`/move/${entry.move_id}`)}
+                                  >
+                                    {move?.name ?? 'Unknown move'}
                                   </span>
-                                )}
 
-                                {entry.notes_added && (
-                                  <span style={{
-                                    fontSize: '12px',
-                                    color: 'var(--accent)',
-                                    background: 'var(--accent-bg)',
-                                    padding: '2px 6px',
-                                    borderRadius: '4px',
-                                  }}>
-                                    note added
-                                  </span>
+                                  {statusChanged && (
+                                    <span style={{ color: 'var(--text)', fontSize: '13px' }}>
+                                      {capitalize(entry.previous_status)} → {capitalize(entry.new_status)}
+                                    </span>
+                                  )}
+
+                                  {entry.notes_added && (
+                                    <span style={{
+                                      fontSize: '12px',
+                                      color: 'var(--accent)',
+                                      background: 'var(--accent-bg)',
+                                      padding: '2px 6px',
+                                      borderRadius: '4px',
+                                    }}>
+                                      note added
+                                    </span>
+                                  )}
+                                </div>
+
+                                {entry.notes_added && move?.notes && (
+                                  <p style={{ fontSize: '13px', color: 'var(--text)', margin: 0, paddingLeft: '2px' }}>
+                                    {move.notes}
+                                  </p>
                                 )}
                               </li>
                             );
@@ -209,30 +251,51 @@ export default function You() {
                       )}
 
                       {/* Delete controls */}
-                      {confirmDeleteId === session.id ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: 'var(--text)', borderTop: '1px solid var(--border)', paddingTop: '12px' }}>
-                          <span>Delete this session?</span>
+                      <div style={{ borderTop: '1px solid var(--border)', paddingTop: '12px' }}>
+                        {deletingSessionId === session.id ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <span style={{ fontSize: '13px', color: 'var(--text)' }}>Delete this session?</span>
+                            <button
+                              onClick={() => handleDeleteSession(session.id)}
+                              style={{
+                                fontSize: '13px',
+                                fontFamily: 'var(--sans)',
+                                padding: '5px 12px',
+                                borderRadius: '6px',
+                                border: 'none',
+                                background: '#c0392b',
+                                color: '#fff',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Confirm
+                            </button>
+                            <button
+                              onClick={() => setDeletingSessionId(null)}
+                              style={{
+                                fontSize: '13px',
+                                fontFamily: 'var(--sans)',
+                                padding: '5px 12px',
+                                borderRadius: '6px',
+                                border: '1px solid var(--border)',
+                                background: 'transparent',
+                                color: 'var(--text)',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
                           <button
-                            onClick={() => handleDeleteSession(session.id)}
+                            onClick={() => setDeletingSessionId(session.id)}
                             style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
                               fontSize: '13px',
                               fontFamily: 'var(--sans)',
-                              padding: '4px 12px',
-                              borderRadius: '6px',
-                              border: 'none',
-                              background: '#c0392b',
-                              color: '#fff',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            Delete
-                          </button>
-                          <button
-                            onClick={() => setConfirmDeleteId(null)}
-                            style={{
-                              fontSize: '13px',
-                              fontFamily: 'var(--sans)',
-                              padding: '4px 12px',
+                              padding: '5px 12px',
                               borderRadius: '6px',
                               border: '1px solid var(--border)',
                               background: 'transparent',
@@ -240,28 +303,11 @@ export default function You() {
                               cursor: 'pointer',
                             }}
                           >
-                            Cancel
-                          </button>
-                        </div>
-                      ) : (
-                        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '12px' }}>
-                          <button
-                            onClick={() => setConfirmDeleteId(session.id)}
-                            style={{
-                              fontSize: '13px',
-                              fontFamily: 'var(--sans)',
-                              padding: '4px 12px',
-                              borderRadius: '6px',
-                              border: '1px solid var(--border)',
-                              background: 'transparent',
-                              color: 'var(--text)',
-                              cursor: 'pointer',
-                            }}
-                          >
+                            <Trash2 size={14} />
                             Delete session
                           </button>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/useApp';
+import styles from './MoveDetail.module.css';
+
+const STATUS_DOT_COLORS = {
+  'achieved': 'var(--color-achieved)',
+  'working on': 'var(--color-working)',
+  'want to try': 'var(--color-want)',
+};
 
 export default function MoveDetail() {
   const { id } = useParams();
@@ -80,67 +87,106 @@ export default function MoveDetail() {
   }
 
   return (
-    <div>
-      <button onClick={() => navigate('/')}>Back</button>
-      <h1>{move.name}</h1>
-      <p>
-        <strong>Alternate names:</strong>{' '}
-        {move.aliases && move.aliases.length > 0
-          ? move.aliases.join(', ')
-          : 'No alternate names'}
-      </p>
+    <div className={styles.page}>
+      <button className={styles.backButton} onClick={() => navigate('/')}>
+        ← Back
+      </button>
+
+      <div className={styles.moveName}>{move.name}</div>
+
+      {move.aliases && move.aliases.length > 0 && (
+        <div className={styles.aliases}>
+          aka {move.aliases.join(', ')}
+        </div>
+      )}
+
+      {!editing && (
+        <div className={styles.statusRow}>
+          <div
+            className={styles.statusDot}
+            style={{ backgroundColor: STATUS_DOT_COLORS[move.status] || 'var(--color-text-muted)' }}
+          />
+          <span className={styles.statusText}>{move.status}</span>
+        </div>
+      )}
+
       {editing ? (
         <>
-          <div>
-            <strong>Status:</strong>
-            <select value={editStatus} onChange={(e) => setEditStatus(e.target.value)}>
+          <div className={styles.card}>
+            <div className={styles.sectionLabel}>Status</div>
+            <select
+              className={styles.select}
+              value={editStatus}
+              onChange={(e) => setEditStatus(e.target.value)}
+            >
               <option value="want to try">want to try</option>
               <option value="working on">working on</option>
               <option value="achieved">achieved</option>
             </select>
           </div>
-          <div>
-            <strong>Alternate names:</strong>
-            <div>
-              {editAliases.map((alias, i) => (
-                <span key={i}>
-                  {alias}{' '}
-                  <button onClick={() => handleRemoveAlias(i)}>x</button>{' '}
-                </span>
-              ))}
+
+          <div className={styles.card}>
+            <div className={styles.sectionLabel}>Alternate names</div>
+            {editAliases.length > 0 && (
+              <div className={styles.aliasTags}>
+                {editAliases.map((alias, i) => (
+                  <span key={i} className={styles.aliasTag}>
+                    {alias}
+                    <button className={styles.aliasRemove} onClick={() => handleRemoveAlias(i)}>×</button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <div className={styles.addAliasRow}>
+              <input
+                className={styles.addAliasInput}
+                value={newAlias}
+                onChange={(e) => { setNewAlias(e.target.value); setAliasError(''); }}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddAlias()}
+                placeholder="Add alias"
+              />
+              <button className={styles.addAliasButton} onClick={handleAddAlias}>Add</button>
             </div>
-            <input
-              value={newAlias}
-              onChange={(e) => { setNewAlias(e.target.value); setAliasError(''); }}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddAlias()}
-              placeholder="Add alias"
-            />
-            <button onClick={handleAddAlias}>Add</button>
-            {aliasError && <p style={{color: 'red'}}>{aliasError}</p>}
+            {aliasError && <p className={styles.aliasError}>{aliasError}</p>}
             {aliasConflict && (
               <div>
-                <p style={{color: 'orange'}}>{aliasConflict.message}</p>
-                <button onClick={() => addAlias(aliasConflict.titled)}>Add Anyway</button>
-                <button onClick={() => { setAliasConflict(null); setNewAlias(''); }}>Cancel</button>
+                <p className={styles.aliasWarning}>{aliasConflict.message}</p>
+                <div className={styles.conflictButtons}>
+                  <button className={styles.saveButton} onClick={() => addAlias(aliasConflict.titled)}>Add Anyway</button>
+                  <button className={styles.cancelButton} onClick={() => { setAliasConflict(null); setNewAlias(''); }}>Cancel</button>
+                </div>
               </div>
             )}
           </div>
-          <div>
-            <strong>Notes:</strong>
-            <textarea value={editNotes} onChange={(e) => setEditNotes(e.target.value)} rows={6} style={{width: '100%'}} />
+
+          <div className={styles.card}>
+            <div className={styles.sectionLabel}>Notes</div>
+            <textarea
+              className={styles.textarea}
+              value={editNotes}
+              onChange={(e) => setEditNotes(e.target.value)}
+              rows={6}
+            />
           </div>
-          <button onClick={handleSave}>Save</button>
-          <button onClick={handleCancel}>Cancel</button>
+
+          <div className={styles.buttonRow}>
+            <button className={styles.saveButton} onClick={handleSave}>Save</button>
+            <button className={styles.cancelButton} onClick={handleCancel}>Cancel</button>
+          </div>
         </>
       ) : (
         <>
-          <p>
-            <strong>Status:</strong> {move.status}
-          </p>
-          <p>
-            <strong>Notes:</strong> {move.notes || 'No notes yet'}
-          </p>
-          <button onClick={handleEditClick}>Edit</button>
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
+              <span className={styles.sectionLabel}>Notes</span>
+              <button className={styles.editButton} onClick={handleEditClick}>Edit</button>
+            </div>
+            {move.notes ? (
+              <div className={styles.notesText}>{move.notes}</div>
+            ) : (
+              <div className={styles.emptyNotes}>No notes yet</div>
+            )}
+          </div>
         </>
       )}
     </div>

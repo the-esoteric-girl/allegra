@@ -1,8 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/useApp';
+import styles from './Library.module.css';
 
 const STATUS_FILTERS = ['All', 'Achieved', 'Working On', 'Want To Try'];
+
+const STATUS_DOT_COLORS = {
+  'achieved': 'var(--color-achieved)',
+  'working on': 'var(--color-working)',
+  'want to try': 'var(--color-want)',
+};
 
 export default function Library() {
   const { moves } = useApp();
@@ -22,35 +29,68 @@ export default function Library() {
   });
 
   return (
-    <div>
-      <input
-        type="text"
-        placeholder="Search moves..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <div className={styles.appName}>Allegra</div>
+        <div className={styles.subtitle}>Move Tracker</div>
+      </div>
 
-      <div>
+      <div className={styles.searchWrapper}>
+        <input
+          className={styles.searchInput}
+          type="text"
+          placeholder="Search moves..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        {search && (
+          <button className={styles.clearSearch} onClick={() => setSearch('')}>
+            ×
+          </button>
+        )}
+      </div>
+
+      <div className={styles.filterRow}>
         {STATUS_FILTERS.map((s) => (
           <button
             key={s}
+            className={`${styles.pill}${statusFilter === s ? ` ${styles.pillActive}` : ''}`}
             onClick={() => setStatusFilter(s)}
-            disabled={statusFilter === s}
           >
             {s}
           </button>
         ))}
       </div>
 
-      <p>{filtered.length} move{filtered.length !== 1 ? 's' : ''} showing</p>
+      <div className={styles.moveCount}>
+        {filtered.length} move{filtered.length !== 1 ? 's' : ''}
+      </div>
 
-      <ul>
-        {filtered.map((move) => (
-          <li key={move.id} onClick={() => navigate(`/move/${move.id}`)} style={{ cursor: 'pointer' }}>
-            <strong>{move.name}</strong> — {move.status}
-          </li>
-        ))}
-      </ul>
+      {filtered.length === 0 ? (
+        <div className={styles.emptyState}>No moves found</div>
+      ) : (
+        filtered.map((move) => (
+          <div
+            key={move.id}
+            className={styles.moveCard}
+            onClick={() => navigate(`/move/${move.id}`)}
+          >
+            <div className={styles.moveName}>{move.name}</div>
+            {move.aliases && move.aliases.length > 0 && (
+              <div className={styles.moveAliases}>
+                {move.aliases.join(', ')}
+              </div>
+            )}
+            <div className={styles.statusRow}>
+              <div
+                className={styles.statusDot}
+                style={{ backgroundColor: STATUS_DOT_COLORS[move.status] || 'var(--color-text-muted)' }}
+              />
+              <span className={styles.statusText}>{move.status}</span>
+            </div>
+          </div>
+        ))
+      )}
     </div>
   );
 }
