@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/useApp';
 import styles from './MoveDetail.module.css';
@@ -9,17 +9,37 @@ const STATUS_DOT_COLORS = {
   'want to try': 'var(--color-want)',
 };
 
+function formatNoteDate(createdAt) {
+  const date = new Date(createdAt);
+  const currentYear = new Date().getFullYear();
+  const month = date.toLocaleString('en-US', { month: 'short' });
+  const day = date.getDate();
+  const year = date.getFullYear();
+  if (year === currentYear) {
+    return `${month} ${day}`;
+  }
+  return `${month} ${day}, ${year}`;
+}
+
 export default function MoveDetail() {
   const { id } = useParams();
-  const { moves, loading, updateMove } = useApp();
+  const { moves, loading, updateMove, fetchMoveNotes, addMoveNote, deleteMoveNote } = useApp();
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
-  const [editNotes, setEditNotes] = useState('');
   const [editStatus, setEditStatus] = useState('');
   const [editAliases, setEditAliases] = useState([]);
   const [newAlias, setNewAlias] = useState('');
   const [aliasError, setAliasError] = useState('');
   const [aliasConflict, setAliasConflict] = useState(null);
+  const [moveNotes, setMoveNotes] = useState([]);
+  const [showAddNote, setShowAddNote] = useState(false);
+  const [newNoteText, setNewNoteText] = useState('');
+
+  useEffect(() => {
+    if (id) {
+      fetchMoveNotes(id).then(setMoveNotes);
+    }
+  }, [id]);
 
   function toTitleCase(str) {
     return str.replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
@@ -32,7 +52,6 @@ export default function MoveDetail() {
   if (!move) return <p>Move not found</p>;
 
   function handleEditClick() {
-    setEditNotes(move.notes || '');
     setEditStatus(move.status);
     setEditAliases(move.aliases ? [...move.aliases] : []);
     setNewAlias('');
@@ -78,12 +97,28 @@ export default function MoveDetail() {
   }
 
   async function handleSave() {
-    await updateMove(move.id, { notes: editNotes, status: editStatus, aliases: editAliases });
+    await updateMove(move.id, { status: editStatus, aliases: editAliases });
     setEditing(false);
   }
 
   function handleCancel() {
     setEditing(false);
+  }
+
+  async function handleDeleteNote(noteId) {
+    await deleteMoveNote(noteId);
+    const updated = await fetchMoveNotes(id);
+    setMoveNotes(updated);
+  }
+
+  async function handleSaveNote() {
+    const trimmed = newNoteText.trim();
+    if (!trimmed) return;
+    await addMoveNote(move.id, trimmed, null);
+    const updated = await fetchMoveNotes(id);
+    setMoveNotes(updated);
+    setNewNoteText('');
+    setShowAddNote(false);
   }
 
   return (
@@ -159,16 +194,6 @@ export default function MoveDetail() {
             )}
           </div>
 
-          <div className={styles.card}>
-            <div className={styles.sectionLabel}>Notes</div>
-            <textarea
-              className={styles.textarea}
-              value={editNotes}
-              onChange={(e) => setEditNotes(e.target.value)}
-              rows={6}
-            />
-          </div>
-
           <div className={styles.buttonRow}>
             <button className={styles.saveButton} onClick={handleSave}>Save</button>
             <button className={styles.cancelButton} onClick={handleCancel}>Cancel</button>
@@ -181,12 +206,43 @@ export default function MoveDetail() {
               <span className={styles.sectionLabel}>Notes</span>
               <button className={styles.editButton} onClick={handleEditClick}>Edit</button>
             </div>
-            {move.notes ? (
-              <div className={styles.notesText}>{move.notes}</div>
-            ) : (
+            {moveNotes.length === 0 ? (
               <div className={styles.emptyNotes}>No notes yet</div>
+            ) : (
+              moveNotes.map((note, index) => (
+                <div key={note.id}>
+                  {index > 0 && <div className={styles.noteDivider} />}
+                  <div className={styles.noteEntry}>
+                    <div className={styles.noteDateHeader}>{formatNoteDate(note.created_at)}</div>
+                    <div className={styles.notesText}>{note.text}</div>
+                    <button className={styles.noteDeleteButton} onClick={() => handleDeleteNote(note.id)}>
+                      Delete note
+                    </button>
+                  </div>
+                </div>
+              ))
             )}
           </div>
+
+          {showAddNote ? (
+            <div className={styles.addNoteForm}>
+              <textarea
+                className={styles.textarea}
+                rows={3}
+                placeholder="Add a note..."
+                value={newNoteText}
+                onChange={(e) => setNewNoteText(e.target.value)}
+              />
+              <div className={styles.addNoteButtons}>
+                <button className={styles.saveButton} onClick={handleSaveNote}>Save</button>
+                <button className={styles.cancelButton} onClick={() => { setShowAddNote(false); setNewNoteText(''); }}>Cancel</button>
+              </div>
+            </div>
+          ) : (
+            <button className={styles.addNoteButton} onClick={() => setShowAddNote(true)}>
+              + Add note
+            </button>
+          )}
         </>
       )}
     </div>

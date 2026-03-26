@@ -227,3 +227,52 @@
   gap: 8px;
   margin-top: 8px;
 }
+
+.noteEntry {
+  padding: 4px 0;
+}
+
+.noteDateHeader {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+.noteDeleteButton {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.noteDivider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 12px 0;
+}
+
+.addNoteButton {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.addNoteForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.addNoteButtons {
+  display: flex;
+  gap: 8px;
+}
