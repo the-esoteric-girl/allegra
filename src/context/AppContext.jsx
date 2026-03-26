@@ -143,12 +143,25 @@ export function AppProvider({ children }) {
     }
   }
 
+  async function deleteSession(id) {
+    const { error } = await supabase
+      .from('sessions')
+      .delete()
+      .eq('id', id);
+    if (error) {
+      console.error(error);
+      setError(error);
+    } else {
+      await loadSessions();
+    }
+  }
+
   return (
     <AppContext.Provider value={{
       moves, loading, error,
       addMove, updateMove, deleteMove,
       sessions, loadSessions,
-      createSession, addSessionEntry, deleteSessionEntry,
+      createSession, addSessionEntry, deleteSessionEntry, deleteSession,
     }}>
       {children}
     </AppContext.Provider>
