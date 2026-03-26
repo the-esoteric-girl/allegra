@@ -69,14 +69,18 @@ export function AppProvider({ children }) {
   }
 
   async function updateMove(id, updates) {
-    const { error } = await supabase
+    console.log('[updateMove] moveId:', id);
+    console.log('[updateMove] updates:', updates);
+    const { data, error } = await supabase
       .from('moves')
       .update(updates)
-      .eq('id', id);
+      .eq('id', id)
+      .select();
     if (error) {
-      console.error(error);
+      console.error('[updateMove] error:', error);
       setError(error);
     } else {
+      console.log('[updateMove] data returned:', data);
       await fetchMoves();
     }
   }
@@ -113,7 +117,7 @@ export function AppProvider({ children }) {
   async function addSessionEntry(sessionId, moveId, previousStatus, newStatus, notesAdded) {
     const { data, error } = await supabase
       .from('session_entries')
-      .insert({ session_id: sessionId, move_id: moveId, previous_status: previousStatus, new_status: newStatus, notes_added: notesAdded })
+      .insert({ session_id: sessionId, move_id: moveId, previous_status: previousStatus, new_status: newStatus, notes_added: Boolean(notesAdded) })
       .select()
       .single();
     if (error) {

@@ -168,6 +168,7 @@ export default function You() {
                         <p style={{ fontSize: '13px', color: 'var(--text)' }}>No moves logged.</p>
                       ) : (
                         <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                          {console.log('[You] session entries:', JSON.stringify(session.entries, null, 2))}
                           {(session.entries || []).map(entry => {
                             const move = getMoveById(entry.move_id);
                             const statusChanged = entry.previous_status && entry.new_status && entry.previous_status !== entry.new_status;

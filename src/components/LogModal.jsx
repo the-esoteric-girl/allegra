@@ -135,6 +135,7 @@ export default function LogModal({ isOpen, onClose }) {
     const existingNotes = move?.notes || '';
     const stamp = formatDatestamp(new Date());
     const notesToSave = `[${stamp}] ${entry.notes.trim()}${existingNotes ? '\n' + existingNotes : ''}`;
+    console.log('[handleSaveNote] calling updateMove with args — id:', entry.moveId, '| updates:', { notes: notesToSave });
     await updateMove(entry.moveId, { notes: notesToSave });
     setSessionEntries(prev => prev.map(e =>
       e.moveId === entry.moveId
@@ -653,7 +654,7 @@ export default function LogModal({ isOpen, onClose }) {
                             )}
                           </div>
                           <div style={s.noteActions}>
-                            <button style={s.saveNoteBtn} onClick={() => handleSaveNote(entry)}>
+                            <button style={s.saveNoteBtn} onClick={() => { console.log('Save note clicked'); handleSaveNote(entry); }}>
                               Save note
                             </button>
                             <button style={s.cancelNoteBtn} onClick={() => handleCancelNote(entry.moveId)}>
