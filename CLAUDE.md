@@ -34,6 +34,7 @@ moves
 - aliases: text[] (array of alternate names)
 - status: text — "want to try" | "working on" | "achieved"
 - parent_move_id: uuid (self-referencing, for variations)
+- note: text (single note field per move, default empty string)
 
 combos
 
@@ -90,12 +91,10 @@ achieved — can do this move
 
 ## Notes system
 
-- Move notes are stored in the move_notes table
-  (id, move_id, text, session_id, created_at)
-- Never write to moves.notes — that column is dropped
-- To add a note: addMoveNote(moveId, text, sessionId)
-- To read notes: fetchMoveNotes(moveId) — returns
-  array ordered newest first
+- Move notes are a single text field on the moves table
+- Read: move.note
+- Write: updateMove(moveId, { note: text }) or
+  updateMove(moveId, { note: null }) to clear
 - Session notes are a separate field on the sessions
   table and are unrelated to move notes
 
