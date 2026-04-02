@@ -1,0 +1,31 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-main);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 4px 10px;
+}
+
+.sm {
+  font-size: 11px;
+  padding: 3px 8px;
+}
+
+.achieved {
+  background-color: var(--color-achieved-bg);
+  color: var(--color-achieved-text);
+}
+
+.workingOn {
+  background-color: var(--color-working-bg);
+  color: var(--color-working-text);
+}
+
+.wantToTry {
+  background-color: var(--color-want-bg);
+  color: var(--color-want-text);
+}

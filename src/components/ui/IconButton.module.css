@@ -1,0 +1,24 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+  width: 45px;
+  height: 45px;
+  border: none;
+}
+
+.sm {
+  width: 32px;
+  height: 32px;
+}
+
+.default {
+  background: var(--color-surface-blue);
+}
+
+.ghost {
+  background: transparent;
+}

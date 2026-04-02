@@ -3,36 +3,65 @@
 :root {
   --font-main: 'Plus Jakarta Sans', sans-serif;
 
-  --color-bg: #F4F5FA;
+  /* Surfaces */
   --color-surface: #FFFFFF;
+  --color-bg: #F4F5FA;
   --color-surface-blue: #E8EEFF;
-  --color-border: rgba(107,122,232,0.12);
-  --color-border-subtle: #E0E2F0;
+  --color-light-blue: #DCE8FF;
+  --color-light-pink: #FDEDF7;
 
+  /* Brand */
   --color-blue: #6B7AE8;
   --color-blue-btn: #4D5EC7;
-  --color-blue-light: #E8EEFF;
-  --color-pink: #EE90CC;
-  --color-green: #5DC48A;
+  --color-pink: #FAB0E8;
+  --color-orange: #FA7F8C;
 
+  /* Borders */
+  --color-border-subtle: #E0E2F0;
+  --color-border: rgba(107,122,232,0.12);
+
+  /* Text */
   --color-text-primary: #1A1B2E;
   --color-text-secondary: #6E708E;
-  --color-text-muted: #B8BAD0;
+  --color-text-muted: #9B9DBB;
+  --color-text-placeholder: #B8BAD0;
 
-  --color-dark-bg: #12131F;
-  --color-dark-surface: #1E1F30;
-  --color-dark-border: rgba(107,122,232,0.15);
-  --color-dark-text: #F0F2FF;
-  --color-dark-text-muted: #4A4B6A;
+  /* Status semantic
+     achieved = blue, working on = orange, want to try = pink */
+  --color-achieved: var(--color-blue);
+  --color-achieved-bg: #E8EEFF;
+  --color-achieved-text: #4A5BD4;
 
+  --color-working: var(--color-orange);
+  --color-working-bg: #FFF0F1;
+  --color-working-text: #C4404A;
+
+  --color-want: var(--color-pink);
+  --color-want-bg: #FDEDF7;
+  --color-want-text: #C45FA0;
+
+  /* Decorative */
+  --color-light-blue-decorative: #DCE8FF;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+
+  /* Border radius */
   --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
   --radius-xl: 20px;
-  --radius-pill: 100px;
+  --radius-pill: 999px;
 
-  --shadow-card: 0 1px 8px rgba(107,122,232,0.08);
+  /* Shadows */
+  --shadow-card: 0 1px 6px rgba(107,122,232,0.07);
   --shadow-card-hover: 0 4px 16px rgba(107,122,232,0.14);
+  --shadow-sheet: 0 -4px 24px rgba(107,122,232,0.10);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -40,13 +69,15 @@
     --color-bg: #12131F;
     --color-surface: #1E1F30;
     --color-surface-blue: #1A1B2E;
-    --color-border: rgba(107,122,232,0.15);
     --color-border-subtle: #2A2B3D;
+    --color-border: rgba(107,122,232,0.15);
     --color-text-primary: #F0F2FF;
     --color-text-secondary: #8B8DAA;
     --color-text-muted: #4A4B6A;
+    --color-text-placeholder: #4A4B6A;
     --shadow-card: none;
     --shadow-card-hover: none;
+    --shadow-sheet: none;
   }
 }
 
@@ -68,6 +99,9 @@ body {
 button {
   cursor: pointer;
   font-family: var(--font-main);
+  border: none;
+  background: none;
+  padding: 0;
 }
 
 input, textarea, select {

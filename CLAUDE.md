@@ -121,33 +121,53 @@ achieved — can do this move
   (working on not attempted)
 
 ## Design system
-Font: Plus Jakarta Sans (Google Fonts)
-Import: @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap')
 
-Colours:
---color-bg: #F4F5FA (page background)
---color-surface: #FFFFFF (card background)
---color-surface-blue: #E8EEFF (airy blue surface, search bars, selected states)
---color-blue: #6B7AE8 (primary accent — active nav, status dots, decorative)
---color-blue-btn: #4D5EC7 (buttons with white text — AA contrast ~4.8:1)
---color-pink: #EE90CC (secondary accent — want to try, subtle highlights)
---color-green: #5DC48A (achieved status only)
---color-text-primary: #1A1B2E
---color-text-secondary: #6E708E (AA compliant ~4.6:1 on light bg)
---color-text-muted: #B8BAD0
+Font: Plus Jakarta Sans
+Import: Google Fonts (already in index.css)
 
-Dark mode: handled via @media (prefers-color-scheme: dark) in index.css
-Dark mode text-secondary: #8B8DAA (AA compliant on dark bg)
+Colour variables (all in index.css):
+  Surfaces: --color-surface, --color-bg,
+            --color-surface-blue, --color-light-blue,
+            --color-light-pink
+  Brand: --color-blue, --color-blue-btn,
+         --color-pink, --color-orange
+  Borders: --color-border-subtle, --color-border
+  Text: --color-text-primary, --color-text-secondary,
+        --color-text-muted, --color-text-placeholder
 
-Status colours:
-achieved → --color-green
-working on → --color-blue
-want to try → --color-pink
+Status colours (IMPORTANT):
+  achieved   = blue  → --color-achieved: var(--color-blue)
+  working on = orange → --color-working: var(--color-orange)
+  want to try = pink  → --color-want: var(--color-pink)
+  Each status has -bg and -text variants
 
-Buttons with white text → use --color-blue-btn (not --color-blue)
-Decorative/surface uses (dots, pills, active state rings) → use --color-blue
+Spacing: --space-1 (4px) through --space-6 (24px)
+Radius: --radius-sm (8px), --radius-md (10px),
+        --radius-lg (14px), --radius-xl (20px),
+        --radius-pill (999px)
+Shadows: --shadow-card, --shadow-card-hover,
+         --shadow-sheet
 
-Cards: white surface, var(--shadow-card), no border, border-radius var(--radius-lg)
+## UI component library
+
+All shared UI components live in src/components/ui/
+Import from: import { Button, Card, Input } from '../components/ui'
+
+Components:
+  StatusDot    — coloured dot for move status
+  StatusPill   — dot + label for move status
+  Button       — primary | secondary | subtle | ghost
+  Pill         — filter pill, active/inactive states
+  Card         — white surface card with shadow
+  Input        — text input or textarea, blue surface bg
+  SectionLabel — uppercase muted label
+  Divider      — horizontal rule
+  IconButton   — circular icon button
+  BottomSheet  — modal sheet that slides up from bottom
+
+Never hardcode colour values in component files.
+Always use CSS variables from index.css.
+Always add id and name to form elements.
 
 ## What is NOT in v1
 
