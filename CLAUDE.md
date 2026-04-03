@@ -125,23 +125,41 @@ achieved — can do this move
 Font: Plus Jakarta Sans
 Import: Google Fonts (already in index.css)
 
-Colour variables (all in index.css):
-  Surfaces: --color-surface, --color-bg,
-            --color-surface-blue, --color-light-blue,
-            --color-light-pink
-  Brand: --color-blue, --color-blue-btn,
-         --color-pink, --color-orange
-  Borders: --color-border-subtle, --color-border
-  Text: --color-text-primary, --color-text-secondary,
-        --color-text-muted, --color-text-placeholder
+Colour ramps (in index.css, use via semantic variables):
+  --neutral-10 … --neutral-100  (cool blue-gray)
+  --pink-10    … --pink-100
+  --blue-10    … --blue-100
+  --coral-10   … --coral-100
+  Never use ramp variables directly in components —
+  always use the semantic variables below.
+
+Semantic colour variables (all in index.css):
+  Surfaces: --color-bg (neutral-100), --color-surface (#fff),
+            --color-surface-blue (blue-100),
+            --color-light-blue (blue-90),
+            --color-light-pink (pink-100)
+  Brand (flat): --color-blue, --color-pink, --color-coral
+  Borders: --color-border-subtle (neutral-90),
+           --color-border (blue-tinted rgba)
+  Text: --color-text-primary (neutral-20),
+        --color-text-secondary (neutral-60),
+        --color-text-muted (neutral-70),
+        --color-text-placeholder (neutral-80)
 
 Status colours (IMPORTANT):
-  achieved   = blue  → --color-achieved: var(--color-blue)
-  working on = orange → --color-working: var(--color-orange)
-  want to try = pink  → --color-want: var(--color-pink)
-  Each status has -bg and -text variants
+  achieved    = blue  → --color-achieved (blue-40)
+  working on  = pink  → --color-working (pink-50)
+  want to try = coral → --color-want (coral-60)
+  Each status has -bg, -text, and -dot variants
+  Always use semantic status vars, never ramp vars.
 
-Spacing: --space-1 (4px) through --space-6 (24px)
+Button hover: use filter: brightness(), not a separate
+colour variable.
+
+Spacing: --space-1 (4px) through --space-12 (48px)
+Layout: --page-padding (20px), --page-padding-bottom (100px),
+        --section-gap (24px), --card-padding (16px),
+        --card-gap (10px), --input-padding (14px 16px)
 Radius: --radius-sm (8px), --radius-md (10px),
         --radius-lg (14px), --radius-xl (20px),
         --radius-pill (999px)

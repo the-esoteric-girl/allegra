@@ -30,9 +30,13 @@
 }
 
 .primary {
-  background: var(--color-blue-btn);
+  background: var(--color-blue);
   color: white;
   border: none;
+}
+
+.primary:hover:not(.disabled) {
+  filter: brightness(1.1);
 }
 
 .secondary {
@@ -41,16 +45,28 @@
   border: none;
 }
 
+.secondary:hover:not(.disabled) {
+  filter: brightness(1.15);
+}
+
 .subtle {
   background: var(--color-surface);
   border: 1px solid var(--color-border-subtle);
   color: var(--color-text-secondary);
 }
 
+.subtle:hover:not(.disabled) {
+  filter: brightness(0.97);
+}
+
 .ghost {
   background: transparent;
   border: none;
   color: var(--color-text-secondary);
+}
+
+.ghost:hover:not(.disabled) {
+  color: var(--color-text-primary);
 }
 
 .leftIcon {

@@ -58,16 +58,20 @@ export function AppProvider({ children }) {
     load();
   }, []);
 
-  async function addMove({ name, aliases = [], status = 'want to try', parent_move_id = null }) {
-    const { error } = await supabase
+  async function addMove({ name, aliases = [], status = 'want to try', parent_move_id = null, user_id = null }) {
+    // user_id is null for now — future: custom moves visible only to creator
+    const { data, error } = await supabase
       .from('moves')
-      .insert({ name, aliases, status, parent_move_id });
+      .insert({ name, aliases, status, parent_move_id, user_id })
+      .select()
+      .single();
     if (error) {
       console.error(error);
       setError(error);
-    } else {
-      await fetchMoves();
+      return null;
     }
+    await fetchMoves();
+    return data;
   }
 
   async function updateMove(id, updates) {

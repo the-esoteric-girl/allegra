@@ -1,0 +1,74 @@
+.pill {
+  position: fixed;
+  bottom: calc(80px + 10px);
+  left: var(--space-4);
+  right: var(--space-4);
+  max-width: calc(480px - 2 * var(--space-4));
+  margin: 0 auto;
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card-hover);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  z-index: 101;
+}
+
+.expandBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-blue);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-blue);
+  flex-shrink: 0;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.liveIndicator {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-blue);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-family: var(--font-main);
+}
+
+.subtitle {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-main);
+}
+
+.discardBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  padding: var(--space-2);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}

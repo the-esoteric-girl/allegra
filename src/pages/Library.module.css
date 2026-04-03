@@ -1,9 +1,9 @@
 .page {
-  padding: 24px 16px 100px;
+  padding: var(--page-padding) var(--page-padding) var(--page-padding-bottom);
 }
 
 .header {
-  margin-bottom: 24px;
+  margin-bottom: var(--section-gap);
 }
 
 .appName {
@@ -65,7 +65,7 @@
   gap: 8px;
   overflow-x: auto;
   scrollbar-width: none;
-  margin-bottom: 20px;
+  margin-bottom: var(--section-gap);
   padding-bottom: 2px;
 }
 
@@ -103,8 +103,8 @@
 .moveCard {
   background: var(--color-surface);
   border-radius: var(--radius-lg);
-  padding: 16px;
-  margin-bottom: 10px;
+  padding: var(--card-padding);
+  margin-bottom: var(--card-gap);
   cursor: pointer;
   box-shadow: var(--shadow-card);
   transition: box-shadow 0.15s ease;

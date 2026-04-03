@@ -3,62 +3,127 @@
 :root {
   --font-main: 'Plus Jakarta Sans', sans-serif;
 
-  /* Surfaces */
-  --color-surface: #FFFFFF;
-  --color-bg: #F4F5FA;
-  --color-surface-blue: #E8EEFF;
-  --color-light-blue: #DCE8FF;
-  --color-light-pink: #FDEDF7;
+  /* ── Neutral ramp (cool blue-gray) ── */
+  --neutral-10:  #0F1020;
+  --neutral-20:  #1A1B2E;
+  --neutral-30:  #2A2B40;
+  --neutral-40:  #3D3F5C;
+  --neutral-50:  #565876;
+  --neutral-60:  #6E708E;
+  --neutral-70:  #9B9DBB;
+  --neutral-80:  #C8CAE0;
+  --neutral-90:  #E0E2F0;
+  --neutral-95:  #EEEFFE;
+  --neutral-100: #F4F5FA;
 
-  /* Brand */
+  /* ── Pink ramp ── */
+  --pink-10: #380333;
+  --pink-20: #511B49;
+  --pink-30: #6B3261;
+  --pink-40: #86497A;
+  --pink-50: #A26194;
+  --pink-60: #BE7BAF;
+  --pink-70: #DB95CB;
+  --pink-80: #F9AFE7;
+  --pink-90: #FFD7F2;
+  --pink-100: #FFEBF6;
+
+  /* ── Blue ramp ── */
+  --blue-10: #000C61;
+  --blue-20: #091D91;
+  --blue-30: #2A3AA6;
+  --blue-40: #4453BF;
+  --blue-50: #5E6DDA;
+  --blue-60: #7887F6;
+  --blue-70: #99A5FF;
+  --blue-80: #BCC2FF;
+  --blue-90: #DFE0FF;
+  --blue-100: #F0EFFF;
+
+  /* ── Coral ramp ── */
+  --coral-10: #40000E;
+  --coral-20: #630A1E;
+  --coral-30: #822333;
+  --coral-40: #A23B49;
+  --coral-50: #C15361;
+  --coral-60: #E16C79;
+  --coral-70: #FF8793;
+  --coral-80: #FFB2B8;
+  --coral-90: #FFDADB;
+  --coral-100: #FFECED;
+
+  /* ── Brand colours (flat) ── */
   --color-blue: #6B7AE8;
-  --color-blue-btn: #4D5EC7;
   --color-pink: #FAB0E8;
-  --color-orange: #FA7F8C;
+  --color-coral: #FA7F8C;
 
-  /* Borders */
-  --color-border-subtle: #E0E2F0;
-  --color-border: rgba(107,122,232,0.12);
+  /* ── Surfaces (from ramps) ── */
+  --color-bg: var(--neutral-100);
+  --color-surface: #FFFFFF;
+  --color-surface-blue: var(--blue-100);
+  --color-light-blue: var(--blue-90);
+  --color-light-pink: var(--pink-100);
 
-  /* Text */
-  --color-text-primary: #1A1B2E;
-  --color-text-secondary: #6E708E;
-  --color-text-muted: #9B9DBB;
-  --color-text-placeholder: #B8BAD0;
+  /* ── Borders (from neutral ramp) ── */
+  --color-border-subtle: var(--neutral-90);
+  --color-border: rgba(107, 122, 232, 0.12);
 
-  /* Status semantic
-     achieved = blue, working on = orange, want to try = pink */
-  --color-achieved: var(--color-blue);
-  --color-achieved-bg: #E8EEFF;
-  --color-achieved-text: #4A5BD4;
+  /* ── Text (from neutral ramp) ── */
+  --color-text-primary: var(--neutral-20);
+  --color-text-secondary: var(--neutral-60);
+  --color-text-muted: var(--neutral-70);
+  --color-text-placeholder: var(--neutral-80);
 
-  --color-working: var(--color-orange);
-  --color-working-bg: #FFF0F1;
-  --color-working-text: #C4404A;
+  /* ── Status semantic ──
+     achieved   = BLUE
+     working on = PINK
+     want to try = CORAL
+     Always use semantic vars in components,
+     never ramp vars directly */
+  --color-achieved: var(--blue-40);
+  --color-achieved-bg: var(--blue-100);
+  --color-achieved-text: var(--blue-30);
+  --color-achieved-dot: var(--blue-40);
 
-  --color-want: var(--color-pink);
-  --color-want-bg: #FDEDF7;
-  --color-want-text: #C45FA0;
+  --color-working: var(--pink-50);
+  --color-working-bg: var(--pink-100);
+  --color-working-text: var(--pink-30);
+  --color-working-dot: var(--pink-50);
 
-  /* Decorative */
-  --color-light-blue-decorative: #DCE8FF;
+  --color-want: var(--coral-60);
+  --color-want-bg: var(--coral-100);
+  --color-want-text: var(--coral-30);
+  --color-want-dot: var(--coral-60);
 
-  /* Spacing */
+  /* ── Spacing ── */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
   --space-5: 20px;
   --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
 
-  /* Border radius */
+  /* ── Layout ── */
+  --page-padding: 20px;
+  --page-padding-bottom: 100px;
+  --section-gap: 24px;
+  --card-padding: 16px;
+  --card-padding-sm: 12px;
+  --card-gap: 10px;
+  --input-padding: 14px 16px;
+
+  /* ── Border radius ── */
   --radius-sm: 8px;
   --radius-md: 10px;
   --radius-lg: 14px;
   --radius-xl: 20px;
   --radius-pill: 999px;
 
-  /* Shadows */
+  /* ── Shadows ── */
   --shadow-card: 0 1px 6px rgba(107,122,232,0.07);
   --shadow-card-hover: 0 4px 16px rgba(107,122,232,0.14);
   --shadow-sheet: 0 -4px 24px rgba(107,122,232,0.10);
@@ -66,15 +131,15 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #12131F;
-    --color-surface: #1E1F30;
-    --color-surface-blue: #1A1B2E;
-    --color-border-subtle: #2A2B3D;
+    --color-bg: var(--neutral-10);
+    --color-surface: var(--neutral-20);
+    --color-surface-blue: var(--neutral-30);
+    --color-border-subtle: var(--neutral-40);
     --color-border: rgba(107,122,232,0.15);
-    --color-text-primary: #F0F2FF;
-    --color-text-secondary: #8B8DAA;
-    --color-text-muted: #4A4B6A;
-    --color-text-placeholder: #4A4B6A;
+    --color-text-primary: var(--neutral-95);
+    --color-text-secondary: var(--neutral-70);
+    --color-text-muted: var(--neutral-50);
+    --color-text-placeholder: var(--neutral-50);
     --shadow-card: none;
     --shadow-card-hover: none;
     --shadow-sheet: none;
