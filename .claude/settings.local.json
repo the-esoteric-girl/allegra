@@ -5,7 +5,8 @@
       "Skill(gsd:discuss-phase:*)",
       "Bash(claude mcp:*)",
       "Bash(npx vite:*)",
-      "Bash(ls -la /Users/sophialing/Documents/Projects/allegra/src/components/ui/index.*)"
+      "Bash(ls -la /Users/sophialing/Documents/Projects/allegra/src/components/ui/index.*)",
+      "Bash(npm install:*)"
     ]
   }
 }

@@ -5,6 +5,7 @@ import { AppContext } from './appContextInstance';
 export function AppProvider({ children }) {
   const [moves, setMoves] = useState([]);
   const [sessions, setSessions] = useState([]);
+  const [combos, setCombos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [librarySearch, setLibrarySearch] = useState('');
@@ -51,9 +52,27 @@ export function AppProvider({ children }) {
     setSessions(sessionsWithEntries);
   }
 
+  async function loadCombos() {
+    const { data } = await supabase
+      .from('combos')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (data) setCombos(data);
+  }
+
+  async function createCombo(name, moveIds, notes) {
+    const { data, error } = await supabase
+      .from('combos')
+      .insert([{ name: name || null, move_ids: moveIds, notes: notes || null }])
+      .select()
+      .single();
+    if (data) setCombos(prev => [data, ...prev]);
+    return { data, error };
+  }
+
   useEffect(() => {
     async function load() {
-      await Promise.all([fetchMoves(), loadSessions()]);
+      await Promise.all([fetchMoves(), loadSessions(), loadCombos()]);
     }
     load();
   }, []);
@@ -168,6 +187,7 @@ export function AppProvider({ children }) {
       addMove, updateMove, deleteMove,
       sessions, loadSessions,
       createSession, addSessionEntry, deleteSessionEntry, deleteSession,
+      combos, loadCombos, createCombo,
       librarySearch, setLibrarySearch, libraryFilter, setLibraryFilter,
     }}>
       {children}

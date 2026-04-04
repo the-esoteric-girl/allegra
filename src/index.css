@@ -95,6 +95,10 @@
   --color-want-text: var(--coral-30);
   --color-want-dot: var(--coral-60);
 
+  /* ── Feedback ── */
+  --color-error-text: var(--coral-30);
+  --color-caution-text: var(--pink-30);
+
   /* ── Spacing ── */
   --space-1: 4px;
   --space-2: 8px;
@@ -129,17 +133,49 @@
   --shadow-sheet: 0 -4px 24px rgba(107,122,232,0.10);
 }
 
+
 @media (prefers-color-scheme: dark) {
   :root {
+    /* Surfaces */
     --color-bg: var(--neutral-10);
     --color-surface: var(--neutral-20);
     --color-surface-blue: var(--neutral-30);
+    --color-light-blue: var(--blue-20);
+    --color-light-pink: var(--pink-20);
+
+    /* Borders */
     --color-border-subtle: var(--neutral-40);
     --color-border: rgba(107,122,232,0.15);
+
+    /* Text */
     --color-text-primary: var(--neutral-95);
     --color-text-secondary: var(--neutral-70);
     --color-text-muted: var(--neutral-50);
     --color-text-placeholder: var(--neutral-50);
+
+    /* Status — achieved (blue) */
+    --color-achieved: var(--blue-60);
+    --color-achieved-bg: var(--blue-20);
+    --color-achieved-text: var(--blue-80);
+    --color-achieved-dot: var(--blue-60);
+
+    /* Status — working on (pink) */
+    --color-working: var(--pink-70);
+    --color-working-bg: var(--pink-20);
+    --color-working-text: var(--pink-80);
+    --color-working-dot: var(--pink-70);
+
+    /* Status — want to try (coral) */
+    --color-want: var(--coral-70);
+    --color-want-bg: var(--coral-20);
+    --color-want-text: var(--coral-80);
+    --color-want-dot: var(--coral-70);
+
+    /* Feedback */
+    --color-error-text: var(--coral-70);
+    --color-caution-text: var(--pink-70);
+
+    /* Shadows */
     --shadow-card: none;
     --shadow-card-hover: none;
     --shadow-sheet: none;

@@ -1,4 +1,4 @@
-/* ── Shared overlays & sheets ───────────────────────────────────────────── */
+/* ── Overlay & sheet ─────────────────────────────────────────────────────── */
 
 .dimOverlay {
   position: fixed;
@@ -24,30 +24,6 @@
   z-index: 201;
 }
 
-.addMovesOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(26, 27, 46, 0.25);
-  z-index: 202;
-}
-
-.addMovesSheet {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  max-width: 480px;
-  margin: 0 auto;
-  height: 80vh;
-  background: var(--color-surface);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-  box-shadow: var(--shadow-sheet);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  z-index: 203;
-}
-
 /* ── Drag handle ────────────────────────────────────────────────────────── */
 
 .handle {
@@ -55,8 +31,31 @@
   height: 3px;
   background: var(--color-border-subtle);
   border-radius: var(--radius-pill);
-  margin: 10px auto 0;
+  margin: var(--space-2) auto 0;
   flex-shrink: 0;
+}
+
+/* ── Sliding panel track ────────────────────────────────────────────────── */
+
+.slidingTrack {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: 200%;
+  transform: translateX(0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slidingTrackActive {
+  transform: translateX(-50%);
+}
+
+.panel {
+  width: 50%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* ── Header ─────────────────────────────────────────────────────────────── */
@@ -94,10 +93,10 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: var(--space-3) var(--space-4) var(--space-6);
+  padding: var(--space-4) var(--space-4) var(--space-6);
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-4);
 }
 
 /* ── Session note ────────────────────────────────────────────────────────── */
@@ -120,7 +119,7 @@
   resize: none;
   overflow: hidden;
   line-height: 1.6;
-  min-height: 80px;
+  min-height: 48px;
 }
 
 .sessionNoteTextarea::placeholder {
@@ -160,14 +159,13 @@
 .entriesList {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--card-gap);
 }
 
 .entryCard {
   background: var(--color-surface);
-  border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--card-padding);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -287,10 +285,17 @@
   color: var(--color-text-placeholder);
 }
 
-/* ── Bottom bar ──────────────────────────────────────────────────────────── */
+/* ── Bottom bars ─────────────────────────────────────────────────────────── */
 
 .bottomBar {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-4);
+  flex-shrink: 0;
+  border-top: 1px solid var(--color-border-subtle);
+  background: var(--color-surface);
+}
+
+.addMovesBottomBar {
+  padding: var(--space-4) var(--space-4);
   flex-shrink: 0;
   border-top: 1px solid var(--color-border-subtle);
   background: var(--color-surface);
@@ -301,7 +306,7 @@
 .summaryCard {
   background: var(--color-surface-blue);
   border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  padding: var(--card-padding);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -316,7 +321,7 @@
 .summaryMetaItem {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-1);
 }
 
 .summaryMetaLabel {
@@ -335,7 +340,7 @@
 .summaryNotesBlock {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .summaryNotesText {
@@ -349,14 +354,13 @@
 .summaryEntries {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--card-gap);
 }
 
 .summaryEntry {
   background: var(--color-surface);
-  border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--card-padding);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -393,7 +397,7 @@
   overflow: hidden;
 }
 
-/* ── Add moves sheet internals ───────────────────────────────────────────── */
+/* ── Add moves panel internals ───────────────────────────────────────────── */
 
 .searchWrap {
   padding: 0 var(--space-4) var(--space-3);
@@ -517,13 +521,6 @@
   padding: 0;
 }
 
-.addMovesBottomBar {
-  padding: var(--space-3) var(--space-4);
-  flex-shrink: 0;
-  border-top: 1px solid var(--color-border-subtle);
-  background: var(--color-surface);
-}
-
 /* ── Create move form ────────────────────────────────────────────────────── */
 
 .createMoveForm {
@@ -543,13 +540,17 @@
   font-family: var(--font-main);
   color: var(--color-text-primary);
   background: var(--color-surface-blue);
-  border: none;
+  border: 1.5px solid transparent;
   border-radius: var(--radius-lg);
   outline: none;
 }
 
 .createInput::placeholder {
   color: var(--color-text-placeholder);
+}
+
+.createInput:focus {
+  box-shadow: 0 0 0 1.5px var(--color-blue);
 }
 
 .createStatusRow {

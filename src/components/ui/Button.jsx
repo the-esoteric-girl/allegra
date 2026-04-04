@@ -16,6 +16,7 @@ export default function Button({
   fullWidth,
   leftIcon,
   type = 'button',
+  className,
 }) {
   return (
     <button
@@ -28,6 +29,7 @@ export default function Button({
         size === 'sm' ? styles.sm : '',
         fullWidth ? styles.fullWidth : '',
         disabled ? styles.disabled : '',
+        className,
       ]
         .filter(Boolean)
         .join(' ')}

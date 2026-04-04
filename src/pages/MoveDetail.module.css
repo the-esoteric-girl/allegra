@@ -3,11 +3,6 @@
 }
 
 .backButton {
-  background: none;
-  border: none;
-  color: var(--color-text-muted);
-  font-size: 13px;
-  padding: 0;
   margin-bottom: var(--section-gap);
   display: block;
 }
@@ -18,33 +13,17 @@
   letter-spacing: 0.05em;
   font-style: italic;
   color: var(--color-text-primary);
-  margin-bottom: 4px;
+  margin-bottom: var(--space-1);
 }
 
 .aliases {
   font-size: 12px;
   color: var(--color-text-muted);
-  margin-bottom: 16px;
+  margin-bottom: var(--space-4);
 }
 
 .statusRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   margin-bottom: var(--section-gap);
-}
-
-.statusDot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.statusText {
-  font-size: 13px;
-  color: var(--color-text-secondary);
-  text-transform: capitalize;
 }
 
 .card {
@@ -59,7 +38,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 }
 
 .sectionLabel {
@@ -76,31 +55,18 @@
   white-space: pre-wrap;
 }
 
-.emptyNotes {
-  font-size: 15px;
-  color: var(--color-text-muted);
-}
-
-.editButton {
-  background: transparent;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-pill);
-  padding: 6px 14px;
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  font-weight: 500;
-}
-
 .select {
   width: 100%;
   height: 44px;
-  padding: 0 12px;
+  padding: 0 var(--space-3);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-md);
   font-size: 15px;
-  background: var(--color-bg);
+  font-family: var(--font-main);
+  background: var(--color-surface-blue);
   color: var(--color-text-primary);
   outline: none;
+  margin-top: var(--space-2);
 }
 
 .select:focus {
@@ -109,62 +75,45 @@
 
 .textarea {
   width: 100%;
-  border: 1px solid var(--color-border-subtle);
+  border: 1.5px solid transparent;
   border-radius: var(--radius-md);
-  padding: 12px;
+  padding: var(--space-3) var(--space-4);
   font-size: 15px;
+  font-family: var(--font-main);
   line-height: 1.6;
-  background: var(--color-bg);
+  background: var(--color-surface-blue);
   color: var(--color-text-primary);
   outline: none;
   resize: vertical;
 }
 
 .textarea:focus {
-  border-color: var(--color-blue);
+  box-shadow: 0 0 0 1.5px var(--color-blue);
 }
 
 .buttonRow {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.saveButton {
-  background: var(--color-blue);
-  color: white;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.cancelButton {
-  background: transparent;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-  padding: 10px 20px;
-  font-size: 14px;
-  color: var(--color-text-secondary);
+  gap: var(--space-2);
+  margin-bottom: var(--section-gap);
 }
 
 .aliasTags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 10px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
 .aliasTag {
   background: var(--color-bg);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-pill);
-  padding: 4px 10px;
+  padding: var(--space-1) var(--space-3);
   font-size: 12px;
+  font-family: var(--font-main);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
   color: var(--color-text-secondary);
 }
 
@@ -175,61 +124,57 @@
   border: none;
   padding: 0;
   line-height: 1;
+  cursor: pointer;
 }
 
 .addAliasRow {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
+  align-items: center;
 }
 
 .addAliasInput {
   flex: 1;
   height: 40px;
-  border: 1px solid var(--color-border-subtle);
+  border: 1.5px solid transparent;
   border-radius: var(--radius-md);
-  padding: 0 12px;
+  padding: 0 var(--space-3);
   font-size: 14px;
-  background: var(--color-bg);
+  font-family: var(--font-main);
+  background: var(--color-surface-blue);
   color: var(--color-text-primary);
   outline: none;
 }
 
 .addAliasInput:focus {
-  border-color: var(--color-blue);
-}
-
-.addAliasButton {
-  background: var(--color-blue);
-  color: white;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 0 16px;
-  height: 40px;
-  font-size: 14px;
-  font-weight: 500;
+  box-shadow: 0 0 0 1.5px var(--color-blue);
 }
 
 .aliasError {
   font-size: 13px;
-  color: #C0392B;
-  margin-top: 6px;
+  color: var(--color-error-text);
+  margin-top: var(--space-2);
 }
 
 .aliasWarning {
   font-size: 13px;
-  color: #B7791F;
-  margin-top: 8px;
+  color: var(--color-caution-text);
+  margin-top: var(--space-2);
   line-height: 1.5;
 }
 
 .conflictButtons {
   display: flex;
-  gap: 8px;
-  margin-top: 8px;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
 }
 
 .noteEntry {
-  padding: 4px 0;
+  padding: var(--space-1) 0;
+}
+
+.noteEditButton {
+  margin-top: var(--space-2);
 }
 
 .noteDateHeader {
@@ -237,42 +182,22 @@
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  margin-bottom: 4px;
-}
-
-.noteDeleteButton {
-  background: none;
-  border: none;
-  padding: 0;
-  margin-top: 6px;
-  font-size: 11px;
-  color: var(--color-text-muted);
-  cursor: pointer;
+  margin-bottom: var(--space-1);
 }
 
 .noteDivider {
   border: none;
   border-top: 1px solid var(--color-border-subtle);
-  margin: 12px 0;
-}
-
-.addNoteButton {
-  background: transparent;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-pill);
-  padding: 6px 14px;
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  font-weight: 500;
+  margin: var(--space-3) 0;
 }
 
 .addNoteForm {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .addNoteButtons {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
 }

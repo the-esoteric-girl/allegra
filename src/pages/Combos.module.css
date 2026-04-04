@@ -1,0 +1,84 @@
+.page {
+  padding: var(--page-padding) var(--page-padding) var(--page-padding-bottom);
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+}
+
+.header {
+  /* no extra margin needed — gap handles it */
+}
+
+.pageTitle {
+  font-size: 28px;
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  font-style: italic;
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* ── Empty state ── */
+.emptyState {
+  text-align: center;
+  padding: var(--space-10) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.emptyHeading {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.emptyBody {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+/* ── Combo list ── */
+.comboList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+}
+
+.comboCard {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--card-padding);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.comboName {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.comboMeta {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.comboPreview {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-top: var(--space-1);
+  line-height: 1.5;
+}

@@ -1,0 +1,236 @@
+/* ── Sliding wrapper — clips the 200%-wide track ── */
+.slidingWrapper {
+  overflow: hidden;
+}
+
+/* ── Sliding track ── */
+.slidingTrack {
+  display: flex;
+  width: 200%;
+  transition: transform 0.3s ease;
+}
+
+.slidingTrack[data-panel='addMoves'] {
+  transform: translateX(-50%);
+}
+
+.panel {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ── Main panel ── */
+.mainContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4) var(--page-padding) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.nameSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.03em;
+}
+
+/* ── Empty state ── */
+.emptyState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-10) 0;
+  text-align: center;
+}
+
+.emptyHeading {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.emptyBody {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* ── Stats row ── */
+.statsRow {
+  display: flex;
+  gap: var(--space-6);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statLabel {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.statValue {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* ── Sequence list ── */
+.sequenceList {
+  display: flex;
+  flex-direction: column;
+}
+
+.sequenceCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--card-padding);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.dragHandle {
+  color: var(--color-text-muted);
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  touch-action: none;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.cardName {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.removeBtn {
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  padding: var(--space-1);
+  flex-shrink: 0;
+}
+
+.removeBtn:hover {
+  color: var(--color-text-secondary);
+}
+
+/* ── Arrow connector between cards ── */
+.connector {
+  display: flex;
+  justify-content: center;
+  color: var(--color-text-muted);
+  padding: var(--space-1) 0;
+}
+
+/* ── Add more button ── */
+.addMoreRow {
+  display: flex;
+}
+
+/* ── Sticky footer ── */
+.stickyFooter {
+  padding: var(--space-4) var(--page-padding) var(--space-6);
+  border-top: 1px solid var(--color-border-subtle);
+  background: var(--color-surface);
+  flex-shrink: 0;
+}
+
+/* ── Add moves panel ── */
+.addContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4) var(--page-padding) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+}
+
+.clearBtn {
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+}
+
+.clearBtn:hover {
+  color: var(--color-text-secondary);
+}
+
+.filterRow {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ── Move list (add panel) ── */
+.moveList {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.moveRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-4) 0;
+  text-align: left;
+}
+
+.checkbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.checkboxSelected {
+  background: var(--color-blue);
+  border-color: var(--color-blue);
+}
+
+.moveName {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border-subtle);
+}
+
+.noResults {
+  padding: var(--space-8) 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}

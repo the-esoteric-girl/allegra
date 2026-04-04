@@ -59,6 +59,9 @@ export default function LogModal({
   const [createForm, setCreateForm] = useState({ name: '', alias: '', status: 'want to try' });
   const [expandedSummaryNotes, setExpandedSummaryNotes] = useState([]);
 
+  const searchInputRef = useRef(null);
+  const createNameInputRef = useRef(null);
+
   useEffect(() => {
     if (isOpen) {
       setMode('logging');
@@ -70,6 +73,22 @@ export default function LogModal({
       setExpandedSummaryNotes([]);
     }
   }, [isOpen]);
+
+  // Focus search input after slide-in transition completes
+  useEffect(() => {
+    if (mode === 'addMoves' && !createMoveMode) {
+      const t = setTimeout(() => searchInputRef.current?.focus(), 320);
+      return () => clearTimeout(t);
+    }
+  }, [mode, createMoveMode]);
+
+  // Focus create-name input when create form opens
+  useEffect(() => {
+    if (createMoveMode) {
+      const t = setTimeout(() => createNameInputRef.current?.focus(), 50);
+      return () => clearTimeout(t);
+    }
+  }, [createMoveMode]);
 
   if (!isOpen) return null;
 
@@ -93,6 +112,7 @@ export default function LogModal({
   // ── Handlers ────────────────────────────────────────────────────────────────
 
   function handleMainOverlayClick() {
+    if (mode === 'addMoves') { dismissAddMoves(); return; }
     if (statusPickerFor) { setStatusPickerFor(null); return; }
     if (sessionEntries.length > 0) onMinimize();
     else onClose();
@@ -159,7 +179,6 @@ export default function LogModal({
     const name = createForm.name.trim();
     if (!name) return;
     const aliases = createForm.alias.trim() ? [createForm.alias.trim()] : [];
-    // user_id is null for now — future: custom moves visible only to the user who created them
     const newMove = await addMove({ name, aliases, status: createForm.status, user_id: null });
     if (!newMove) return;
     setSessionEntries(prev => [...prev, {
@@ -198,7 +217,7 @@ export default function LogModal({
 
   // ── Summary ──────────────────────────────────────────────────────────────────
 
-  const summaryContent = mode === 'summary' && (
+  const summaryContent = (
     <>
       <div className={styles.handle} />
       <div className={styles.header}>
@@ -281,156 +300,7 @@ export default function LogModal({
     </>
   );
 
-  // ── Add moves sheet ──────────────────────────────────────────────────────────
-
-  const addMovesSheet = mode === 'addMoves' && (
-    <>
-      <div className={styles.addMovesOverlay} onClick={dismissAddMoves} />
-      <div className={styles.addMovesSheet}>
-        <div className={styles.handle} />
-        <div className={styles.header}>
-          <div className={styles.headerSide}>
-            <IconButton
-              icon={<ChevronLeft size={20} />}
-              onClick={dismissAddMoves}
-              label="Back"
-              variant="ghost"
-            />
-          </div>
-          <h2 className={styles.title}>Add moves</h2>
-          <div className={styles.headerSide} />
-        </div>
-
-        {createMoveMode ? (
-          <div className={styles.createMoveForm}>
-            <input
-              id="create-name"
-              name="create-name"
-              className={styles.createInput}
-              placeholder="Move name"
-              value={createForm.name}
-              onChange={e => setCreateForm(f => ({ ...f, name: e.target.value }))}
-              autoFocus
-            />
-            <input
-              id="create-alias"
-              name="create-alias"
-              className={styles.createInput}
-              placeholder="Alias (optional)"
-              value={createForm.alias}
-              onChange={e => setCreateForm(f => ({ ...f, alias: e.target.value }))}
-            />
-            <div className={styles.createStatusRow}>
-              {STATUS_OPTIONS.map(s => (
-                <button
-                  key={s}
-                  className={[
-                    styles.createStatusOption,
-                    createForm.status === s ? styles.createStatusOptionActive : '',
-                  ].filter(Boolean).join(' ')}
-                  onClick={() => setCreateForm(f => ({ ...f, status: s }))}
-                >
-                  <StatusDot status={s} size={7} />
-                  {STATUS_LABELS[s]}
-                </button>
-              ))}
-            </div>
-            <div className={styles.createFormActions}>
-              <Button variant="primary" fullWidth onClick={handleCreateMove}>
-                Create move
-              </Button>
-              <Button variant="ghost" fullWidth onClick={() => setCreateMoveMode(false)}>
-                Cancel
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className={styles.searchWrap}>
-              <div className={styles.searchInputWrap}>
-                <Search size={16} className={styles.searchIcon} />
-                <input
-                  id="add-move-search"
-                  name="add-move-search"
-                  className={styles.searchInput}
-                  placeholder="Search moves"
-                  value={searchQuery}
-                  onChange={e => { setSearchQuery(e.target.value); setSearchFilter('all'); }}
-                  autoFocus
-                />
-                {searchQuery && (
-                  <button className={styles.searchClear} onClick={() => setSearchQuery('')}>
-                    <X size={14} />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className={styles.filterRow}>
-              <Pill active={searchFilter === 'all'} onClick={() => setSearchFilter('all')}>
-                All Statuses
-              </Pill>
-              <Pill active={searchFilter === 'selected'} onClick={() => setSearchFilter('selected')}>
-                Selected
-              </Pill>
-            </div>
-
-            <div className={styles.moveSearchList}>
-              {noResults ? (
-                <div className={styles.noResultsState}>
-                  <p className={styles.noResultsText}>No results for "{searchQuery}"</p>
-                  <button
-                    className={styles.createMoveLink}
-                    onClick={() => {
-                      setCreateForm({ name: searchQuery, alias: '', status: 'want to try' });
-                      setCreateMoveMode(true);
-                    }}
-                  >
-                    + Create custom move
-                  </button>
-                </div>
-              ) : (
-                shownMoves.map(move => {
-                  const inSession = sessionEntries.some(e => e.moveId === move.id);
-                  const isChecked = inSession || pendingIds.includes(move.id);
-                  return (
-                    <button
-                      key={move.id}
-                      className={styles.moveSearchItem}
-                      onClick={() => togglePendingId(move.id)}
-                    >
-                      <div className={[
-                        styles.moveCheckbox,
-                        isChecked ? styles.moveCheckboxChecked : '',
-                      ].filter(Boolean).join(' ')}>
-                        {isChecked && <Check size={11} strokeWidth={3} />}
-                      </div>
-                      <span className={styles.moveSearchName}>{move.name}</span>
-                    </button>
-                  );
-                })
-              )}
-            </div>
-
-            {newPendingCount > 0 && (
-              <div className={styles.addMovesBottomBar}>
-                <Button
-                  variant="primary"
-                  fullWidth
-                  leftIcon={<Plus size={16} />}
-                  onClick={handleConfirmAddMoves}
-                >
-                  Add {newPendingCount} {newPendingCount === 1 ? 'move' : 'moves'}
-                </Button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </>
-  );
-
-  // ── Logging sheet ────────────────────────────────────────────────────────────
+  // ── Main render ──────────────────────────────────────────────────────────────
 
   return (
     <>
@@ -440,123 +310,285 @@ export default function LogModal({
         {mode === 'summary' ? summaryContent : (
           <>
             <div className={styles.handle} />
-            <div className={styles.header}>
-              <div className={styles.headerSide} />
-              <h2 className={styles.title}>Log session</h2>
-              <div className={styles.headerSide + ' ' + styles.headerSideRight}>
+
+            <div className={[styles.slidingTrack, mode === 'addMoves' ? styles.slidingTrackActive : ''].filter(Boolean).join(' ')}>
+
+              {/* ── Panel 1: Logging ── */}
+              <div className={styles.panel}>
+                <div className={styles.header}>
+                  <div className={styles.headerSide} />
+                  <h2 className={styles.title}>Log session</h2>
+                  <div className={styles.headerSide + ' ' + styles.headerSideRight}>
+                    {sessionEntries.length > 0 && (
+                      <IconButton
+                        icon={<ChevronRight size={20} />}
+                        onClick={() => setMode('summary')}
+                        label="Review session"
+                        variant="ghost"
+                      />
+                    )}
+                  </div>
+                </div>
+
+                <div className={styles.scrollContent}>
+                  <div className={styles.sessionNoteWrap}>
+                    <AutoTextarea
+                      value={sessionNotes}
+                      onChange={e => setSessionNotes(e.target.value)}
+                      placeholder="How's the session going?"
+                      className={styles.sessionNoteTextarea}
+                    />
+                  </div>
+
+                  {sessionEntries.length === 0 ? (
+                    <div className={styles.emptyState}>
+                      <p className={styles.emptyTitle}>It's a whole new world…</p>
+                      <p className={styles.emptySubtitle}>Add moves to start logging this session!</p>
+                      <Button
+                        variant="primary"
+                        leftIcon={<Plus size={16} />}
+                        onClick={() => { setMode('addMoves'); setPendingIds([]); }}
+                      >
+                        Add move
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className={styles.entriesList}>
+                      {sessionEntries.map(entry => {
+                        const move = moves.find(m => m.id === entry.moveId);
+                        return (
+                          <div key={entry.moveId} className={styles.entryCard}>
+                            <div className={styles.entryRow}>
+                              <span className={styles.entryName}>{move?.name ?? 'Unknown'}</span>
+                              <div className={styles.entryActions}>
+                                <div className={styles.statusPickerWrap}>
+                                  <button
+                                    className={styles.statusPillBtn}
+                                    onClick={() => setStatusPickerFor(
+                                      prev => prev === entry.moveId ? null : entry.moveId
+                                    )}
+                                  >
+                                    <StatusPill status={entry.currentStatus} size="sm" />
+                                  </button>
+                                  {statusPickerFor === entry.moveId && (
+                                    <div className={styles.pickerDropdown}>
+                                      {STATUS_OPTIONS.map(s => (
+                                        <button
+                                          key={s}
+                                          className={[
+                                            styles.pickerOption,
+                                            s === entry.currentStatus ? styles.pickerOptionActive : '',
+                                          ].filter(Boolean).join(' ')}
+                                          onClick={() => {
+                                            handleStatusChange(entry.moveId, s);
+                                            setStatusPickerFor(null);
+                                          }}
+                                        >
+                                          <StatusDot status={s} size={7} />
+                                          <span>{STATUS_LABELS[s]}</span>
+                                          {s === entry.currentStatus && <Check size={13} />}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                                <button
+                                  className={styles.entryDeleteBtn}
+                                  onClick={() => handleRemoveEntry(entry.moveId)}
+                                  aria-label="Remove move"
+                                >
+                                  <X size={16} />
+                                </button>
+                              </div>
+                            </div>
+                            <AutoTextarea
+                              value={entry.note}
+                              onChange={e => handleNoteChange(entry.moveId, e.target.value)}
+                              onBlur={() => handleNoteBlur(entry)}
+                              placeholder="Add note…"
+                              className={styles.entryNoteTextarea}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
                 {sessionEntries.length > 0 && (
-                  <IconButton
-                    icon={<ChevronRight size={20} />}
-                    onClick={() => setMode('summary')}
-                    label="Review session"
-                    variant="ghost"
-                  />
+                  <div className={styles.bottomBar}>
+                    <Button
+                      variant="primary"
+                      fullWidth
+                      leftIcon={<Plus size={16} />}
+                      onClick={() => { setMode('addMoves'); setPendingIds([]); }}
+                    >
+                      Add move
+                    </Button>
+                  </div>
                 )}
               </div>
-            </div>
 
-            <div className={styles.scrollContent}>
-              <div className={styles.sessionNoteWrap}>
-                <AutoTextarea
-                  value={sessionNotes}
-                  onChange={e => setSessionNotes(e.target.value)}
-                  placeholder="How's the session going?"
-                  className={styles.sessionNoteTextarea}
-                />
-              </div>
-
-              {sessionEntries.length === 0 ? (
-                <div className={styles.emptyState}>
-                  <p className={styles.emptyTitle}>It's a whole new world…</p>
-                  <p className={styles.emptySubtitle}>Add moves to start logging this session!</p>
-                  <Button
-                    variant="primary"
-                    leftIcon={<Plus size={16} />}
-                    onClick={() => { setMode('addMoves'); setPendingIds([]); }}
-                  >
-                    Add move
-                  </Button>
-                </div>
-              ) : (
-                <div className={styles.entriesList}>
-                  {sessionEntries.map(entry => {
-                    const move = moves.find(m => m.id === entry.moveId);
-                    return (
-                      <div key={entry.moveId} className={styles.entryCard}>
-                        <div className={styles.entryRow}>
-                          <span className={styles.entryName}>{move?.name ?? 'Unknown'}</span>
-                          <div className={styles.entryActions}>
-                            <div className={styles.statusPickerWrap}>
-                              <button
-                                className={styles.statusPillBtn}
-                                onClick={() => setStatusPickerFor(
-                                  prev => prev === entry.moveId ? null : entry.moveId
-                                )}
-                              >
-                                <StatusPill status={entry.currentStatus} size="sm" />
-                              </button>
-                              {statusPickerFor === entry.moveId && (
-                                <div className={styles.pickerDropdown}>
-                                  {STATUS_OPTIONS.map(s => (
-                                    <button
-                                      key={s}
-                                      className={[
-                                        styles.pickerOption,
-                                        s === entry.currentStatus ? styles.pickerOptionActive : '',
-                                      ].filter(Boolean).join(' ')}
-                                      onClick={() => {
-                                        handleStatusChange(entry.moveId, s);
-                                        setStatusPickerFor(null);
-                                      }}
-                                    >
-                                      <StatusDot status={s} size={7} />
-                                      <span>{STATUS_LABELS[s]}</span>
-                                      {s === entry.currentStatus && <Check size={13} />}
-                                    </button>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                            <button
-                              className={styles.entryDeleteBtn}
-                              onClick={() => handleRemoveEntry(entry.moveId)}
-                              aria-label="Remove move"
-                            >
-                              <X size={16} />
-                            </button>
-                          </div>
-                        </div>
-                        <AutoTextarea
-                          value={entry.note}
-                          onChange={e => handleNoteChange(entry.moveId, e.target.value)}
-                          onBlur={() => handleNoteBlur(entry)}
-                          placeholder="Add note…"
-                          className={styles.entryNoteTextarea}
+              {/* ── Panel 2: Add moves ── */}
+              <div className={styles.panel}>
+                {createMoveMode ? (
+                  <>
+                    <div className={styles.header}>
+                      <div className={styles.headerSide}>
+                        <IconButton
+                          icon={<ChevronLeft size={20} />}
+                          onClick={() => setCreateMoveMode(false)}
+                          label="Back"
+                          variant="ghost"
                         />
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+                      <h2 className={styles.title}>Create move</h2>
+                      <div className={styles.headerSide} />
+                    </div>
+                    <div className={styles.createMoveForm}>
+                      <input
+                        ref={createNameInputRef}
+                        id="create-name"
+                        name="create-name"
+                        className={styles.createInput}
+                        placeholder="Move name"
+                        value={createForm.name}
+                        onChange={e => setCreateForm(f => ({ ...f, name: e.target.value }))}
+                      />
+                      <input
+                        id="create-alias"
+                        name="create-alias"
+                        className={styles.createInput}
+                        placeholder="Alias (optional)"
+                        value={createForm.alias}
+                        onChange={e => setCreateForm(f => ({ ...f, alias: e.target.value }))}
+                      />
+                      <div className={styles.createStatusRow}>
+                        {STATUS_OPTIONS.map(s => (
+                          <button
+                            key={s}
+                            className={[
+                              styles.createStatusOption,
+                              createForm.status === s ? styles.createStatusOptionActive : '',
+                            ].filter(Boolean).join(' ')}
+                            onClick={() => setCreateForm(f => ({ ...f, status: s }))}
+                          >
+                            <StatusDot status={s} size={7} />
+                            {STATUS_LABELS[s]}
+                          </button>
+                        ))}
+                      </div>
+                      <div className={styles.createFormActions}>
+                        <Button variant="primary" fullWidth onClick={handleCreateMove}>
+                          Create move
+                        </Button>
+                        <Button variant="ghost" fullWidth onClick={() => setCreateMoveMode(false)}>
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className={styles.header}>
+                      <div className={styles.headerSide}>
+                        <IconButton
+                          icon={<ChevronLeft size={20} />}
+                          onClick={dismissAddMoves}
+                          label="Back"
+                          variant="ghost"
+                        />
+                      </div>
+                      <h2 className={styles.title}>Add moves</h2>
+                      <div className={styles.headerSide} />
+                    </div>
 
-            {sessionEntries.length > 0 && (
-              <div className={styles.bottomBar}>
-                <Button
-                  variant="primary"
-                  fullWidth
-                  leftIcon={<Plus size={16} />}
-                  onClick={() => { setMode('addMoves'); setPendingIds([]); }}
-                >
-                  Add move
-                </Button>
+                    <div className={styles.searchWrap}>
+                      <div className={styles.searchInputWrap}>
+                        <Search size={16} className={styles.searchIcon} />
+                        <input
+                          ref={searchInputRef}
+                          id="add-move-search"
+                          name="add-move-search"
+                          className={styles.searchInput}
+                          placeholder="Search moves"
+                          value={searchQuery}
+                          onChange={e => { setSearchQuery(e.target.value); setSearchFilter('all'); }}
+                        />
+                        {searchQuery && (
+                          <button className={styles.searchClear} onClick={() => setSearchQuery('')}>
+                            <X size={14} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className={styles.filterRow}>
+                      <Pill active={searchFilter === 'all'} onClick={() => setSearchFilter('all')}>
+                        All Statuses
+                      </Pill>
+                      <Pill active={searchFilter === 'selected'} onClick={() => setSearchFilter('selected')}>
+                        Selected
+                      </Pill>
+                    </div>
+
+                    <div className={styles.moveSearchList}>
+                      {noResults ? (
+                        <div className={styles.noResultsState}>
+                          <p className={styles.noResultsText}>No results for "{searchQuery}"</p>
+                          <button
+                            className={styles.createMoveLink}
+                            onClick={() => {
+                              setCreateForm({ name: searchQuery, alias: '', status: 'want to try' });
+                              setCreateMoveMode(true);
+                            }}
+                          >
+                            + Create custom move
+                          </button>
+                        </div>
+                      ) : (
+                        shownMoves.map(move => {
+                          const inSession = sessionEntries.some(e => e.moveId === move.id);
+                          const isChecked = inSession || pendingIds.includes(move.id);
+                          return (
+                            <button
+                              key={move.id}
+                              className={styles.moveSearchItem}
+                              onClick={() => togglePendingId(move.id)}
+                            >
+                              <div className={[
+                                styles.moveCheckbox,
+                                isChecked ? styles.moveCheckboxChecked : '',
+                              ].filter(Boolean).join(' ')}>
+                                {isChecked && <Check size={11} strokeWidth={3} />}
+                              </div>
+                              <span className={styles.moveSearchName}>{move.name}</span>
+                            </button>
+                          );
+                        })
+                      )}
+                    </div>
+
+                    {newPendingCount > 0 && (
+                      <div className={styles.addMovesBottomBar}>
+                        <Button
+                          variant="primary"
+                          fullWidth
+                          leftIcon={<Plus size={16} />}
+                          onClick={handleConfirmAddMoves}
+                        >
+                          Add {newPendingCount} {newPendingCount === 1 ? 'move' : 'moves'}
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
-            )}
+
+            </div>
           </>
         )}
       </div>
-
-      {addMovesSheet}
     </>
   );
 }

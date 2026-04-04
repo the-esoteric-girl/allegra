@@ -1,14 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/useApp';
+import { Pill, StatusPill } from '../components/ui';
 import styles from './Library.module.css';
 
 const STATUS_FILTERS = ['All', 'Achieved', 'Working On', 'Want To Try'];
-
-const STATUS_DOT_COLORS = {
-  'achieved': 'var(--color-green)',
-  'working on': 'var(--color-blue)',
-  'want to try': 'var(--color-pink)',
-};
 
 export default function Library() {
   const { moves, librarySearch: search, setLibrarySearch: setSearch, libraryFilter: statusFilter, setLibraryFilter: setStatusFilter } = useApp();
@@ -49,13 +44,13 @@ export default function Library() {
 
       <div className={styles.filterRow}>
         {STATUS_FILTERS.map((s) => (
-          <button
+          <Pill
             key={s}
-            className={`${styles.pill}${statusFilter === s ? ` ${styles.pillActive}` : ''}`}
+            active={statusFilter === s}
             onClick={() => setStatusFilter(s)}
           >
             {s}
-          </button>
+          </Pill>
         ))}
       </div>
 
@@ -78,13 +73,7 @@ export default function Library() {
                 {move.aliases.join(', ')}
               </div>
             )}
-            <div className={styles.statusRow}>
-              <div
-                className={styles.statusDot}
-                style={{ backgroundColor: STATUS_DOT_COLORS[move.status] || 'var(--color-text-muted)' }}
-              />
-              <span className={styles.statusText}>{move.status}</span>
-            </div>
+            <StatusPill status={move.status} />
           </div>
         ))
       )}

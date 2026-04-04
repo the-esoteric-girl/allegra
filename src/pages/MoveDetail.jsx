@@ -1,14 +1,8 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/useApp';
+import { Button, StatusPill } from '../components/ui';
 import styles from './MoveDetail.module.css';
-
-const STATUS_DOT_COLORS = {
-  'achieved': 'var(--color-green)',
-  'working on': 'var(--color-blue)',
-  'want to try': 'var(--color-pink)',
-};
-
 
 export default function MoveDetail() {
   const { id } = useParams();
@@ -99,9 +93,9 @@ export default function MoveDetail() {
 
   return (
     <div className={styles.page}>
-      <button className={styles.backButton} onClick={() => navigate('/')}>
+      <Button variant="ghost" size="sm" className={styles.backButton} onClick={() => navigate('/')}>
         ← Back
-      </button>
+      </Button>
 
       <div className={styles.moveName}>{move.name}</div>
 
@@ -113,11 +107,7 @@ export default function MoveDetail() {
 
       {!editing && (
         <div className={styles.statusRow}>
-          <div
-            className={styles.statusDot}
-            style={{ backgroundColor: STATUS_DOT_COLORS[move.status] || 'var(--color-text-muted)' }}
-          />
-          <span className={styles.statusText}>{move.status}</span>
+          <StatusPill status={move.status} />
         </div>
       )}
 
@@ -126,6 +116,8 @@ export default function MoveDetail() {
           <div className={styles.card}>
             <div className={styles.sectionLabel}>Status</div>
             <select
+              id="edit-status"
+              name="edit-status"
               className={styles.select}
               value={editStatus}
               onChange={(e) => setEditStatus(e.target.value)}
@@ -150,29 +142,31 @@ export default function MoveDetail() {
             )}
             <div className={styles.addAliasRow}>
               <input
+                id="add-alias"
+                name="add-alias"
                 className={styles.addAliasInput}
                 value={newAlias}
                 onChange={(e) => { setNewAlias(e.target.value); setAliasError(''); }}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddAlias()}
                 placeholder="Add alias"
               />
-              <button className={styles.addAliasButton} onClick={handleAddAlias}>Add</button>
+              <Button variant="primary" size="sm" onClick={handleAddAlias}>Add</Button>
             </div>
             {aliasError && <p className={styles.aliasError}>{aliasError}</p>}
             {aliasConflict && (
               <div>
                 <p className={styles.aliasWarning}>{aliasConflict.message}</p>
                 <div className={styles.conflictButtons}>
-                  <button className={styles.saveButton} onClick={() => addAlias(aliasConflict.titled)}>Add Anyway</button>
-                  <button className={styles.cancelButton} onClick={() => { setAliasConflict(null); setNewAlias(''); }}>Cancel</button>
+                  <Button variant="primary" size="sm" onClick={() => addAlias(aliasConflict.titled)}>Add Anyway</Button>
+                  <Button variant="subtle" size="sm" onClick={() => { setAliasConflict(null); setNewAlias(''); }}>Cancel</Button>
                 </div>
               </div>
             )}
           </div>
 
           <div className={styles.buttonRow}>
-            <button className={styles.saveButton} onClick={handleSave}>Save</button>
-            <button className={styles.cancelButton} onClick={handleCancel}>Cancel</button>
+            <Button variant="primary" size="sm" onClick={handleSave}>Save</Button>
+            <Button variant="subtle" size="sm" onClick={handleCancel}>Cancel</Button>
           </div>
         </>
       ) : (
@@ -180,11 +174,13 @@ export default function MoveDetail() {
           <div className={styles.card}>
             <div className={styles.cardHeader}>
               <span className={styles.sectionLabel}>Note</span>
-              <button className={styles.editButton} onClick={handleEditClick}>Edit</button>
+              <Button variant="subtle" size="sm" onClick={handleEditClick}>Edit</Button>
             </div>
             {editingNote ? (
               <div className={styles.addNoteForm}>
                 <textarea
+                  id="note-text"
+                  name="note-text"
                   className={styles.textarea}
                   rows={3}
                   placeholder="Add a technique tip..."
@@ -193,19 +189,17 @@ export default function MoveDetail() {
                   autoFocus
                 />
                 <div className={styles.addNoteButtons}>
-                  <button className={styles.saveButton} onClick={handleSaveNote}>Save</button>
-                  <button className={styles.cancelButton} onClick={() => setEditingNote(false)}>Cancel</button>
+                  <Button variant="primary" size="sm" onClick={handleSaveNote}>Save</Button>
+                  <Button variant="subtle" size="sm" onClick={() => setEditingNote(false)}>Cancel</Button>
                 </div>
               </div>
             ) : move.note ? (
               <div className={styles.noteEntry}>
                 <div className={styles.notesText}>{move.note}</div>
-                <button className={styles.noteDeleteButton} onClick={handleEditNote}>Edit note</button>
+                <Button variant="ghost" size="sm" className={styles.noteEditButton} onClick={handleEditNote}>Edit note</Button>
               </div>
             ) : (
-              <button className={styles.addNoteButton} onClick={handleEditNote}>
-                + Add note
-              </button>
+              <Button variant="subtle" size="sm" onClick={handleEditNote}>+ Add note</Button>
             )}
           </div>
         </>
