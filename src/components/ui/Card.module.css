@@ -5,11 +5,11 @@
 }
 
 .paddingDefault {
-  padding: 14px;
+  padding: 0.875rem;
 }
 
 .paddingSm {
-  padding: 10px;
+  padding: 0.625rem;
 }
 
 .paddingNone {

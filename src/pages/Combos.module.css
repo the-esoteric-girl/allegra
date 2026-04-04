@@ -10,7 +10,7 @@
 }
 
 .pageTitle {
-  font-size: 28px;
+  font-size: 1.75rem;
   font-weight: 300;
   letter-spacing: 0.15em;
   font-style: italic;
@@ -18,11 +18,11 @@
 }
 
 .subtitle {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--color-text-muted);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  margin-top: 2px;
+  margin-top: 0.125rem;
 }
 
 /* ── Empty state ── */
@@ -35,13 +35,13 @@
 }
 
 .emptyHeading {
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
 .emptyBody {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--color-text-secondary);
   line-height: 1.6;
 }
@@ -64,20 +64,20 @@
 }
 
 .comboName {
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 500;
   color: var(--color-text-primary);
 }
 
 .comboMeta {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .comboPreview {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-text-secondary);
   margin-top: var(--space-1);
   line-height: 1.5;

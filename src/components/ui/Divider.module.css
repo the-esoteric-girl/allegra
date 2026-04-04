@@ -4,13 +4,13 @@
 }
 
 .sm {
-  margin: 8px 0;
+  margin: 0.5rem 0;
 }
 
 .md {
-  margin: 12px 0;
+  margin: 0.75rem 0;
 }
 
 .lg {
-  margin: 16px 0;
+  margin: 1rem 0;
 }

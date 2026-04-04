@@ -5,14 +5,14 @@
   border-radius: 50%;
   cursor: pointer;
   flex-shrink: 0;
-  width: 45px;
-  height: 45px;
+  width: 2.8125rem;
+  height: 2.8125rem;
   border: none;
 }
 
 .sm {
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
 }
 
 .default {

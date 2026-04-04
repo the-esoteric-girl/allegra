@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/useApp';
 import { Pill, StatusPill } from '../components/ui';
@@ -8,17 +9,24 @@ const STATUS_FILTERS = ['All', 'Achieved', 'Working On', 'Want To Try'];
 export default function Library() {
   const { moves, librarySearch: search, setLibrarySearch: setSearch, libraryFilter: statusFilter, setLibraryFilter: setStatusFilter } = useApp();
   const navigate = useNavigate();
+  const [sortDir, setSortDir] = useState('asc');
 
-  const filtered = moves.filter((move) => {
-    const query = search.toLowerCase();
-    const matchesSearch =
-      move.name.toLowerCase().includes(query) ||
-      (move.aliases || []).some((alias) => alias.toLowerCase().includes(query));
-    const matchesStatus =
-      statusFilter === 'All' ||
-      move.status.toLowerCase() === statusFilter.toLowerCase();
-    return matchesSearch && matchesStatus;
-  });
+  const filtered = moves
+    .filter((move) => {
+      const query = search.toLowerCase();
+      const matchesSearch =
+        move.name.toLowerCase().includes(query) ||
+        (move.aliases || []).some((alias) => alias.toLowerCase().includes(query));
+      const matchesStatus =
+        statusFilter === 'All' ||
+        move.status.toLowerCase() === statusFilter.toLowerCase();
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) =>
+      sortDir === 'asc'
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name)
+    );
 
   return (
     <div className={styles.page}>
@@ -54,8 +62,16 @@ export default function Library() {
         ))}
       </div>
 
-      <div className={styles.moveCount}>
-        {filtered.length} move{filtered.length !== 1 ? 's' : ''}
+      <div className={styles.moveCountRow}>
+        <div className={styles.moveCount}>
+          {filtered.length} move{filtered.length !== 1 ? 's' : ''}
+        </div>
+        <button
+          className={styles.sortToggle}
+          onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
+        >
+          {sortDir === 'asc' ? 'A→Z' : 'Z→A'}
+        </button>
       </div>
 
       {filtered.length === 0 ? (

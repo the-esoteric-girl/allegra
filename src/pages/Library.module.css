@@ -7,7 +7,7 @@
 }
 
 .appName {
-  font-size: 28px;
+  font-size: 1.75rem;
   font-weight: 300;
   letter-spacing: 0.15em;
   font-style: italic;
@@ -15,11 +15,11 @@
 }
 
 .subtitle {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--color-text-muted);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  margin-top: 2px;
+  margin-top: 0.125rem;
 }
 
 .searchWrapper {
@@ -29,12 +29,12 @@
 
 .searchInput {
   width: 100%;
-  height: 44px;
+  height: 2.75rem;
   background: var(--color-surface-blue);
   border: none;
   border-radius: var(--radius-md);
-  padding: 0 16px;
-  font-size: 15px;
+  padding: 0 1rem;
+  font-size: 0.9375rem;
   color: var(--color-text-primary);
   outline: none;
 }
@@ -49,37 +49,60 @@
 
 .clearSearch {
   position: absolute;
-  right: 12px;
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   color: var(--color-text-muted);
-  font-size: 18px;
+  font-size: 1.125rem;
   padding: 0;
   line-height: 1;
 }
 
 .filterRow {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   overflow-x: auto;
   scrollbar-width: none;
   margin-bottom: var(--section-gap);
-  padding-bottom: 2px;
+  padding-bottom: 0.125rem;
 }
 
 .filterRow::-webkit-scrollbar {
   display: none;
 }
 
+.moveCountRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--card-gap);
+}
 
 .moveCount {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--color-text-muted);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  margin-bottom: var(--card-gap);
+}
+
+.sortToggle {
+  font-size: 0.6875rem;
+  font-family: var(--font-main);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.04em;
+  padding: 0.1875rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.sortToggle:hover {
+  filter: brightness(0.97);
 }
 
 .moveCard {
@@ -97,22 +120,22 @@
 }
 
 .moveName {
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 500;
   color: var(--color-text-primary);
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
 }
 
 .moveAliases {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 
 
 .emptyState {
   text-align: center;
-  padding: 40px 0;
-  font-size: 15px;
+  padding: 2.5rem 0;
+  font-size: 0.9375rem;
   color: var(--color-text-muted);
 }

@@ -38,7 +38,7 @@
 }
 
 .fieldLabel {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   color: var(--color-text-secondary);
   letter-spacing: 0.03em;
@@ -57,13 +57,13 @@
 }
 
 .emptyHeading {
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
 .emptyBody {
-  font-size: 15px;
+  font-size: 0.9375rem;
   color: var(--color-text-secondary);
   line-height: 1.5;
 }
@@ -77,18 +77,18 @@
 .stat {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.125rem;
 }
 
 .statLabel {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
 .statValue {
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -124,7 +124,7 @@
 
 .cardName {
   flex: 1;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 500;
   color: var(--color-text-primary);
 }
@@ -204,8 +204,8 @@
 }
 
 .checkbox {
-  width: 24px;
-  height: 24px;
+  width: 1.5rem;
+  height: 1.5rem;
   border-radius: 50%;
   border: 2px solid var(--color-border);
   flex-shrink: 0;
@@ -218,7 +218,7 @@
 }
 
 .moveName {
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 500;
   color: var(--color-text-primary);
 }
@@ -231,6 +231,6 @@
 .noResults {
   padding: var(--space-8) 0;
   text-align: center;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--color-text-muted);
 }
