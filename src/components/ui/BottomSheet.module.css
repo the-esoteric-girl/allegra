@@ -8,7 +8,7 @@
 
 .sheet {
   position: fixed;
-  bottom: 0;
+  bottom: 65px;
   left: 0;
   right: 0;
   max-width: 480px;
