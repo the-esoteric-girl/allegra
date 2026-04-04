@@ -3,6 +3,17 @@
 :root {
   --font-main: 'Plus Jakarta Sans', sans-serif;
 
+  /* ── Text styles ── */
+  --text-heading-2:      700 1.75rem/1.5 var(--font-main);
+  --text-heading-3:      700 1.5rem/1.5 var(--font-main);
+  --text-heading-4:      700 1.25rem/1.5 var(--font-main);
+  --text-body-semibold:  600 1rem/1.5 var(--font-main);
+  --text-body:           400 1rem/1.5 var(--font-main);
+  --text-body-sm-medium: 500 0.875rem/1.5 var(--font-main);
+  --text-body-sm:        400 0.875rem/1.5 var(--font-main);
+  --text-caption:        400 0.75rem/1.5 var(--font-main);
+  --text-label:          600 0.75rem/1.5 var(--font-main);
+
   /* ── Neutral ramp (cool blue-gray) ── */
   --neutral-10:  #0F1020;
   --neutral-20:  #1A1B2E;

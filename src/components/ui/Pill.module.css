@@ -3,10 +3,7 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-pill);
-  font-family: var(--font-main);
-  font-weight: 500;
-  font-size: 0.875rem;
-  line-height: 1.5;
+  font: var(--text-body-sm-medium);
   padding: 0.25rem 0.75rem;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;

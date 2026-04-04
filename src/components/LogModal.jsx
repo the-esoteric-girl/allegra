@@ -221,7 +221,6 @@ export default function LogModal({
         icon={<ChevronLeft size={20} />}
         onClick={() => setMode('logging')}
         label="Back"
-        variant="ghost"
       />
     );
     rightAction = (
@@ -229,7 +228,6 @@ export default function LogModal({
         icon={<Trash2 size={18} />}
         onClick={onDiscard}
         label="Discard session"
-        variant="ghost"
       />
     );
   } else if (mode === 'addMoves' && createMoveMode) {
@@ -239,7 +237,6 @@ export default function LogModal({
         icon={<ChevronLeft size={20} />}
         onClick={() => setCreateMoveMode(false)}
         label="Back"
-        variant="ghost"
       />
     );
     rightAction = null;
@@ -250,7 +247,6 @@ export default function LogModal({
         icon={<ChevronLeft size={20} />}
         onClick={dismissAddMoves}
         label="Back"
-        variant="ghost"
       />
     );
     rightAction = null;
@@ -263,7 +259,6 @@ export default function LogModal({
           icon={<ChevronRight size={20} />}
           onClick={() => setMode('summary')}
           label="Review session"
-          variant="ghost"
         />
       )
       : null;

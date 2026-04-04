@@ -92,7 +92,7 @@
 }
 
 .statLabel {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -240,5 +240,5 @@
   padding: var(--space-8) 0;
   text-align: center;
   font-size: 0.875rem;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }

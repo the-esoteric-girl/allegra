@@ -9,10 +9,7 @@
   border: 1.5px solid transparent;
   border-radius: var(--radius-md);
   padding: 0.75rem 1rem;
-  font-family: var(--font-main);
-  font-weight: 400;
-  font-size: 1rem;
-  line-height: 1.5;
+  font: var(--text-body);
   color: var(--color-text-primary);
   outline: none;
   resize: vertical;

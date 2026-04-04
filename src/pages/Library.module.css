@@ -15,8 +15,8 @@
 }
 
 .subtitle {
-  font-size: 0.6875rem;
-  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-top: 0.125rem;
@@ -81,14 +81,14 @@
 }
 
 .moveCount {
-  font-size: 0.6875rem;
-  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .sortToggle {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-family: var(--font-main);
   font-weight: 600;
   color: var(--color-text-secondary);
@@ -128,7 +128,7 @@
 
 .moveAliases {
   font-size: 0.75rem;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   margin-bottom: 0.5rem;
 }
 
@@ -137,5 +137,5 @@
   text-align: center;
   padding: 2.5rem 0;
   font-size: 0.9375rem;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }

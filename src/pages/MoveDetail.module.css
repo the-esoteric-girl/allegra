@@ -18,7 +18,7 @@
 
 .aliases {
   font-size: 0.75rem;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   margin-bottom: var(--space-4);
 }
 
@@ -42,10 +42,10 @@
 }
 
 .sectionLabel {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .notesText {
@@ -178,8 +178,8 @@
 }
 
 .noteDateHeader {
-  font-size: 0.6875rem;
-  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin-bottom: var(--space-1);

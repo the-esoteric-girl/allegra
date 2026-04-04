@@ -3,15 +3,13 @@
   align-items: center;
   gap: 0.3125rem;
   border-radius: var(--radius-pill);
-  font-family: var(--font-main);
+  font: var(--text-caption);
   font-weight: 500;
-  font-size: 0.75rem;
-  line-height: 1.5;
   padding: 0.25rem 0.625rem;
 }
 
 .sm {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   padding: 0.1875rem 0.5rem;
 }
 

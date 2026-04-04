@@ -5,6 +5,24 @@
 Font: Plus Jakarta Sans
 Import: Google Fonts (already in index.css)
 
+### Text style variables
+
+Use `font: var(--text-*)` shorthand instead of individual `font-size`, `font-weight`, `line-height`, and `font-family` declarations.
+
+```
+--text-heading-2       700 1.75rem/1.5  — page titles
+--text-heading-3       700 1.5rem/1.5   — section headings
+--text-heading-4       700 1.25rem/1.5  — sheet titles, card headings
+--text-body-semibold   600 1rem/1.5     — buttons, strong labels
+--text-body            400 1rem/1.5     — body copy, inputs
+--text-body-sm-medium  500 0.875rem/1.5 — pills, secondary actions
+--text-body-sm         400 0.875rem/1.5 — secondary body text
+--text-caption         400 0.75rem/1.5  — captions, meta text
+--text-label           600 0.75rem/1.5  — section labels (uppercase)
+```
+
+When a weight differs from the shorthand (e.g. StatusPill uses 500 at 0.75rem), use `font: var(--text-caption)` then override `font-weight`.
+
 ## Colour ramps
 
 Defined in index.css. Never use ramp variables directly in
@@ -123,8 +141,32 @@ status colours never diverge between components.
 
 Not implemented in v1.
 
+## Accessibility
+
+### Font size minimum
+- **12px (0.75rem) is the minimum** for any text that carries meaning
+- Placeholder text is exempt from this minimum
+- Never use `0.625rem` (10px) or `0.6875rem` (11px) for meaningful text
+
+### Text colour rules
+
+| Variable                  | Use for                                              |
+|---------------------------|------------------------------------------------------|
+| `--color-text-primary`    | Body text, headings, interactive labels              |
+| `--color-text-secondary`  | Metadata, dates, counts, captions, empty states, nav |
+| `--color-text-muted`      | Decorative icons, placeholder text only              |
+| `--color-text-placeholder`| Input placeholder text only                         |
+
+**Rule:** `--color-text-muted` (#9B9DBB) fails WCAG AA on white for small text. Only use it for icons (drag handles, search icons, arrows) and placeholders. Any text that conveys information must use `--color-text-secondary` at minimum.
+
+### Contrast requirements
+- All meaningful text must meet WCAG AA: 4.5:1 contrast ratio
+- Placeholder text is exempt
+- Status pill colours (`--color-achieved-text`, `--color-working-text`, `--color-want-text`) are verified to pass AA on their respective backgrounds
+
 ## Rules
 
 - Never hardcode colour hex values in component files
 - Always use CSS variables from index.css
 - Spacing should use --space-* variables, not arbitrary px values
+- Typography should use `--text-*` shorthand variables, not individual font properties
