@@ -1,11 +1,16 @@
-/* ── Sliding wrapper — clips the 200%-wide track ── */
+/* ── Sliding layout ── */
 .slidingWrapper {
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-/* ── Sliding track ── */
 .slidingTrack {
   display: flex;
+  flex: 1;
+  min-height: 0;
   width: 200%;
   transition: transform 0.3s ease;
 }
@@ -16,6 +21,7 @@
 
 .panel {
   width: 50%;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -29,6 +35,11 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
+  scrollbar-width: none;
+}
+
+.mainContent::-webkit-scrollbar {
+  display: none;
 }
 
 .nameSection {
@@ -154,14 +165,6 @@
   display: flex;
 }
 
-/* ── Sticky footer ── */
-.stickyFooter {
-  padding: var(--space-4) var(--page-padding) var(--space-6);
-  border-top: 1px solid var(--color-border-subtle);
-  background: var(--color-surface);
-  flex-shrink: 0;
-}
-
 /* ── Add moves panel ── */
 .addContent {
   flex: 1;
@@ -171,6 +174,11 @@
   flex-direction: column;
   gap: var(--space-4);
   min-height: 0;
+  scrollbar-width: none;
+}
+
+.addContent::-webkit-scrollbar {
+  display: none;
 }
 
 .clearBtn {

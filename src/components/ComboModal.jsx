@@ -78,7 +78,6 @@ export default function ComboModal({ isOpen, onClose }) {
   }
 
   function confirmAddMoves() {
-    // Preserve existing order, append newly selected moves
     const existing = moveIds.filter(id => pendingIds.includes(id));
     const newOnes = pendingIds.filter(id => !moveIds.includes(id));
     setMoveIds([...existing, ...newOnes]);
@@ -123,10 +122,19 @@ export default function ComboModal({ isOpen, onClose }) {
   }, [moves, searchQuery, showSelected, pendingIds]);
 
   const isAddPanel = view === 'addMoves';
-  const newlySelectedCount = pendingIds.filter(id => !moveIds.includes(id)).length;
   const addBtnLabel = pendingIds.length === 0
     ? 'Add moves'
     : `Add ${pendingIds.length} move${pendingIds.length !== 1 ? 's' : ''}`;
+
+  const bottomAction = isAddPanel
+    ? (
+      <Button fullWidth onClick={confirmAddMoves} disabled={pendingIds.length === 0}>
+        + {addBtnLabel}
+      </Button>
+    )
+    : moveIds.length > 0
+      ? <Button fullWidth onClick={handleCreate}>Create combo</Button>
+      : null;
 
   return (
     <BottomSheet
@@ -149,154 +157,143 @@ export default function ComboModal({ isOpen, onClose }) {
           />
         ) : undefined
       }
+      bottomAction={bottomAction}
     >
       <div className={styles.slidingWrapper}>
-      <div className={styles.slidingTrack} data-panel={view}>
-        {/* ── Main panel ── */}
-        <div className={styles.panel}>
-          <div className={styles.mainContent}>
-            <div className={styles.nameSection}>
-              <label className={styles.fieldLabel} htmlFor="combo-name">Name</label>
-              <Input
-                id="combo-name"
-                name="combo-name"
-                placeholder="Name (optional)"
-                value={comboName}
-                onChange={e => setComboName(e.target.value)}
-              />
-            </div>
+        <div className={styles.slidingTrack} data-panel={view}>
 
-            {moveIds.length === 0 ? (
-              <div className={styles.emptyState}>
-                <p className={styles.emptyHeading}>Feeling your flow?</p>
-                <p className={styles.emptyBody}>Add moves to create a new combo!</p>
-                <Button leftIcon={<span>+</span>} onClick={openAddMoves}>
-                  Add move
-                </Button>
+          {/* ── Main panel ── */}
+          <div className={styles.panel}>
+            <div className={styles.mainContent}>
+              <div className={styles.nameSection}>
+                <label className={styles.fieldLabel} htmlFor="combo-name">Name</label>
+                <Input
+                  id="combo-name"
+                  name="combo-name"
+                  placeholder="Name (optional)"
+                  value={comboName}
+                  onChange={e => setComboName(e.target.value)}
+                />
               </div>
-            ) : (
-              <>
-                <div className={styles.statsRow}>
-                  <div className={styles.stat}>
-                    <span className={styles.statLabel}>Moves</span>
-                    <span className={styles.statValue}>{moveIds.length}</span>
-                  </div>
-                </div>
 
-                <SectionLabel>Sequence</SectionLabel>
-
-                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                  <SortableContext items={moveIds} strategy={verticalListSortingStrategy}>
-                    <div className={styles.sequenceList}>
-                      {moveIds.map((id, index) => (
-                        <div key={id}>
-                          <SortableCard
-                            id={id}
-                            name={moveMap[id]?.name ?? id}
-                            onRemove={removeFromSequence}
-                          />
-                          {index < moveIds.length - 1 && (
-                            <div className={styles.connector}>
-                              <ArrowDown size={16} />
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </SortableContext>
-                </DndContext>
-
-                <div className={styles.addMoreRow}>
-                  <Button variant="ghost" leftIcon={<span>+</span>} onClick={openAddMoves}>
+              {moveIds.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <p className={styles.emptyHeading}>Feeling your flow?</p>
+                  <p className={styles.emptyBody}>Add moves to create a new combo!</p>
+                  <Button leftIcon={<span>+</span>} onClick={openAddMoves}>
                     Add move
                   </Button>
                 </div>
-
-                <Input
-                  id="combo-notes"
-                  name="combo-notes"
-                  placeholder="Any notes about this combo..."
-                  value={notes}
-                  onChange={e => setNotes(e.target.value)}
-                  multiline
-                  rows={3}
-                />
-              </>
-            )}
-          </div>
-
-          {moveIds.length > 0 && (
-            <div className={styles.stickyFooter}>
-              <Button fullWidth onClick={handleCreate}>
-                Create combo
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* ── Add moves panel ── */}
-        <div className={styles.panel}>
-          <div className={styles.addContent}>
-            <Input
-              id="combo-search"
-              name="combo-search"
-              placeholder="Search moves..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              leftIcon={<Search size={16} />}
-              rightIcon={
-                searchQuery ? (
-                  <button
-                    type="button"
-                    className={styles.clearBtn}
-                    onClick={() => setSearchQuery('')}
-                    aria-label="Clear search"
-                  >
-                    <X size={16} />
-                  </button>
-                ) : null
-              }
-            />
-
-            <div className={styles.filterRow}>
-              <Pill active={!showSelected} onClick={() => setShowSelected(false)}>
-                All Statuses
-              </Pill>
-              <Pill active={showSelected} onClick={() => setShowSelected(true)}>
-                Selected
-              </Pill>
-            </div>
-
-            <div className={styles.moveList}>
-              {filteredMoves.map((move, index) => {
-                const selected = pendingIds.includes(move.id);
-                return (
-                  <div key={move.id}>
-                    <button
-                      type="button"
-                      className={styles.moveRow}
-                      onClick={() => togglePending(move.id)}
-                    >
-                      <span className={`${styles.checkbox} ${selected ? styles.checkboxSelected : ''}`} />
-                      <span className={styles.moveName}>{move.name}</span>
-                    </button>
-                    {index < filteredMoves.length - 1 && <div className={styles.divider} />}
+              ) : (
+                <>
+                  <div className={styles.statsRow}>
+                    <div className={styles.stat}>
+                      <span className={styles.statLabel}>Moves</span>
+                      <span className={styles.statValue}>{moveIds.length}</span>
+                    </div>
                   </div>
-                );
-              })}
-              {filteredMoves.length === 0 && (
-                <p className={styles.noResults}>No moves found</p>
+
+                  <SectionLabel>Sequence</SectionLabel>
+
+                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext items={moveIds} strategy={verticalListSortingStrategy}>
+                      <div className={styles.sequenceList}>
+                        {moveIds.map((id, index) => (
+                          <div key={id}>
+                            <SortableCard
+                              id={id}
+                              name={moveMap[id]?.name ?? id}
+                              onRemove={removeFromSequence}
+                            />
+                            {index < moveIds.length - 1 && (
+                              <div className={styles.connector}>
+                                <ArrowDown size={16} />
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </SortableContext>
+                  </DndContext>
+
+                  <div className={styles.addMoreRow}>
+                    <Button variant="ghost" leftIcon={<span>+</span>} onClick={openAddMoves}>
+                      Add move
+                    </Button>
+                  </div>
+
+                  <Input
+                    id="combo-notes"
+                    name="combo-notes"
+                    placeholder="Any notes about this combo..."
+                    value={notes}
+                    onChange={e => setNotes(e.target.value)}
+                    multiline
+                    rows={3}
+                  />
+                </>
               )}
             </div>
           </div>
 
-          <div className={styles.stickyFooter}>
-            <Button fullWidth onClick={confirmAddMoves} disabled={pendingIds.length === 0}>
-              + {addBtnLabel}
-            </Button>
+          {/* ── Add moves panel ── */}
+          <div className={styles.panel}>
+            <div className={styles.addContent}>
+              <Input
+                id="combo-search"
+                name="combo-search"
+                placeholder="Search moves..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                leftIcon={<Search size={16} />}
+                rightIcon={
+                  searchQuery ? (
+                    <button
+                      type="button"
+                      className={styles.clearBtn}
+                      onClick={() => setSearchQuery('')}
+                      aria-label="Clear search"
+                    >
+                      <X size={16} />
+                    </button>
+                  ) : null
+                }
+              />
+
+              <div className={styles.filterRow}>
+                <Pill active={!showSelected} onClick={() => setShowSelected(false)}>
+                  All Statuses
+                </Pill>
+                <Pill active={showSelected} onClick={() => setShowSelected(true)}>
+                  Selected
+                </Pill>
+              </div>
+
+              <div className={styles.moveList}>
+                {filteredMoves.map((move, index) => {
+                  const selected = pendingIds.includes(move.id);
+                  return (
+                    <div key={move.id}>
+                      <button
+                        type="button"
+                        className={styles.moveRow}
+                        onClick={() => togglePending(move.id)}
+                      >
+                        <span className={`${styles.checkbox} ${selected ? styles.checkboxSelected : ''}`} />
+                        <span className={styles.moveName}>{move.name}</span>
+                      </button>
+                      {index < filteredMoves.length - 1 && <div className={styles.divider} />}
+                    </div>
+                  );
+                })}
+                {filteredMoves.length === 0 && (
+                  <p className={styles.noResults}>No moves found</p>
+                )}
+              </div>
+            </div>
           </div>
+
         </div>
-      </div>
       </div>
     </BottomSheet>
   );

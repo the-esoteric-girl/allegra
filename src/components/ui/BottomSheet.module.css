@@ -3,6 +3,7 @@
   inset: 0;
   background: rgba(26, 27, 46, 0.45);
   z-index: 40;
+  cursor: pointer;
 }
 
 .sheet {
@@ -12,28 +13,28 @@
   right: 0;
   max-width: 480px;
   margin: 0 auto;
-  border-radius: 22px 22px 0 0;
   background: var(--color-surface);
+  border-radius: 22px 22px 0 0;
   box-shadow: var(--shadow-sheet);
-  max-height: 92vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   z-index: 50;
 }
 
 .handle {
-  width: 2rem;
+  width: 32px;
   height: 3px;
   background: var(--color-border-subtle);
-  border-radius: 2px;
-  margin: 0.5rem auto 0;
+  border-radius: 999px;
+  margin: 12px auto 8px;
   flex-shrink: 0;
 }
 
 .header {
   display: flex;
   align-items: center;
-  padding: 0.625rem 1rem 0.375rem;
+  padding: 0 1rem 0.75rem;
   flex-shrink: 0;
 }
 
@@ -51,13 +52,28 @@
   font-family: var(--font-main);
   font-weight: 700;
   font-size: 1.25rem;
-  line-height: 1.5;
   color: var(--color-text-primary);
   text-align: center;
-  flex: 1;
+  flex: 2;
+  margin: 0;
 }
 
 .content {
-  overflow-y: auto;
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.content::-webkit-scrollbar {
+  display: none;
+}
+
+.bottomAction {
+  flex-shrink: 0;
+  padding: 0.75rem 1rem 1.25rem;
+  border-top: 1px solid var(--color-border-subtle);
+  background: var(--color-surface);
 }
