@@ -553,7 +553,6 @@ export default function LogModal({
                       onStatusFilterChange={setMoveStatusFilter}
                       sortBy={moveSortBy}
                       onSortByChange={setMoveSortBy}
-                      includeCreatedSort
                       searchPlaceholder="Search moves"
                       searchInputRef={searchInputRef}
                       searchClassName={styles.searchInputWrap}
@@ -578,6 +577,7 @@ export default function LogModal({
                           type="button"
                           variant="ghost"
                           size="sm"
+                          leftIcon={<Plus size={16} />}
                           className={styles.createMoveLink}
                           onClick={() => {
                             setCreateForm({ name: searchQuery, alias: '', status: '' });
@@ -585,7 +585,7 @@ export default function LogModal({
                           }}
                           data-testid="log-create-custom-move"
                         >
-                          + Create custom move
+                          Create custom move
                         </Button>
                       </div>
                     ) : (

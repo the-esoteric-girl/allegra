@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowDown, Layers, Pencil, ChevronLeft } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Card, Button, SectionLabel, IconButton, ConfirmDialog } from '../components/ui';
+import { Card, Button, SectionLabel, IconButton, ConfirmDialog, PageHeader } from '../components/ui';
 import styles from './ComboDetail.module.css';
 
 export default function ComboDetail() {
@@ -30,24 +30,26 @@ export default function ComboDetail() {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <Button
-          variant="ghost"
-          size="sm"
-          className={styles.backButton}
-          leftIcon={<ChevronLeft size={16} />}
-          onClick={() => navigate('/combos')}
-        >
-          Back
-        </Button>
-        <h1 className={styles.headerTitle}>Combo</h1>
-        <div className={styles.rightSlot}>
-          <IconButton
-            icon={<Pencil size={18} />}
-            variant="ghost"
-            label="Edit combo"
-            onClick={() => navigate(`/combos/${combo.id}/edit`)}
-          />
-        </div>
+        <PageHeader
+          title="Combo"
+          leftAction={(
+            <IconButton
+              icon={<ChevronLeft size={18} />}
+              variant="ghost"
+              label="Back to combos"
+              onClick={() => navigate('/combos')}
+            />
+          )}
+          rightAction={(
+            <IconButton
+              icon={<Pencil size={18} />}
+              variant="ghost"
+              label="Edit combo"
+              onClick={() => navigate(`/combos/${combo.id}/edit`)}
+            />
+          )}
+          className={styles.headerInner}
+        />
       </div>
 
       <h2 className={styles.comboName}>{combo.name || 'Untitled combo'}</h2>

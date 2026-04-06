@@ -6,6 +6,7 @@ export default function IconButton({
   variant = 'default',
   size = 'default',
   label,
+  className,
   ...props
 }) {
   return (
@@ -18,6 +19,7 @@ export default function IconButton({
         styles.button,
         variant === 'ghost' ? styles.ghost : styles.default,
         size === 'sm' ? styles.sm : '',
+        className,
       ]
         .filter(Boolean)
         .join(' ')}

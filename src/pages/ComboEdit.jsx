@@ -4,7 +4,7 @@ import { ChevronLeft } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
 import { useComboEditor } from '../hooks/useComboEditor';
 import ComboEditorPanels from '../components/ComboEditorPanels';
-import { Button } from '../components/ui';
+import { Button, PageHeader } from '../components/ui';
 import styles from './ComboEdit.module.css';
 
 export default function ComboEdit() {
@@ -43,24 +43,31 @@ export default function ComboEdit() {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <Button
-          variant="ghost"
-          size="sm"
-          leftIcon={<ChevronLeft size={16} />}
-          onClick={() => navigate(`/combos/${combo.id}`)}
-          className={styles.headerButton}
-        >
-          Cancel
-        </Button>
-        <h1 className={styles.headerTitle}>Edit combo</h1>
-        <Button
-          size="sm"
-          onClick={handleSave}
-          disabled={editor.moveIds.length === 0}
-          className={styles.saveButton}
-        >
-          Save
-        </Button>
+        <PageHeader
+          title="Edit combo"
+          leftAction={(
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon={<ChevronLeft size={16} />}
+              onClick={() => navigate(`/combos/${combo.id}`)}
+              className={styles.headerButton}
+            >
+              Cancel
+            </Button>
+          )}
+          rightAction={(
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={editor.moveIds.length === 0}
+              className={styles.saveButton}
+            >
+              Save
+            </Button>
+          )}
+          className={styles.headerInner}
+        />
       </div>
 
       <ComboEditorPanels editor={editor} mode="edit" showInlineAddButton={editor.isAddPanel} />

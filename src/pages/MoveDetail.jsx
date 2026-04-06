@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { ChevronLeft, Plus } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Button, StatusPill, ConfirmDialog, Select, Input, Field } from '../components/ui';
+import { Button, StatusPill, ConfirmDialog, Select, Input, Field, IconButton, PageHeader } from '../components/ui';
 import styles from './MoveDetail.module.css';
 
 export default function MoveDetail() {
@@ -102,9 +103,20 @@ export default function MoveDetail() {
 
   return (
     <div className={styles.page}>
-      <Button variant="ghost" size="sm" className={styles.backButton} onClick={() => navigate('/')}>
-        ← Back
-      </Button>
+      <div className={styles.header}>
+        <PageHeader
+          title="Move"
+          leftAction={(
+            <IconButton
+              icon={<ChevronLeft size={18} />}
+              variant="ghost"
+              label="Back to library"
+              onClick={() => navigate('/')}
+            />
+          )}
+          className={styles.headerInner}
+        />
+      </div>
 
       <div className={styles.moveName}>{move.name}</div>
 
@@ -212,7 +224,9 @@ export default function MoveDetail() {
                 <Button variant="ghost" size="sm" className={styles.noteEditButton} onClick={handleEditNote}>Edit note</Button>
               </div>
             ) : (
-              <Button variant="subtle" size="sm" onClick={handleEditNote}>+ Add note</Button>
+              <Button variant="subtle" size="sm" leftIcon={<Plus size={16} />} onClick={handleEditNote}>
+                Add note
+              </Button>
             )}
           </div>
 

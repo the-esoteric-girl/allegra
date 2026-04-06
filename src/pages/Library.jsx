@@ -32,7 +32,6 @@ export default function Library() {
         onStatusFilterChange={setStatusFilter}
         sortBy={sortBy}
         onSortByChange={setSortBy}
-        includeCreatedSort
         searchPlaceholder="Search moves..."
         className={styles.controls}
         searchClassName={styles.searchWrapper}

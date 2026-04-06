@@ -12,7 +12,6 @@ export default function BottomSheet({
   leftAction,
   rightAction,
   bottomAction,
-  height = '92vh',
 }) {
   const [isRendered, setIsRendered] = useState(isOpen);
   const [isVisible, setIsVisible] = useState(isOpen);
@@ -55,15 +54,16 @@ export default function BottomSheet({
         role="dialog"
         aria-modal="true"
         style={{
-          height,
           transitionDuration: `${isVisible ? SHEET_OPEN_MS : SHEET_CLOSE_MS}ms`,
         }}
       >
-        <div className={styles.handle} />
-        <div className={styles.header}>
-          <div className={styles.side}>{leftAction}</div>
-          <h2 className={styles.title}>{title}</h2>
-          <div className={`${styles.side} ${styles.sideRight}`}>{rightAction}</div>
+        <div className={styles.topBar}>
+          <div className={styles.handle} />
+          <div className={styles.header}>
+            <div className={styles.side}>{leftAction}</div>
+            <h2 className={styles.title}>{title}</h2>
+            <div className={`${styles.side} ${styles.sideRight}`}>{rightAction}</div>
+          </div>
         </div>
         <div className={styles.content}>{children}</div>
         {bottomAction && (

@@ -338,6 +338,82 @@ Renders nothing when `isOpen` is false (no DOM).
 
 ---
 
+### PageHeader
+
+Sticky page header for detail and edit pages. Uses a 3-column grid:
+left action slot, centred title, right action slot.
+
+```jsx
+<PageHeader
+  title="Move"
+  leftAction={<IconButton icon={<ChevronLeft size={18} />} label="Back" onClick={() => navigate(-1)} />}
+  rightAction={<IconButton icon={<Pencil size={18} />} label="Edit" onClick={handleEdit} />}
+/>
+```
+
+| Prop        | Type      | Default | Values                           |
+|-------------|-----------|---------|----------------------------------|
+| title       | string    | —       | centred header text              |
+| leftAction  | ReactNode | —       | left slot (typically back button)|
+| rightAction | ReactNode | —       | right slot (typically action)    |
+| className   | string    | —       | additional CSS class             |
+
+If `rightAction` is omitted, a spacer is rendered to keep the title centred.
+
+Used on detail and edit pages (MoveDetail, ComboDetail, ComboEdit).
+Not used on tab pages (Library, Combos, You) which have their own header patterns.
+
+The page container must have `padding: var(--page-padding)`. To make
+PageHeader bleed to the container edges, wrap it:
+
+```css
+.header {
+  margin: calc(-1 * var(--page-padding)) calc(-1 * var(--page-padding)) 0;
+}
+```
+
+---
+
+### MoveListControls
+
+Combined search field, status filter pill, and sort toggle for move lists.
+Used in Library and LogModal.
+
+```jsx
+<MoveListControls
+  idPrefix="library"
+  searchValue={search}
+  onSearchChange={setSearch}
+  onSearchClear={() => setSearch('')}
+  statusFilter={statusFilter}
+  onStatusFilterChange={setStatusFilter}
+  sortBy={sortBy}
+  onSortByChange={setSortBy}
+  searchPlaceholder="Search moves..."
+/>
+```
+
+| Prop                | Type     | Default       | Values                              |
+|---------------------|----------|---------------|-------------------------------------|
+| idPrefix            | string   | "move-list"   | prefix for input id/name attributes |
+| searchValue         | string   | —             | controlled search value             |
+| onSearchChange      | function | —             | called with new string value        |
+| onSearchClear       | function | —             | clear button handler                |
+| statusFilter        | string   | "any"         | status filter value                 |
+| onStatusFilterChange| function | —             | called with new status value        |
+| sortBy              | string   | "alpha-asc"   | "alpha-asc" \| "alpha-desc"         |
+| onSortByChange      | function | —             | called with new sort value          |
+| searchPlaceholder   | string   | "Search moves"| input placeholder                   |
+| searchInputRef      | ref      | —             | forwarded to search input           |
+| className           | string   | —             | wrapper class                       |
+| searchClassName     | string   | —             | search field wrapper class          |
+| searchInputClassName| string   | —             | search input class                  |
+
+Sort and filter logic lives in `src/lib/moveListControls.js` —
+use `filterMovesBySearchAndStatus` and `sortMoves` there.
+
+---
+
 ## Rules
 
 - Never hardcode colour values in component files

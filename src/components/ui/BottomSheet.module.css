@@ -15,6 +15,7 @@
 
 .sheet {
   position: fixed;
+  top: 14px;
   bottom: 65px;
   left: 0;
   right: 0;
@@ -36,6 +37,14 @@
   pointer-events: none;
 }
 
+.topBar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
 .handle {
   width: 32px;
   height: 3px;
@@ -48,7 +57,7 @@
 .header {
   display: flex;
   align-items: center;
-  padding: 0 1rem 0.75rem;
+  padding: 0 1rem 0.625rem;
   flex-shrink: 0;
 }
 

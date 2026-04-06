@@ -12,7 +12,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, X, ArrowDown } from 'lucide-react';
+import { GripVertical, X, ArrowDown, Plus } from 'lucide-react';
 import { Button, Pill, Input, SectionLabel, MoveSelectRow, Field, MoveListControls } from './ui';
 import styles from './ComboEditorPanels.module.css';
 
@@ -101,7 +101,7 @@ export default function ComboEditorPanels({ editor, mode = 'create', showInlineA
               <div className={styles.emptyState}>
                 <p className={styles.emptyHeading}>{emptyHeading}</p>
                 <p className={styles.emptyBody}>{emptyBody}</p>
-                <Button leftIcon={<span>+</span>} onClick={openAddMoves}>
+                <Button leftIcon={<Plus size={16} />} onClick={openAddMoves}>
                   Add move
                 </Button>
               </div>
@@ -138,7 +138,7 @@ export default function ComboEditorPanels({ editor, mode = 'create', showInlineA
                 </DndContext>
 
                 <div className={styles.addMoreRow}>
-                  <Button variant="ghost" leftIcon={<span>+</span>} onClick={openAddMoves}>
+                  <Button variant="ghost" leftIcon={<Plus size={16} />} onClick={openAddMoves}>
                     Add move
                   </Button>
                 </div>
@@ -170,7 +170,6 @@ export default function ComboEditorPanels({ editor, mode = 'create', showInlineA
               onStatusFilterChange={setStatusFilter}
               sortBy={sortBy}
               onSortByChange={setSortBy}
-              includeCreatedSort
               searchPlaceholder="Search moves..."
             />
 
@@ -208,11 +207,12 @@ export default function ComboEditorPanels({ editor, mode = 'create', showInlineA
             {showInlineAddButton && (
               <Button
                 fullWidth
+                leftIcon={<Plus size={16} />}
                 onClick={confirmAddMoves}
                 disabled={pendingIds.length === 0}
                 className={styles.mobileAddButton}
               >
-                + Add {pendingIds.length} move{pendingIds.length !== 1 ? 's' : ''}
+                Add {pendingIds.length} move{pendingIds.length !== 1 ? 's' : ''}
               </Button>
             )}
           </div>

@@ -1,11 +1,11 @@
 import styles from './Pill.module.css';
 
-export default function Pill({ active, onClick, children }) {
+export default function Pill({ active, onClick, children, className }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`${styles.pill} ${active ? styles.active : styles.inactive}`}
+      className={[styles.pill, active ? styles.active : styles.inactive, className].filter(Boolean).join(' ')}
     >
       {children}
     </button>

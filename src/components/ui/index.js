@@ -16,3 +16,4 @@ export { default as MoveSelectRow } from './MoveSelectRow';
 export { default as Field } from './Field';
 export { default as StatusOptionButton } from './StatusOptionButton';
 export { default as MoveListControls } from './MoveListControls';
+export { default as PageHeader } from './PageHeader';

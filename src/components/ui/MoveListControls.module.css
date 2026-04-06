@@ -9,12 +9,67 @@
 }
 
 .row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-2);
+  position: relative;
 }
 
-.select {
-  height: 2.5rem;
+.statusWrap {
+  position: relative;
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 2rem;
+  padding: 0.25rem 0.625rem;
+}
+
+.statusPillLabel {
   font: var(--text-body-sm);
+}
+
+.statusChevron {
+  transition: transform 0.2s ease;
+}
+
+.statusChevronOpen {
+  transform: rotate(180deg);
+}
+
+.statusMenu {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  min-width: 11.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card-hover);
+  z-index: 20;
+  overflow: hidden;
+}
+
+.statusOption {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font: var(--text-body-sm);
+  color: var(--color-text-primary);
+}
+
+.statusOptionActive {
+  background: var(--color-surface-blue);
+}
+
+.sortButton {
+  min-height: 2rem;
+  height: 2rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+  padding: 0.25rem 0.5rem;
 }

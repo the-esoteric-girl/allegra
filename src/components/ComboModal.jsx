@@ -1,4 +1,4 @@
-import { ChevronLeft, Trash2 } from 'lucide-react';
+import { ChevronLeft, Trash2, Plus } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
 import { useComboEditor } from '../hooks/useComboEditor';
 import { BottomSheet, IconButton, Button } from './ui';
@@ -36,11 +36,12 @@ export default function ComboModal({ isOpen, onClose }) {
     ? (
       <Button
         fullWidth
+        leftIcon={<Plus size={16} />}
         onClick={editor.confirmAddMoves}
         disabled={editor.pendingIds.length === 0}
         data-testid="combo-add-moves-submit"
       >
-        + {addBtnLabel}
+        {addBtnLabel}
       </Button>
     )
     : editor.moveIds.length > 0

@@ -12,31 +12,19 @@
 }
 
 .header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
+  margin: calc(-1 * var(--page-padding)) calc(-1 * var(--page-padding)) 0;
 }
 
-.backButton {
-  justify-self: flex-start;
-}
-
-.headerTitle {
-  margin: 0;
-  font: var(--text-body-sm-medium);
-  color: var(--color-text-secondary);
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.rightSlot {
-  justify-self: flex-end;
+.headerInner {
+  border-bottom: none;
 }
 
 .comboName {
   margin: 0;
-  font: var(--text-heading-2);
+  font-size: 1.75rem;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  font-style: italic;
   color: var(--color-text-primary);
 }
 

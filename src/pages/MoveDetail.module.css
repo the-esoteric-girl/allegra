@@ -2,9 +2,12 @@
   padding: var(--page-padding) var(--page-padding) var(--page-padding-bottom);
 }
 
-.backButton {
-  margin-bottom: var(--section-gap);
-  display: block;
+.header {
+  margin: calc(-1 * var(--page-padding)) calc(-1 * var(--page-padding)) var(--section-gap);
+}
+
+.headerInner {
+  border-bottom: none;
 }
 
 .moveName {

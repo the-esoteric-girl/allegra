@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Plus } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
 import { Button, ComboCard } from '../components/ui';
 import ComboModal from '../components/ComboModal';
@@ -17,8 +18,13 @@ export default function Combos() {
         <div className={styles.subtitle}>Build your sequences</div>
       </div>
 
-      <Button onClick={() => setIsModalOpen(true)} fullWidth data-testid="combos-new-button">
-        + New combo
+      <Button
+        onClick={() => setIsModalOpen(true)}
+        fullWidth
+        leftIcon={<Plus size={16} />}
+        data-testid="combos-new-button"
+      >
+        New combo
       </Button>
 
       {loading ? (
