@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { AppContext } from './appContextInstance';
 
+const DEFAULT_STATUS = 'want to try';
+
 export function AppProvider({ children }) {
+  const [user, setUser] = useState(null);
   const [moves, setMoves] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [combos, setCombos] = useState([]);
@@ -11,219 +14,491 @@ export function AppProvider({ children }) {
   const [librarySearch, setLibrarySearch] = useState('');
   const [libraryFilter, setLibraryFilter] = useState('All');
 
-  async function fetchMoves() {
-    const { data, error } = await supabase
+  async function getCurrentUserId() {
+    if (user?.id) return user.id;
+
+    const { data, error: authError } = await supabase.auth.getUser();
+
+    if (authError) {
+      console.error(authError);
+      setError(authError);
+      return null;
+    }
+
+    const nextUser = data?.user ?? null;
+    setUser(nextUser);
+    return nextUser?.id ?? null;
+  }
+
+  async function fetchMoves(userIdOverride) {
+    const currentUserId = userIdOverride !== undefined
+      ? userIdOverride
+      : await getCurrentUserId();
+
+    const { data: moveRows, error: moveError } = await supabase
       .from('moves')
       .select('*')
       .order('name', { ascending: true });
-    if (error) {
-      console.error(error);
-      setError(error);
-    } else {
-      setMoves(data);
+
+    if (moveError) {
+      console.error(moveError);
+      setError(moveError);
+      setMoves([]);
+      return;
     }
-    setLoading(false);
+
+    const moveIds = (moveRows || []).map((move) => move.id);
+    let userDataMap = {};
+
+    if (currentUserId && moveIds.length > 0) {
+      const { data: userMoveRows, error: userMoveError } = await supabase
+        .from('user_move_data')
+        .select('move_id, status, note')
+        .eq('user_id', currentUserId)
+        .in('move_id', moveIds);
+
+      if (userMoveError) {
+        console.error(userMoveError);
+        setError(userMoveError);
+      } else {
+        userDataMap = Object.fromEntries(
+          userMoveRows.map((row) => [row.move_id, row])
+        );
+      }
+    }
+
+    const mergedMoves = (moveRows || []).map((move) => ({
+      ...move,
+      status: userDataMap[move.id]?.status ?? DEFAULT_STATUS,
+      note: userDataMap[move.id]?.note ?? null,
+    }));
+
+    setMoves(mergedMoves);
   }
 
-  async function loadSessions() {
+  async function loadSessions(userIdOverride) {
+    const currentUserId = userIdOverride !== undefined
+      ? userIdOverride
+      : await getCurrentUserId();
+
+    if (!currentUserId) {
+      setSessions([]);
+      return;
+    }
+
     const { data: sessionData, error: sessionError } = await supabase
       .from('sessions')
       .select('*')
+      .eq('user_id', currentUserId)
       .order('date', { ascending: false });
+
     if (sessionError) {
       console.error(sessionError);
       setError(sessionError);
+      setSessions([]);
       return;
     }
-    const sessionIds = sessionData.map(s => s.id);
+
+    if (!sessionData || sessionData.length === 0) {
+      setSessions([]);
+      return;
+    }
+
+    const sessionIds = sessionData.map((session) => session.id);
+
     const { data: entryData, error: entryError } = await supabase
       .from('session_entries')
       .select('*')
+      .eq('user_id', currentUserId)
       .in('session_id', sessionIds);
+
     if (entryError) {
       console.error(entryError);
       setError(entryError);
       return;
     }
-    const sessionsWithEntries = sessionData.map(session => ({
+
+    const sessionsWithEntries = sessionData.map((session) => ({
       ...session,
-      entries: entryData.filter(e => e.session_id === session.id),
+      entries: (entryData || []).filter((entry) => entry.session_id === session.id),
     }));
+
     setSessions(sessionsWithEntries);
   }
 
-  async function loadCombos() {
-    const { data } = await supabase
+  async function loadCombos(userIdOverride) {
+    const currentUserId = userIdOverride !== undefined
+      ? userIdOverride
+      : await getCurrentUserId();
+
+    if (!currentUserId) {
+      setCombos([]);
+      return;
+    }
+
+    const { data, error: comboError } = await supabase
       .from('combos')
       .select('*')
+      .eq('user_id', currentUserId)
       .order('created_at', { ascending: false });
-    console.log('[loadCombos] fetched:', data);
-    if (data) setCombos(data);
+
+    if (comboError) {
+      console.error(comboError);
+      setError(comboError);
+      setCombos([]);
+      return;
+    }
+
+    setCombos(data || []);
   }
 
+  async function refreshAllData(userIdOverride) {
+    setLoading(true);
+    await Promise.all([
+      fetchMoves(userIdOverride),
+      loadSessions(userIdOverride),
+      loadCombos(userIdOverride),
+    ]);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function boot() {
+      const { data, error: authError } = await supabase.auth.getUser();
+
+      if (authError) {
+        console.error(authError);
+        setError(authError);
+      }
+
+      if (!isMounted) return;
+
+      const nextUser = data?.user ?? null;
+      setUser(nextUser);
+      await refreshAllData(nextUser?.id ?? null);
+    }
+
+    boot();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      const nextUser = session?.user ?? null;
+      setUser(nextUser);
+      refreshAllData(nextUser?.id ?? null);
+    });
+
+    return () => {
+      isMounted = false;
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
   async function createCombo(name, moveIds, notes) {
-    console.log('[createCombo] inserting:', { name, moveIds, notes });
-    console.log('[createCombo] move_ids type:', typeof moveIds, Array.isArray(moveIds));
-    const { data, error } = await supabase
+    const currentUserId = await getCurrentUserId();
+
+    if (!currentUserId) {
+      const noUserError = new Error('You need to be signed in to create a combo.');
+      setError(noUserError);
+      return { data: null, error: noUserError };
+    }
+
+    const { data, error: comboError } = await supabase
       .from('combos')
-      .insert([{ name: name || null, move_ids: moveIds, notes: notes || null }])
+      .insert([{
+        user_id: currentUserId,
+        name: name || null,
+        move_ids: moveIds,
+        notes: notes || null,
+      }])
       .select()
       .single();
-    console.log('[createCombo] result:', { data, error });
-    if (data) await loadCombos();
-    return { data, error };
+
+    if (comboError) {
+      console.error(comboError);
+      setError(comboError);
+      return { data: null, error: comboError };
+    }
+
+    await loadCombos(currentUserId);
+    return { data, error: null };
   }
 
   async function updateCombo(id, updates) {
-    const { data, error } = await supabase
+    const { data, error: comboError } = await supabase
       .from('combos')
       .update(updates)
       .eq('id', id)
       .select()
       .single();
-    if (error) {
-      console.error(error);
-      setError(error);
-      return { data: null, error };
+
+    if (comboError) {
+      console.error(comboError);
+      setError(comboError);
+      return { data: null, error: comboError };
     }
+
     await loadCombos();
     return { data, error: null };
   }
 
   async function deleteCombo(id) {
-    const { error } = await supabase
+    const { error: comboError } = await supabase
       .from('combos')
       .delete()
       .eq('id', id);
-    if (error) {
-      console.error(error);
-      setError(error);
-      return { error };
+
+    if (comboError) {
+      console.error(comboError);
+      setError(comboError);
+      return { error: comboError };
     }
+
     await loadCombos();
     return { error: null };
   }
 
-  useEffect(() => {
-    async function load() {
-      await Promise.all([fetchMoves(), loadSessions(), loadCombos()]);
-    }
-    load();
-  }, []);
+  async function addMove({
+    name,
+    aliases = [],
+    status = DEFAULT_STATUS,
+    parent_move_id = null,
+    user_id = null,
+  }) {
+    const currentUserId = await getCurrentUserId();
 
-  async function addMove({ name, aliases = [], status = 'want to try', parent_move_id = null, user_id = null }) {
-    // user_id is null for now — future: custom moves visible only to creator
-    const { data, error } = await supabase
-      .from('moves')
-      .insert({ name, aliases, status, parent_move_id, user_id })
-      .select()
-      .single();
-    if (error) {
-      console.error(error);
-      setError(error);
+    if (!currentUserId) {
+      const noUserError = new Error('You need to be signed in to add a move.');
+      setError(noUserError);
       return null;
     }
-    await fetchMoves();
-    return data;
+
+    const ownerId = user_id ?? currentUserId;
+
+    const { data: moveRow, error: moveError } = await supabase
+      .from('moves')
+      .insert({
+        name,
+        aliases,
+        parent_move_id,
+        user_id: ownerId,
+        status,
+      })
+      .select()
+      .single();
+
+    if (moveError) {
+      console.error(moveError);
+      setError(moveError);
+      return null;
+    }
+
+    const { error: userMoveError } = await supabase
+      .from('user_move_data')
+      .upsert({
+        user_id: currentUserId,
+        move_id: moveRow.id,
+        status,
+        note: null,
+      }, { onConflict: 'user_id,move_id' });
+
+    if (userMoveError) {
+      console.error(userMoveError);
+      setError(userMoveError);
+      return null;
+    }
+
+    await fetchMoves(currentUserId);
+    return { ...moveRow, status, note: null };
   }
 
   async function updateMove(id, updates) {
-    console.log('[updateMove] moveId:', id);
-    console.log('[updateMove] updates:', updates);
-    const { data, error } = await supabase
-      .from('moves')
-      .update(updates)
-      .eq('id', id)
-      .select();
-    if (error) {
-      console.error('[updateMove] error:', error);
-      setError(error);
-    } else {
-      console.log('[updateMove] data returned:', data);
-      await fetchMoves();
+    const currentUserId = await getCurrentUserId();
+
+    if (!currentUserId) {
+      const noUserError = new Error('You need to be signed in to update a move.');
+      setError(noUserError);
+      return;
     }
+
+    const { status, note, ...moveUpdates } = updates || {};
+
+    if (Object.keys(moveUpdates).length > 0) {
+      const { error: moveError } = await supabase
+        .from('moves')
+        .update(moveUpdates)
+        .eq('id', id);
+
+      if (moveError) {
+        console.error(moveError);
+        setError(moveError);
+        return;
+      }
+    }
+
+    if (status !== undefined || note !== undefined) {
+      const existingMove = moves.find((move) => move.id === id);
+      const resolvedStatus = status ?? existingMove?.status ?? DEFAULT_STATUS;
+
+      const upsertPayload = {
+        user_id: currentUserId,
+        move_id: id,
+        status: resolvedStatus,
+      };
+
+      if (note !== undefined) {
+        upsertPayload.note = note ?? null;
+      }
+
+      const { error: userMoveError } = await supabase
+        .from('user_move_data')
+        .upsert(upsertPayload, { onConflict: 'user_id,move_id' });
+
+      if (userMoveError) {
+        console.error(userMoveError);
+        setError(userMoveError);
+        return;
+      }
+    }
+
+    await fetchMoves(currentUserId);
   }
 
   async function deleteMove(id) {
-    const { error } = await supabase
+    const { error: moveError } = await supabase
       .from('moves')
       .delete()
       .eq('id', id);
-    if (error) {
-      console.error(error);
-      setError(error);
-    } else {
-      await fetchMoves();
+
+    if (moveError) {
+      console.error(moveError);
+      setError(moveError);
+      return;
     }
+
+    await fetchMoves();
   }
 
   async function createSession(notes = '') {
-    const today = new Date().toISOString().slice(0, 10);
-    const { data, error } = await supabase
-      .from('sessions')
-      .insert({ date: today, notes })
-      .select()
-      .single();
-    if (error) {
-      console.error(error);
-      setError(error);
+    const currentUserId = await getCurrentUserId();
+
+    if (!currentUserId) {
+      const noUserError = new Error('You need to be signed in to create a session.');
+      setError(noUserError);
       return null;
     }
-    await loadSessions();
+
+    const today = new Date().toISOString().slice(0, 10);
+
+    const { data, error: sessionError } = await supabase
+      .from('sessions')
+      .insert({
+        user_id: currentUserId,
+        date: today,
+        notes,
+      })
+      .select()
+      .single();
+
+    if (sessionError) {
+      console.error(sessionError);
+      setError(sessionError);
+      return null;
+    }
+
+    await loadSessions(currentUserId);
     return data;
   }
 
   async function addSessionEntry(sessionId, moveId, previousStatus, newStatus, notesAdded) {
-    const { data, error } = await supabase
-      .from('session_entries')
-      .insert({ session_id: sessionId, move_id: moveId, previous_status: previousStatus, new_status: newStatus, notes_added: Boolean(notesAdded) })
-      .select()
-      .single();
-    if (error) {
-      console.error(error);
-      setError(error);
+    const currentUserId = await getCurrentUserId();
+
+    if (!currentUserId) {
+      const noUserError = new Error('You need to be signed in to add a session entry.');
+      setError(noUserError);
       return null;
     }
-    await loadSessions();
+
+    const { data, error: entryError } = await supabase
+      .from('session_entries')
+      .insert({
+        user_id: currentUserId,
+        session_id: sessionId,
+        move_id: moveId,
+        previous_status: previousStatus,
+        new_status: newStatus,
+        notes_added: Boolean(notesAdded),
+      })
+      .select()
+      .single();
+
+    if (entryError) {
+      console.error(entryError);
+      setError(entryError);
+      return null;
+    }
+
+    await loadSessions(currentUserId);
     return data;
   }
 
   async function deleteSessionEntry(sessionId, moveId) {
-    const { error } = await supabase
+    const { error: entryError } = await supabase
       .from('session_entries')
       .delete()
       .eq('session_id', sessionId)
       .eq('move_id', moveId);
-    if (error) {
-      console.error(error);
-      setError(error);
-    } else {
-      await loadSessions();
+
+    if (entryError) {
+      console.error(entryError);
+      setError(entryError);
+      return;
     }
+
+    await loadSessions();
   }
 
   async function deleteSession(id) {
-    const { error } = await supabase
+    const { error: sessionError } = await supabase
       .from('sessions')
       .delete()
       .eq('id', id);
-    if (error) {
-      console.error(error);
-      setError(error);
-    } else {
-      await loadSessions();
+
+    if (sessionError) {
+      console.error(sessionError);
+      setError(sessionError);
+      return;
     }
+
+    await loadSessions();
   }
 
   return (
     <AppContext.Provider value={{
-      moves, loading, error,
-      addMove, updateMove, deleteMove,
-      sessions, loadSessions,
-      createSession, addSessionEntry, deleteSessionEntry, deleteSession,
-      combos, loadCombos, createCombo, updateCombo, deleteCombo,
-      librarySearch, setLibrarySearch, libraryFilter, setLibraryFilter,
-    }}>
+      user,
+      moves,
+      sessions,
+      combos,
+      loading,
+      error,
+      addMove,
+      updateMove,
+      deleteMove,
+      loadSessions,
+      createSession,
+      addSessionEntry,
+      deleteSessionEntry,
+      deleteSession,
+      loadCombos,
+      createCombo,
+      updateCombo,
+      deleteCombo,
+      librarySearch,
+      setLibrarySearch,
+      libraryFilter,
+      setLibraryFilter,
+    }}
+    >
       {children}
     </AppContext.Provider>
   );
