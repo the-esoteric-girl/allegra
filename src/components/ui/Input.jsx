@@ -11,6 +11,7 @@ export default function Input({
   name,
   id,
   className,
+  type = 'text',
 }) {
   const wrapperClass = [
     styles.wrapper,
@@ -28,6 +29,7 @@ export default function Input({
     onChange,
     name,
     id,
+    type,
   };
 
   return (

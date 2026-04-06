@@ -30,6 +30,63 @@ export function AppProvider({ children }) {
     return nextUser?.id ?? null;
   }
 
+  async function signIn(email, password) {
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
+      console.error(signInError);
+      setError(signInError);
+      return { data: null, error: signInError };
+    }
+
+    return { data, error: null };
+  }
+
+  async function signUp(email, password, username) {
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (signUpError) {
+      console.error(signUpError);
+      setError(signUpError);
+      return { data: null, error: signUpError };
+    }
+
+    const userId = data?.user?.id ?? data?.session?.user?.id;
+
+    if (userId && username) {
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ username: username.trim() })
+        .eq('id', userId);
+
+      if (profileError) {
+        console.error(profileError);
+        setError(profileError);
+        return { data: null, error: profileError };
+      }
+    }
+
+    return { data, error: null };
+  }
+
+  async function signOut() {
+    const { error: signOutError } = await supabase.auth.signOut();
+
+    if (signOutError) {
+      console.error(signOutError);
+      setError(signOutError);
+      return { error: signOutError };
+    }
+
+    return { error: null };
+  }
+
   async function fetchMoves(userIdOverride) {
     const currentUserId = userIdOverride !== undefined
       ? userIdOverride
@@ -493,6 +550,9 @@ export function AppProvider({ children }) {
       createCombo,
       updateCombo,
       deleteCombo,
+      signIn,
+      signUp,
+      signOut,
       librarySearch,
       setLibrarySearch,
       libraryFilter,

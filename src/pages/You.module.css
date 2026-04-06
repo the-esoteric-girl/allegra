@@ -11,6 +11,23 @@
   margin-bottom: 1.5rem;
 }
 
+.headingRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headingRow .heading {
+  margin-bottom: 0;
+}
+
+.userMeta {
+  margin-top: var(--space-1);
+  margin-bottom: var(--space-6);
+  font: var(--text-body-sm);
+  color: var(--color-text-secondary);
+}
+
 .statsRow {
   display: flex;
   gap: 0.625rem;

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useApp } from '../context/useApp';
+import { useApp } from '../hooks/useApp';
 import { Button, StatusPill } from '../components/ui';
 import styles from './MoveDetail.module.css';
 

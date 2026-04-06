@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
-import { useApp } from '../context/useApp';
+import { useApp } from '../hooks/useApp';
+import { Button } from '../components/ui';
 import styles from './You.module.css';
 
 function formatDate(isoString) {
@@ -16,7 +17,7 @@ function capitalize(str) {
 }
 
 export default function You() {
-  const { moves, sessions, deleteSession } = useApp();
+  const { user, moves, sessions, deleteSession, signOut } = useApp();
   const navigate = useNavigate();
   const [sortOrder, setSortOrder] = useState('newest');
   const [expandedSessionId, setExpandedSessionId] = useState(null);
@@ -46,9 +47,23 @@ export default function You() {
     setDeletingSessionId(null);
   }
 
+  async function handleSignOut() {
+    const { error } = await signOut();
+    if (!error) navigate('/auth');
+  }
+
   return (
     <div className={styles.page}>
-      <h1 className={styles.heading}>You</h1>
+      <div className={styles.headingRow}>
+        <h1 className={styles.heading}>You</h1>
+        <Button variant="ghost" size="sm" onClick={handleSignOut}>
+          Sign out
+        </Button>
+      </div>
+
+      {user?.email && (
+        <p className={styles.userMeta}>{user.email}</p>
+      )}
 
       {/* Stats */}
       <div className={styles.statsRow}>

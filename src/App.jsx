@@ -1,16 +1,18 @@
 import { useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Outlet } from 'react-router-dom';
 import Library from './pages/Library';
 import MoveDetail from './pages/MoveDetail';
 import Combos from './pages/Combos';
 import ComboDetail from './pages/ComboDetail';
 import ComboEdit from './pages/ComboEdit';
 import You from './pages/You';
+import Auth from './pages/Auth';
 import BottomNav from './components/BottomNav';
 import LogModal from './components/LogModal';
 import SessionPill from './components/SessionPill';
+import ProtectedRoute from './components/ProtectedRoute';
 
-function App() {
+function ProtectedAppLayout() {
   const [isLogOpen, setIsLogOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [sessionEntries, setSessionEntries] = useState([]);
@@ -48,15 +50,9 @@ function App() {
   return (
     <>
       <div style={{ paddingBottom: 80 }}>
-        <Routes>
-          <Route path="/" element={<Library />} />
-          <Route path="/move/:id" element={<MoveDetail />} />
-          <Route path="/combos" element={<Combos />} />
-          <Route path="/combos/:id" element={<ComboDetail />} />
-          <Route path="/combos/:id/edit" element={<ComboEdit />} />
-          <Route path="/you" element={<You />} />
-        </Routes>
+        <Outlet />
       </div>
+
       {isMinimized && !isLogOpen && (
         <SessionPill
           entryCount={sessionEntries.length}
@@ -64,7 +60,9 @@ function App() {
           onDiscard={handleDiscard}
         />
       )}
+
       <BottomNav onLogPress={handleLogPress} />
+
       <LogModal
         isOpen={isLogOpen}
         onClose={handleClose}
@@ -77,6 +75,29 @@ function App() {
         setSessionNotes={setSessionNotes}
       />
     </>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/auth" element={<Auth />} />
+
+      <Route
+        element={(
+          <ProtectedRoute>
+            <ProtectedAppLayout />
+          </ProtectedRoute>
+        )}
+      >
+        <Route path="/" element={<Library />} />
+        <Route path="/move/:id" element={<MoveDetail />} />
+        <Route path="/combos" element={<Combos />} />
+        <Route path="/combos/:id" element={<ComboDetail />} />
+        <Route path="/combos/:id/edit" element={<ComboEdit />} />
+        <Route path="/you" element={<You />} />
+      </Route>
+    </Routes>
   );
 }
 

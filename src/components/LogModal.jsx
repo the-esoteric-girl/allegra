@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronRight, ChevronLeft, Trash2, X, Search, Plus, Check } from 'lucide-react';
-import { useApp } from '../context/useApp';
+import { useApp } from '../hooks/useApp';
 import { Button, StatusPill, StatusDot, IconButton, Pill, BottomSheet } from './ui';
 import styles from './LogModal.module.css';
 
