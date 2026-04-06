@@ -21,7 +21,7 @@ test.describe('Auth', () => {
     test.skip(!email || !password, 'Set E2E_EMAIL and E2E_PASSWORD to run sign-in flow');
 
     await signIn(page, { email, password });
-    await expect(page.getByText('Allegra')).toBeVisible();
+    await expect(page.getByPlaceholder('Search moves...')).toBeVisible();
   });
 
   test('can create a profile with disposable credentials', async ({ page }) => {

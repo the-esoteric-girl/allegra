@@ -10,11 +10,15 @@ export function getTestCredentials() {
 
 export async function signIn(page, { email, password }) {
   await page.goto('/auth');
+
+  // If session is already active, /auth redirects to the app.
+  if (!page.url().includes('/auth')) return;
+
   await page.getByRole('button', { name: 'Sign in' }).first().click();
   await page.locator('#auth-email').fill(email);
   await page.locator('#auth-password').fill(password);
   await page.locator('form').getByRole('button', { name: 'Sign in' }).click();
-  await expect(page).not.toHaveURL(/\/auth$/);
+  await expect(page).toHaveURL((url) => url.pathname !== '/auth');
 }
 
 export async function signUp(page, { email, password, username }) {

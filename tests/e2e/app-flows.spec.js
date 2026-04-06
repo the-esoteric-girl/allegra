@@ -9,7 +9,7 @@ test.describe('Core app flows', () => {
   });
 
   test('library search filters visible moves', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: 'Allegra' })).toBeVisible();
+    await expect(page.getByPlaceholder('Search moves...')).toBeVisible();
     const cardsBefore = page.locator('[class*="moveCard"]');
     const beforeCount = await cardsBefore.count();
 
@@ -60,7 +60,7 @@ test.describe('Core app flows', () => {
     await page.getByRole('button', { name: 'Create combo' }).click();
 
     await page.getByText(comboName).first().click();
-    await expect(page.getByRole('heading', { name: 'Combo' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Combo', exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Delete combo' }).click();
     await expect(page.getByRole('heading', { name: 'Delete combo?' })).toBeVisible();
     await page.getByRole('button', { name: 'Delete combo' }).last().click();
