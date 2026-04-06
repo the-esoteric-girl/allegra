@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronRight, ChevronLeft, Trash2, X, Plus } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Button, StatusPill, IconButton, Pill, BottomSheet, Input, SearchField, MoveSelectRow, Card, StatusOptionButton } from './ui';
+import { Button, StatusPill, IconButton, Pill, BottomSheet, Input, MoveSelectRow, Card, StatusOptionButton, MoveListControls } from './ui';
+import { filterMovesBySearchAndStatus, sortMoves } from '../lib/moveListControls';
 import styles from './LogModal.module.css';
 
 const STATUS_OPTIONS = ['', 'want to try', 'working on', 'achieved'];
@@ -62,7 +63,9 @@ export default function LogModal({
 
   const [mode, setMode] = useState('logging');
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchFilter, setSearchFilter] = useState('all');
+  const [moveScopeFilter, setMoveScopeFilter] = useState('all');
+  const [moveStatusFilter, setMoveStatusFilter] = useState('any');
+  const [moveSortBy, setMoveSortBy] = useState('alpha-asc');
   const [pendingIds, setPendingIds] = useState([]);
   const [statusPickerFor, setStatusPickerFor] = useState(null);
   const [createMoveMode, setCreateMoveMode] = useState(false);
@@ -74,13 +77,18 @@ export default function LogModal({
 
   useEffect(() => {
     if (isOpen) {
-      setMode('logging');
-      setSearchQuery('');
-      setSearchFilter('all');
-      setPendingIds([]);
-      setStatusPickerFor(null);
-      setCreateMoveMode(false);
-      setExpandedSummaryNotes([]);
+      const resetTimer = setTimeout(() => {
+        setMode('logging');
+        setSearchQuery('');
+        setMoveScopeFilter('all');
+        setMoveStatusFilter('any');
+        setMoveSortBy('alpha-asc');
+        setPendingIds([]);
+        setStatusPickerFor(null);
+        setCreateMoveMode(false);
+        setExpandedSummaryNotes([]);
+      }, 0);
+      return () => clearTimeout(resetTimer);
     }
   }, [isOpen]);
 
@@ -100,19 +108,19 @@ export default function LogModal({
 
   const q = searchQuery.trim().toLowerCase();
 
-  const shownMoves = moves.filter(m => {
-    if (searchFilter === 'selected') {
-      return sessionEntries.some(e => e.moveId === m.id) || pendingIds.includes(m.id);
-    }
-    if (q) {
-      if (m.name.toLowerCase().includes(q)) return true;
-      if (Array.isArray(m.aliases) && m.aliases.some(a => a.toLowerCase().includes(q))) return true;
-      return false;
-    }
-    return true;
-  });
+  const scopedMoves = moveScopeFilter === 'selected'
+    ? moves.filter((m) => sessionEntries.some((e) => e.moveId === m.id) || pendingIds.includes(m.id))
+    : moves;
 
-  const noResults = q && shownMoves.length === 0 && searchFilter === 'all';
+  const shownMoves = sortMoves(
+    filterMovesBySearchAndStatus(scopedMoves, {
+      searchQuery: q,
+      statusFilter: moveStatusFilter,
+    }),
+    moveSortBy
+  );
+
+  const noResults = q && shownMoves.length === 0 && moveScopeFilter === 'all';
   const newPendingCount = pendingIds.filter(id => !sessionEntries.some(e => e.moveId === id)).length;
 
   // ── Handlers ────────────────────────────────────────────────────────────────
@@ -178,7 +186,9 @@ export default function LogModal({
     setPendingIds([]);
     setMode('logging');
     setSearchQuery('');
-    setSearchFilter('all');
+    setMoveScopeFilter('all');
+    setMoveStatusFilter('any');
+    setMoveSortBy('alpha-asc');
   }
 
   async function handleCreateMove() {
@@ -198,7 +208,9 @@ export default function LogModal({
     setCreateForm({ name: '', alias: '', status: '' });
     setMode('logging');
     setSearchQuery('');
-    setSearchFilter('all');
+    setMoveScopeFilter('all');
+    setMoveStatusFilter('any');
+    setMoveSortBy('alpha-asc');
   }
 
   async function handleSaveSession() {
@@ -216,7 +228,9 @@ export default function LogModal({
   function dismissAddMoves() {
     setMode('logging');
     setSearchQuery('');
-    setSearchFilter('all');
+    setMoveScopeFilter('all');
+    setMoveStatusFilter('any');
+    setMoveSortBy('alpha-asc');
     setPendingIds([]);
     setCreateMoveMode(false);
   }
@@ -526,25 +540,32 @@ export default function LogModal({
                 </div>
               ) : (
                 <>
-                  <div className={styles.searchWrap}>
-                    <SearchField
-                      inputRef={searchInputRef}
-                      id="add-move-search"
-                      name="add-move-search"
-                      className={styles.searchInputWrap}
-                      inputClassName={styles.searchInput}
-                      placeholder="Search moves"
-                      value={searchQuery}
-                      onChange={e => { setSearchQuery(e.target.value); setSearchFilter('all'); }}
-                      onClear={() => setSearchQuery('')}
+                  <div className={styles.addMovesControls}>
+                    <MoveListControls
+                      idPrefix="log-add"
+                      searchValue={searchQuery}
+                      onSearchChange={(next) => {
+                        setSearchQuery(next);
+                        setMoveScopeFilter('all');
+                      }}
+                      onSearchClear={() => setSearchQuery('')}
+                      statusFilter={moveStatusFilter}
+                      onStatusFilterChange={setMoveStatusFilter}
+                      sortBy={moveSortBy}
+                      onSortByChange={setMoveSortBy}
+                      includeCreatedSort
+                      searchPlaceholder="Search moves"
+                      searchInputRef={searchInputRef}
+                      searchClassName={styles.searchInputWrap}
+                      searchInputClassName={styles.searchInput}
                     />
                   </div>
 
-                  <div className={styles.filterRow}>
-                    <Pill active={searchFilter === 'all'} onClick={() => setSearchFilter('all')}>
-                      All Statuses
+                  <div className={styles.scopeRow}>
+                    <Pill active={moveScopeFilter === 'all'} onClick={() => setMoveScopeFilter('all')}>
+                      All moves
                     </Pill>
-                    <Pill active={searchFilter === 'selected'} onClick={() => setSearchFilter('selected')}>
+                    <Pill active={moveScopeFilter === 'selected'} onClick={() => setMoveScopeFilter('selected')}>
                       Selected
                     </Pill>
                   </div>

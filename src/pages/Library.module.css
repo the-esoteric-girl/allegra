@@ -24,7 +24,6 @@
 
 .searchWrapper {
   position: relative;
-  margin-bottom: var(--card-gap);
 }
 
 .searchInput {
@@ -45,17 +44,8 @@
   color: var(--color-text-placeholder);
 }
 
-.filterRow {
-  display: flex;
-  gap: 0.5rem;
-  overflow-x: auto;
-  scrollbar-width: none;
+.controls {
   margin-bottom: var(--section-gap);
-  padding-bottom: 0.125rem;
-}
-
-.filterRow::-webkit-scrollbar {
-  display: none;
 }
 
 .moveCountRow {
@@ -70,15 +60,6 @@
   color: var(--color-text-secondary);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-}
-
-.sortToggle {
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
-  letter-spacing: 0.04em;
-  padding: 0.1875rem 0.625rem;
-  height: auto;
-  min-height: 2rem;
 }
 
 .moveCard {

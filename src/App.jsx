@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Routes, Route, Outlet } from 'react-router-dom';
+import { Routes, Route, useLocation, useOutlet } from 'react-router-dom';
 import Library from './pages/Library';
 import MoveDetail from './pages/MoveDetail';
 import Combos from './pages/Combos';
@@ -11,12 +11,15 @@ import BottomNav from './components/BottomNav';
 import LogModal from './components/LogModal';
 import SessionPill from './components/SessionPill';
 import ProtectedRoute from './components/ProtectedRoute';
+import './App.css';
 
 function ProtectedAppLayout() {
   const [isLogOpen, setIsLogOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [sessionEntries, setSessionEntries] = useState([]);
   const [sessionNotes, setSessionNotes] = useState('');
+  const outlet = useOutlet();
+  const location = useLocation();
 
   function handleLogPress() {
     setIsMinimized(false);
@@ -49,8 +52,13 @@ function ProtectedAppLayout() {
 
   return (
     <>
-      <div style={{ paddingBottom: 80 }}>
-        <Outlet />
+      <div className="appShell">
+        <div
+          key={location.pathname}
+          className="pageTransition pageTransitionGeneric"
+        >
+          {outlet}
+        </div>
       </div>
 
       {isMinimized && !isLogOpen && (

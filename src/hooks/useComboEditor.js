@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
+import { filterMovesBySearchAndStatus, sortMoves } from '../lib/moveListControls';
 
 function normalizeIds(ids) {
   return Array.isArray(ids) ? ids.filter(Boolean) : [];
@@ -12,29 +13,31 @@ export function useComboEditor(moves, initialDraft = {}) {
   const [notes, setNotes] = useState(initialDraft.notes || '');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSelected, setShowSelected] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('any');
+  const [sortBy, setSortBy] = useState('alpha-asc');
   const [pendingIds, setPendingIds] = useState([]);
 
   const moveMap = useMemo(() => Object.fromEntries(moves.map((m) => [m.id, m])), [moves]);
 
   const filteredMoves = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
+    const scopedMoves = showSelected
+      ? moves.filter((move) => pendingIds.includes(move.id))
+      : moves;
 
-    return moves.filter((move) => {
-      const matchesSearch =
-        !q ||
-        move.name.toLowerCase().includes(q) ||
-        (move.aliases || []).some((alias) => alias.toLowerCase().includes(q));
-
-      const matchesFilter = !showSelected || pendingIds.includes(move.id);
-
-      return matchesSearch && matchesFilter;
+    const filtered = filterMovesBySearchAndStatus(scopedMoves, {
+      searchQuery,
+      statusFilter,
     });
-  }, [moves, searchQuery, showSelected, pendingIds]);
+
+    return sortMoves(filtered, sortBy);
+  }, [moves, searchQuery, showSelected, pendingIds, statusFilter, sortBy]);
 
   function openAddMoves() {
     setPendingIds([...moveIds]);
     setSearchQuery('');
     setShowSelected(false);
+    setStatusFilter('any');
+    setSortBy('alpha-asc');
     setView('addMoves');
   }
 
@@ -42,6 +45,8 @@ export function useComboEditor(moves, initialDraft = {}) {
     setView('main');
     setSearchQuery('');
     setShowSelected(false);
+    setStatusFilter('any');
+    setSortBy('alpha-asc');
     setPendingIds([]);
   }
 
@@ -79,6 +84,8 @@ export function useComboEditor(moves, initialDraft = {}) {
     setView('main');
     setSearchQuery('');
     setShowSelected(false);
+    setStatusFilter('any');
+    setSortBy('alpha-asc');
     setPendingIds([]);
   }
 
@@ -100,6 +107,10 @@ export function useComboEditor(moves, initialDraft = {}) {
     setSearchQuery,
     showSelected,
     setShowSelected,
+    statusFilter,
+    setStatusFilter,
+    sortBy,
+    setSortBy,
     pendingIds,
     moveMap,
     filteredMoves,

@@ -13,7 +13,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, X, ArrowDown } from 'lucide-react';
-import { Button, Pill, Input, SectionLabel, SearchField, MoveSelectRow, Field } from './ui';
+import { Button, Pill, Input, SectionLabel, MoveSelectRow, Field, MoveListControls } from './ui';
 import styles from './ComboEditorPanels.module.css';
 
 function SortableCard({ id, name, onRemove }) {
@@ -65,6 +65,10 @@ export default function ComboEditorPanels({ editor, mode = 'create', showInlineA
     setSearchQuery,
     showSelected,
     setShowSelected,
+    statusFilter,
+    setStatusFilter,
+    sortBy,
+    setSortBy,
     filteredMoves,
     togglePending,
     moveMap,
@@ -157,18 +161,22 @@ export default function ComboEditorPanels({ editor, mode = 'create', showInlineA
 
         <div className={styles.panel}>
           <div className={styles.addContent}>
-            <SearchField
-              id="combo-search"
-              name="combo-search"
-              placeholder="Search moves..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onClear={() => setSearchQuery('')}
+            <MoveListControls
+              idPrefix="combo-add"
+              searchValue={searchQuery}
+              onSearchChange={setSearchQuery}
+              onSearchClear={() => setSearchQuery('')}
+              statusFilter={statusFilter}
+              onStatusFilterChange={setStatusFilter}
+              sortBy={sortBy}
+              onSortByChange={setSortBy}
+              includeCreatedSort
+              searchPlaceholder="Search moves..."
             />
 
             <div className={styles.filterRow}>
               <Pill active={!showSelected} onClick={() => setShowSelected(false)}>
-                All Statuses
+                All moves
               </Pill>
               <Pill active={showSelected} onClick={() => setShowSelected(true)}>
                 Selected

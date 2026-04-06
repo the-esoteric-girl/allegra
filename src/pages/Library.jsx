@@ -1,32 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../hooks/useApp';
-import { Pill, StatusPill, SearchField, Card, Button } from '../components/ui';
+import { StatusPill, Card, MoveListControls } from '../components/ui';
+import { filterMovesBySearchAndStatus, sortMoves } from '../lib/moveListControls';
 import styles from './Library.module.css';
 
-const STATUS_FILTERS = ['All', 'Achieved', 'Working On', 'Want To Try'];
-
 export default function Library() {
-  const { moves, librarySearch: search, setLibrarySearch: setSearch, libraryFilter: statusFilter, setLibraryFilter: setStatusFilter } = useApp();
+  const { moves, librarySearch: search, setLibrarySearch: setSearch } = useApp();
   const navigate = useNavigate();
-  const [sortDir, setSortDir] = useState('asc');
+  const [statusFilter, setStatusFilter] = useState('any');
+  const [sortBy, setSortBy] = useState('alpha-asc');
 
-  const filtered = moves
-    .filter((move) => {
-      const query = search.toLowerCase();
-      const matchesSearch =
-        move.name.toLowerCase().includes(query) ||
-        (move.aliases || []).some((alias) => alias.toLowerCase().includes(query));
-      const matchesStatus =
-        statusFilter === 'All' ||
-        (move.status || '').toLowerCase() === statusFilter.toLowerCase();
-      return matchesSearch && matchesStatus;
-    })
-    .sort((a, b) =>
-      sortDir === 'asc'
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name)
-    );
+  const filtered = sortMoves(
+    filterMovesBySearchAndStatus(moves, { searchQuery: search, statusFilter }),
+    sortBy
+  );
 
   return (
     <div className={styles.page}>
@@ -35,41 +23,26 @@ export default function Library() {
         <div className={styles.subtitle}>Move Tracker</div>
       </div>
 
-      <SearchField
-        id="library-search"
-        name="library-search"
-        className={styles.searchWrapper}
-        inputClassName={styles.searchInput}
-        placeholder="Search moves..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        onClear={() => setSearch('')}
+      <MoveListControls
+        idPrefix="library"
+        searchValue={search}
+        onSearchChange={setSearch}
+        onSearchClear={() => setSearch('')}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        sortBy={sortBy}
+        onSortByChange={setSortBy}
+        includeCreatedSort
+        searchPlaceholder="Search moves..."
+        className={styles.controls}
+        searchClassName={styles.searchWrapper}
+        searchInputClassName={styles.searchInput}
       />
-
-      <div className={styles.filterRow}>
-        {STATUS_FILTERS.map((s) => (
-          <Pill
-            key={s}
-            active={statusFilter === s}
-            onClick={() => setStatusFilter(s)}
-          >
-            {s}
-          </Pill>
-        ))}
-      </div>
 
       <div className={styles.moveCountRow}>
         <div className={styles.moveCount}>
           {filtered.length} move{filtered.length !== 1 ? 's' : ''}
         </div>
-        <Button
-          variant="subtle"
-          size="sm"
-          className={styles.sortToggle}
-          onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
-        >
-          {sortDir === 'asc' ? 'A→Z' : 'Z→A'}
-        </Button>
       </div>
 
       {filtered.length === 0 ? (
