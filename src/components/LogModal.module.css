@@ -52,31 +52,6 @@
   flex-shrink: 0;
 }
 
-.sessionNoteTextarea {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0.75rem 1rem;
-  font-size: 0.9375rem;
-  font-family: var(--font-main);
-  color: var(--color-text-primary);
-  background: var(--color-surface-blue);
-  border: 1.5px solid transparent;
-  border-radius: var(--radius-md);
-  outline: none;
-  resize: none;
-  overflow: hidden;
-  line-height: 1.6;
-  min-height: 3rem;
-}
-
-.sessionNoteTextarea:focus {
-  box-shadow: 0 0 0 1.5px var(--color-blue);
-}
-
-.sessionNoteTextarea::placeholder {
-  color: var(--color-text-placeholder);
-}
-
 /* ── Empty state ─────────────────────────────────────────────────────────── */
 
 .emptyState {
@@ -114,13 +89,9 @@
 }
 
 .entryCard {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: var(--card-padding);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  box-shadow: var(--shadow-card);
 }
 
 .entryRow {
@@ -153,12 +124,10 @@
 }
 
 .statusPillBtn {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
+  height: auto;
+  min-height: 0;
+  padding: 0 !important;
+  border-radius: var(--radius-pill);
 }
 
 .pickerDropdown {
@@ -174,46 +143,14 @@
   overflow: hidden;
 }
 
-.pickerOption {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 0.8125rem;
-  font-family: var(--font-main);
-  color: var(--color-text-primary);
-  text-align: left;
-}
-
-.pickerOption:hover {
-  background: var(--color-bg);
-}
-
-.pickerOptionActive {
-  background: var(--color-surface-blue);
-}
-
-.pickerOptionActive:hover {
-  background: var(--color-surface-blue);
-}
-
-.pickerOption span {
-  flex: 1;
-}
-
 .entryDeleteBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
   color: var(--color-text-muted);
-  padding: var(--space-1);
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.entryDeleteBtn:hover {
+  color: var(--color-text-primary);
 }
 
 .entryNoteTextarea {
@@ -293,13 +230,9 @@
 }
 
 .summaryEntry {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: var(--card-padding);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  box-shadow: var(--shadow-card);
 }
 
 .summaryEntryRow {
@@ -340,43 +273,11 @@
 }
 
 .searchInputWrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  background: var(--color-surface-blue);
-  border-radius: var(--radius-lg);
-  padding: 0 var(--space-3);
-}
-
-.searchIcon {
-  color: var(--color-text-muted);
-  flex-shrink: 0;
+  width: 100%;
 }
 
 .searchInput {
-  flex: 1;
-  padding: var(--space-3) var(--space-2);
-  font-size: 0.9375rem;
-  font-family: var(--font-main);
-  color: var(--color-text-primary);
-  background: transparent;
-  border: none;
-  outline: none;
-}
-
-.searchInput::placeholder {
-  color: var(--color-text-placeholder);
-}
-
-.searchClear {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--color-text-muted);
-  padding: 0;
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
+  border-radius: var(--radius-lg);
 }
 
 .filterRow {
@@ -390,43 +291,29 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  padding: 0 var(--space-4);
 }
 
 .moveSearchItem {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background: none;
-  border: none;
-  border-bottom: 1px solid var(--color-border-subtle);
-  cursor: pointer;
-  text-align: left;
+  padding: var(--space-4) 0;
+  border-bottom: none;
 }
 
 .moveCheckbox {
-  width: 1.375rem;
-  height: 1.375rem;
-  border-radius: var(--radius-pill);
-  border: 2px solid var(--color-border-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: var(--color-surface);
-}
-
-.moveCheckboxChecked {
-  background: var(--color-blue);
-  border-color: var(--color-blue);
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
 }
 
 .moveSearchName {
-  font-size: 0.9375rem;
-  font-weight: 600;
+  font: var(--text-body-sm-medium);
   color: var(--color-text-primary);
-  font-family: var(--font-main);
+}
+
+.moveRowDivider {
+  height: 1px;
+  background: var(--color-border-subtle);
 }
 
 .noResultsState {
@@ -446,14 +333,11 @@
 }
 
 .createMoveLink {
-  background: none;
-  border: none;
-  cursor: pointer;
   font-size: 0.875rem;
-  font-weight: 600;
   color: var(--color-blue);
-  font-family: var(--font-main);
-  padding: 0;
+  padding: 0.25rem 0.5rem;
+  height: auto;
+  min-height: 0;
 }
 
 /* ── Create move form ────────────────────────────────────────────────────── */
@@ -492,28 +376,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-}
-
-.createStatusOption {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-bg);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-family: var(--font-main);
-  color: var(--color-text-secondary);
-  text-align: left;
-}
-
-.createStatusOptionActive {
-  background: var(--color-surface-blue);
-  border-color: var(--color-blue);
-  color: var(--color-text-primary);
-  font-weight: 600;
 }
 
 .createFormActions {

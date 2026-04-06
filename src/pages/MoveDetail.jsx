@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../hooks/useApp';
-import { Button, StatusPill, ConfirmDialog, Select, Input } from '../components/ui';
+import { Button, StatusPill, ConfirmDialog, Select, Input, Field } from '../components/ui';
 import styles from './MoveDetail.module.css';
 
 export default function MoveDetail() {
@@ -123,19 +123,20 @@ export default function MoveDetail() {
       {editing ? (
         <>
           <div className={styles.card}>
-            <div className={styles.sectionLabel}>Status</div>
-            <Select
-              id="edit-status"
-              name="edit-status"
-              className={styles.select}
-              value={editStatus}
-              onChange={(e) => setEditStatus(e.target.value)}
-            >
-              <option value="">no status</option>
-              <option value="want to try">want to try</option>
-              <option value="working on">working on</option>
-              <option value="achieved">achieved</option>
-            </Select>
+            <Field label="Status" htmlFor="edit-status" labelClassName={styles.sectionLabel}>
+              <Select
+                id="edit-status"
+                name="edit-status"
+                className={styles.select}
+                value={editStatus}
+                onChange={(e) => setEditStatus(e.target.value)}
+              >
+                <option value="">no status</option>
+                <option value="want to try">want to try</option>
+                <option value="working on">working on</option>
+                <option value="achieved">achieved</option>
+              </Select>
+            </Field>
           </div>
 
           <div className={styles.card}>

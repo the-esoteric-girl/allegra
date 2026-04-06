@@ -41,15 +41,7 @@
 }
 
 .nameSection {
-  display: flex;
-  flex-direction: column;
   gap: var(--space-2);
-}
-
-.fieldLabel {
-  font: var(--text-label);
-  color: var(--color-text-secondary);
-  letter-spacing: 0.03em;
 }
 
 .emptyState {
@@ -167,16 +159,6 @@
   display: none;
 }
 
-.clearBtn {
-  color: var(--color-text-muted);
-  display: flex;
-  align-items: center;
-}
-
-.clearBtn:hover {
-  color: var(--color-text-secondary);
-}
-
 .filterRow {
   display: flex;
   gap: var(--space-2);
@@ -188,12 +170,8 @@
 }
 
 .moveRow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  width: 100%;
   padding: var(--space-4) 0;
-  text-align: left;
+  border-bottom: none;
 }
 
 .checkbox {
@@ -201,13 +179,6 @@
   height: 1.5rem;
   border-radius: 50%;
   border: 2px solid var(--color-border);
-  flex-shrink: 0;
-  transition: background 0.15s, border-color 0.15s;
-}
-
-.checkboxSelected {
-  background: var(--color-blue);
-  border-color: var(--color-blue);
 }
 
 .moveName {

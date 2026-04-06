@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Pill, StatusPill, Input, Card, Button } from '../components/ui';
+import { Pill, StatusPill, SearchField, Card, Button } from '../components/ui';
 import styles from './Library.module.css';
 
 const STATUS_FILTERS = ['All', 'Achieved', 'Working On', 'Want To Try'];
@@ -36,27 +35,15 @@ export default function Library() {
         <div className={styles.subtitle}>Move Tracker</div>
       </div>
 
-      <Input
+      <SearchField
         id="library-search"
         name="library-search"
         className={styles.searchWrapper}
         inputClassName={styles.searchInput}
-        type="text"
         placeholder="Search moves..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        rightIcon={
-          search ? (
-            <button
-              type="button"
-              className={styles.clearSearch}
-              onClick={() => setSearch('')}
-              aria-label="Clear search"
-            >
-              <X size={14} />
-            </button>
-          ) : null
-        }
+        onClear={() => setSearch('')}
       />
 
       <div className={styles.filterRow}>

@@ -35,7 +35,8 @@
 .leftIcon {
   position: absolute;
   left: 0.875rem;
-  top: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
   color: var(--color-text-placeholder);
   display: flex;
   align-items: center;
@@ -45,7 +46,8 @@
 .rightIcon {
   position: absolute;
   right: 0.875rem;
-  top: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
   color: var(--color-text-placeholder);
   display: flex;
   align-items: center;

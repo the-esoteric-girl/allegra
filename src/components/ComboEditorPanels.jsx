@@ -12,8 +12,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, X, Search, ArrowDown } from 'lucide-react';
-import { Button, Pill, Input, SectionLabel } from './ui';
+import { GripVertical, X, ArrowDown } from 'lucide-react';
+import { Button, Pill, Input, SectionLabel, SearchField, MoveSelectRow, Field } from './ui';
 import styles from './ComboEditorPanels.module.css';
 
 function SortableCard({ id, name, onRemove }) {
@@ -82,14 +82,15 @@ export default function ComboEditorPanels({ editor, mode = 'create', showInlineA
         <div className={styles.panel}>
           <div className={styles.mainContent}>
             <div className={styles.nameSection}>
-              <label className={styles.fieldLabel} htmlFor="combo-name">Name</label>
-              <Input
-                id="combo-name"
-                name="combo-name"
-                placeholder="Name (optional)"
-                value={comboName}
-                onChange={(e) => setComboName(e.target.value)}
-              />
+              <Field label="Name" htmlFor="combo-name">
+                <Input
+                  id="combo-name"
+                  name="combo-name"
+                  placeholder="Name (optional)"
+                  value={comboName}
+                  onChange={(e) => setComboName(e.target.value)}
+                />
+              </Field>
             </div>
 
             {moveIds.length === 0 ? (
@@ -138,15 +139,17 @@ export default function ComboEditorPanels({ editor, mode = 'create', showInlineA
                   </Button>
                 </div>
 
-                <Input
-                  id="combo-notes"
-                  name="combo-notes"
-                  placeholder="Any notes about this combo..."
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  multiline
-                  rows={3}
-                />
+                <Field label="Notes" htmlFor="combo-notes">
+                  <Input
+                    id="combo-notes"
+                    name="combo-notes"
+                    placeholder="Any notes about this combo..."
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    multiline
+                    rows={3}
+                  />
+                </Field>
               </>
             )}
           </div>
@@ -154,25 +157,13 @@ export default function ComboEditorPanels({ editor, mode = 'create', showInlineA
 
         <div className={styles.panel}>
           <div className={styles.addContent}>
-            <Input
+            <SearchField
               id="combo-search"
               name="combo-search"
               placeholder="Search moves..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              leftIcon={<Search size={16} />}
-              rightIcon={
-                searchQuery ? (
-                  <button
-                    type="button"
-                    className={styles.clearBtn}
-                    onClick={() => setSearchQuery('')}
-                    aria-label="Clear search"
-                  >
-                    <X size={16} />
-                  </button>
-                ) : null
-              }
+              onClear={() => setSearchQuery('')}
             />
 
             <div className={styles.filterRow}>
@@ -189,14 +180,14 @@ export default function ComboEditorPanels({ editor, mode = 'create', showInlineA
                 const selected = pendingIds.includes(move.id);
                 return (
                   <div key={move.id}>
-                    <button
-                      type="button"
-                      className={styles.moveRow}
+                    <MoveSelectRow
+                      label={move.name}
+                      selected={selected}
                       onClick={() => togglePending(move.id)}
-                    >
-                      <span className={`${styles.checkbox} ${selected ? styles.checkboxSelected : ''}`} />
-                      <span className={styles.moveName}>{move.name}</span>
-                    </button>
+                      className={styles.moveRow}
+                      checkboxClassName={styles.checkbox}
+                      labelClassName={styles.moveName}
+                    />
                     {index < filteredMoves.length - 1 && <div className={styles.divider} />}
                   </div>
                 );

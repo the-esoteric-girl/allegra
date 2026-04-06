@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronRight, ChevronLeft, Trash2, X, Search, Plus, Check } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Trash2, X, Plus } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Button, StatusPill, StatusDot, IconButton, Pill, BottomSheet } from './ui';
+import { Button, StatusPill, IconButton, Pill, BottomSheet, Input, SearchField, MoveSelectRow, Card, StatusOptionButton } from './ui';
 import styles from './LogModal.module.css';
 
 const STATUS_OPTIONS = ['', 'want to try', 'working on', 'achieved'];
@@ -367,7 +367,7 @@ export default function LogModal({
               const isExpanded = expandedSummaryNotes.includes(entry.moveId);
               const noteText = entry.savedNote?.trim();
               return (
-                <div key={entry.moveId} className={styles.summaryEntry}>
+                <Card key={entry.moveId} className={styles.summaryEntry}>
                   <div className={styles.summaryEntryRow}>
                     <span className={styles.summaryEntryName}>{move?.name ?? 'Unknown'}</span>
                     <StatusPill status={entry.currentStatus} size="sm" />
@@ -387,7 +387,7 @@ export default function LogModal({
                       {noteText}
                     </p>
                   )}
-                </div>
+                </Card>
               );
             })}
           </div>
@@ -400,11 +400,14 @@ export default function LogModal({
             <div className={styles.panel}>
               <div className={styles.scrollContent}>
                 <div className={styles.sessionNoteWrap}>
-                  <AutoTextarea
+                  <Input
+                    id="log-session-notes"
+                    name="log-session-notes"
+                    multiline
+                    rows={3}
                     value={sessionNotes}
                     onChange={e => setSessionNotes(e.target.value)}
                     placeholder="How's the session going?"
-                    className={styles.sessionNoteTextarea}
                     data-testid="log-session-notes"
                   />
                 </div>
@@ -427,48 +430,49 @@ export default function LogModal({
                     {sessionEntries.map(entry => {
                       const move = moves.find(m => m.id === entry.moveId);
                       return (
-                        <div key={entry.moveId} className={styles.entryCard}>
+                        <Card key={entry.moveId} className={styles.entryCard}>
                           <div className={styles.entryRow}>
                             <span className={styles.entryName}>{move?.name ?? 'Unknown'}</span>
                             <div className={styles.entryActions}>
                               <div className={styles.statusPickerWrap}>
-                                <button
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
                                   className={styles.statusPillBtn}
                                   onClick={() => setStatusPickerFor(
                                     prev => prev === entry.moveId ? null : entry.moveId
                                   )}
                                 >
                                   <StatusPill status={entry.currentStatus} size="sm" />
-                                </button>
+                                </Button>
                                 {statusPickerFor === entry.moveId && (
                                   <div className={styles.pickerDropdown}>
                                     {STATUS_OPTIONS.map(s => (
-                                      <button
+                                      <StatusOptionButton
                                         key={s}
-                                        className={[
-                                          styles.pickerOption,
-                                          s === entry.currentStatus ? styles.pickerOptionActive : '',
-                                        ].filter(Boolean).join(' ')}
+                                        status={s}
+                                        label={STATUS_LABELS[s]}
+                                        selected={s === entry.currentStatus}
+                                        variant="menu"
+                                        showCheck
                                         onClick={() => {
                                           handleStatusChange(entry.moveId, s);
                                           setStatusPickerFor(null);
                                         }}
-                                      >
-                                        <StatusDot status={s} size={7} />
-                                        <span>{STATUS_LABELS[s]}</span>
-                                        {s === entry.currentStatus && <Check size={13} />}
-                                      </button>
+                                      />
                                     ))}
                                   </div>
                                 )}
                               </div>
-                              <button
-                                className={styles.entryDeleteBtn}
+                              <IconButton
+                                icon={<X size={16} />}
                                 onClick={() => handleRemoveEntry(entry.moveId)}
-                                aria-label="Remove move"
-                              >
-                                <X size={16} />
-                              </button>
+                                label="Remove move"
+                                variant="ghost"
+                                size="sm"
+                                className={styles.entryDeleteBtn}
+                              />
                             </div>
                           </div>
                           <AutoTextarea
@@ -478,7 +482,7 @@ export default function LogModal({
                             placeholder="Add note…"
                             className={styles.entryNoteTextarea}
                           />
-                        </div>
+                        </Card>
                       );
                     })}
                   </div>
@@ -490,59 +494,50 @@ export default function LogModal({
             <div className={styles.panel}>
               {createMoveMode ? (
                 <div className={styles.createMoveForm}>
-                  <input
-                    ref={createNameInputRef}
+                  <Input
+                    inputRef={createNameInputRef}
                     id="create-name"
                     name="create-name"
-                    className={styles.createInput}
+                    inputClassName={styles.createInput}
                     placeholder="Move name"
                     value={createForm.name}
                     onChange={e => setCreateForm(f => ({ ...f, name: e.target.value }))}
                   />
-                  <input
+                  <Input
                     id="create-alias"
                     name="create-alias"
-                    className={styles.createInput}
+                    inputClassName={styles.createInput}
                     placeholder="Alias (optional)"
                     value={createForm.alias}
                     onChange={e => setCreateForm(f => ({ ...f, alias: e.target.value }))}
                   />
                   <div className={styles.createStatusRow}>
                     {STATUS_OPTIONS.map(s => (
-                      <button
+                      <StatusOptionButton
                         key={s}
-                        className={[
-                          styles.createStatusOption,
-                          createForm.status === s ? styles.createStatusOptionActive : '',
-                        ].filter(Boolean).join(' ')}
+                        status={s}
+                        label={STATUS_LABELS[s]}
+                        selected={createForm.status === s}
+                        variant="list"
                         onClick={() => setCreateForm(f => ({ ...f, status: s }))}
-                      >
-                        <StatusDot status={s} size={7} />
-                        {STATUS_LABELS[s]}
-                      </button>
+                      />
                     ))}
                   </div>
                 </div>
               ) : (
                 <>
                   <div className={styles.searchWrap}>
-                    <div className={styles.searchInputWrap}>
-                      <Search size={16} className={styles.searchIcon} />
-                      <input
-                        ref={searchInputRef}
-                        id="add-move-search"
-                        name="add-move-search"
-                        className={styles.searchInput}
-                        placeholder="Search moves"
-                        value={searchQuery}
-                        onChange={e => { setSearchQuery(e.target.value); setSearchFilter('all'); }}
-                      />
-                      {searchQuery && (
-                        <button className={styles.searchClear} onClick={() => setSearchQuery('')}>
-                          <X size={14} />
-                        </button>
-                      )}
-                    </div>
+                    <SearchField
+                      inputRef={searchInputRef}
+                      id="add-move-search"
+                      name="add-move-search"
+                      className={styles.searchInputWrap}
+                      inputClassName={styles.searchInput}
+                      placeholder="Search moves"
+                      value={searchQuery}
+                      onChange={e => { setSearchQuery(e.target.value); setSearchFilter('all'); }}
+                      onClear={() => setSearchQuery('')}
+                    />
                   </div>
 
                   <div className={styles.filterRow}>
@@ -558,7 +553,10 @@ export default function LogModal({
                     {noResults ? (
                       <div className={styles.noResultsState}>
                         <p className={styles.noResultsText}>No results for "{searchQuery}"</p>
-                        <button
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
                           className={styles.createMoveLink}
                           onClick={() => {
                             setCreateForm({ name: searchQuery, alias: '', status: '' });
@@ -567,26 +565,25 @@ export default function LogModal({
                           data-testid="log-create-custom-move"
                         >
                           + Create custom move
-                        </button>
+                        </Button>
                       </div>
                     ) : (
-                      shownMoves.map(move => {
+                      shownMoves.map((move, index) => {
                         const inSession = sessionEntries.some(e => e.moveId === move.id);
                         const isChecked = inSession || pendingIds.includes(move.id);
                         return (
-                          <button
-                            key={move.id}
-                            className={styles.moveSearchItem}
-                            onClick={() => togglePendingId(move.id)}
-                          >
-                            <div className={[
-                              styles.moveCheckbox,
-                              isChecked ? styles.moveCheckboxChecked : '',
-                            ].filter(Boolean).join(' ')}>
-                              {isChecked && <Check size={11} strokeWidth={3} />}
-                            </div>
-                            <span className={styles.moveSearchName}>{move.name}</span>
-                          </button>
+                          <div key={move.id}>
+                            <MoveSelectRow
+                              label={move.name}
+                              selected={isChecked}
+                              onClick={() => togglePendingId(move.id)}
+                              className={styles.moveSearchItem}
+                              checkboxClassName={styles.moveCheckbox}
+                              labelClassName={styles.moveSearchName}
+                              disabled={inSession}
+                            />
+                            {index < shownMoves.length - 1 && <div className={styles.moveRowDivider} />}
+                          </div>
                         );
                       })
                     )}

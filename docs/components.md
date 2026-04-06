@@ -161,6 +161,108 @@ Shared select/dropdown field rendered on blue surface background.
 
 ---
 
+### SearchField
+
+Shared search input using `Input` with built-in search and clear affordances.
+
+```jsx
+<SearchField
+  id="library-search"
+  name="library-search"
+  value={search}
+  onChange={e => setSearch(e.target.value)}
+  onClear={() => setSearch('')}
+  placeholder="Search moves..."
+/>
+```
+
+| Prop        | Type     | Default  | Values                         |
+|-------------|----------|----------|--------------------------------|
+| id          | string   | —        | required                       |
+| name        | string   | —        | required                       |
+| value       | string   | —        | controlled input value         |
+| onChange    | function | —        | input change handler           |
+| onClear     | function | —        | clear action handler           |
+| placeholder | string   | "Search" | placeholder text               |
+| inputRef    | ref      | —        | input ref (focus/select use)   |
+| className   | string   | —        | wrapper class                  |
+| inputClassName | string | —       | input element class            |
+
+---
+
+### MoveSelectRow
+
+Reusable selectable row used in move pickers.
+
+```jsx
+<MoveSelectRow
+  label={move.name}
+  selected={selected}
+  onClick={() => togglePending(move.id)}
+/>
+```
+
+| Prop             | Type     | Default | Values                             |
+|------------------|----------|---------|------------------------------------|
+| label            | string   | —       | row label                          |
+| selected         | boolean  | false   | checked state                      |
+| onClick          | function | —       | click handler                      |
+| disabled         | boolean  | false   | disables selection                 |
+| className        | string   | —       | row class override                 |
+| checkboxClassName| string   | —       | checkbox class override            |
+| labelClassName   | string   | —       | label class override               |
+
+---
+
+### Field
+
+Simple field wrapper for consistent label/hint/error layout.
+
+```jsx
+<Field label="Name" htmlFor="combo-name" error={nameError}>
+  <Input id="combo-name" name="combo-name" value={name} onChange={...} />
+</Field>
+```
+
+| Prop           | Type   | Default | Values                              |
+|----------------|--------|---------|-------------------------------------|
+| label          | string | —       | field label text                    |
+| htmlFor        | string | —       | label target id                     |
+| hint           | string | —       | helper text under label             |
+| error          | string | —       | error text under input              |
+| className      | string | —       | wrapper class override              |
+| labelClassName | string | —       | label class override                |
+| contentClassName | string | —     | class for children container        |
+
+---
+
+### StatusOptionButton
+
+Reusable status option row with dot, label, and optional selected checkmark.
+
+```jsx
+<StatusOptionButton
+  status="working on"
+  label="Working on"
+  selected={value === 'working on'}
+  variant="menu"
+  showCheck
+  onClick={...}
+/>
+```
+
+| Prop      | Type     | Default | Values                                  |
+|-----------|----------|---------|-----------------------------------------|
+| status    | string   | —       | status token used by `StatusDot`        |
+| label     | string   | —       | visible label                           |
+| selected  | boolean  | false   | selected visual state                   |
+| onClick   | function | —       | click handler                           |
+| variant   | string   | "menu"  | "menu" \| "list"                        |
+| showCheck | boolean  | false   | renders check icon when selected        |
+| className | string   | —       | additional class                        |
+
+---
+
 ### SectionLabel
 
 Uppercase muted section heading label.
