@@ -10,14 +10,19 @@ export default function Input({
   rows = 3,
   name,
   id,
+  inputRef,
+  inputClassName,
+  wrapperClassName,
   className,
   type = 'text',
+  ...props
 }) {
   const wrapperClass = [
     styles.wrapper,
     leftIcon ? styles.hasLeft : '',
     rightIcon ? styles.hasRight : '',
     className,
+    wrapperClassName,
   ]
     .filter(Boolean)
     .join(' ');
@@ -29,16 +34,26 @@ export default function Input({
     onChange,
     name,
     id,
-    type,
+    ...props,
   };
 
   return (
     <div className={wrapperClass}>
       {leftIcon && <span className={styles.leftIcon}>{leftIcon}</span>}
       {multiline ? (
-        <textarea {...sharedProps} rows={rows} />
+        <textarea
+          {...sharedProps}
+          ref={inputRef}
+          rows={rows}
+          className={[styles.input, inputClassName].filter(Boolean).join(' ')}
+        />
       ) : (
-        <input {...sharedProps} />
+        <input
+          {...sharedProps}
+          ref={inputRef}
+          type={type}
+          className={[styles.input, inputClassName].filter(Boolean).join(' ')}
+        />
       )}
       {rightIcon && <span className={styles.rightIcon}>{rightIcon}</span>}
     </div>

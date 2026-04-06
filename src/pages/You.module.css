@@ -71,15 +71,11 @@
 }
 
 .sortSelect {
-  font-size: 0.8125rem;
-  font-family: var(--font-main);
-  color: var(--color-text-secondary);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-sm);
+  width: auto;
+  min-height: 2rem;
   padding: 0.25rem 0.5rem;
-  cursor: pointer;
-  outline: none;
+  font: var(--text-body-sm);
+  color: var(--color-text-secondary);
 }
 
 .emptyText {
@@ -225,15 +221,18 @@
 }
 
 .deleteButton {
-  display: flex;
-  align-items: center;
+  justify-content: flex-start;
   gap: 0.375rem;
-  font-size: 0.8125rem;
-  font-family: var(--font-main);
-  padding: 0.3125rem 0.75rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border-subtle);
-  background: transparent;
-  color: var(--color-text-secondary);
-  cursor: pointer;
+  min-height: 0;
+  height: auto;
+  padding: 0.3125rem 0.75rem !important;
+  border-radius: var(--radius-sm) !important;
+  border: 1px solid var(--color-border-subtle) !important;
+  background: transparent !important;
+  color: var(--color-text-secondary) !important;
+  font: var(--text-body-sm);
+}
+
+.deleteButton:hover {
+  color: var(--color-text-primary) !important;
 }

@@ -132,9 +132,32 @@ Text input or textarea, renders on blue surface background.
 | rows        | number    | 3       | textarea rows|
 | leftIcon    | ReactNode | —       | —            |
 | rightIcon   | ReactNode | —       | —            |
-| className   | string    | —       | —            |
+| className   | string    | —       | wrapper class |
+| inputClassName | string | —       | input/textarea class |
+| inputRef    | ref       | —       | input/textarea ref |
 
 Focus style: `box-shadow`, never border colour change.
+
+---
+
+### Select
+
+Shared select/dropdown field rendered on blue surface background.
+
+```jsx
+<Select id="sort-order" name="sort-order" value={sortOrder} onChange={...}>
+  <option value="newest">Newest first</option>
+  <option value="oldest">Oldest first</option>
+</Select>
+```
+
+| Prop      | Type     | Default | Values                |
+|-----------|----------|---------|-----------------------|
+| id        | string   | —       | required              |
+| name      | string   | —       | required              |
+| value     | string   | —       | selected option value |
+| onChange  | function | —       | —                     |
+| className | string   | —       | additional CSS class  |
 
 ---
 

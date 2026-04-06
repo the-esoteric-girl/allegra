@@ -28,23 +28,21 @@
 }
 
 .searchInput {
-  width: 100%;
   height: 2.75rem;
   background: var(--color-surface-blue);
-  border: none;
+  border: 1.5px solid transparent;
   border-radius: var(--radius-md);
-  padding: 0 1rem;
-  font-size: 0.9375rem;
+  padding: 0 2.5rem 0 1rem;
+  font: var(--text-body);
   color: var(--color-text-primary);
-  outline: none;
 }
 
 .searchInput:focus {
-  border-color: var(--color-blue);
+  box-shadow: 0 0 0 1.5px var(--color-blue);
 }
 
 .searchInput::placeholder {
-  color: var(--color-text-muted);
+  color: var(--color-text-placeholder);
 }
 
 .clearSearch {
@@ -54,10 +52,13 @@
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: var(--color-text-muted);
-  font-size: 1.125rem;
+  color: var(--color-text-placeholder);
   padding: 0;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .filterRow {
@@ -89,34 +90,16 @@
 
 .sortToggle {
   font-size: 0.75rem;
-  font-family: var(--font-main);
-  font-weight: 600;
   color: var(--color-text-secondary);
   letter-spacing: 0.04em;
-  padding: 0.1875rem 0.5rem;
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-subtle);
-  cursor: pointer;
-  transition: filter 0.15s ease;
-}
-
-.sortToggle:hover {
-  filter: brightness(0.97);
+  padding: 0.1875rem 0.625rem;
+  height: auto;
+  min-height: 2rem;
 }
 
 .moveCard {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: var(--card-padding);
+  padding: var(--card-padding) !important;
   margin-bottom: var(--card-gap);
-  cursor: pointer;
-  box-shadow: var(--shadow-card);
-  transition: box-shadow 0.15s ease;
-}
-
-.moveCard:hover {
-  box-shadow: var(--shadow-card-hover);
 }
 
 .moveName {

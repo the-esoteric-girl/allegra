@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { X } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Pill, StatusPill } from '../components/ui';
+import { Pill, StatusPill, Input, Card, Button } from '../components/ui';
 import styles from './Library.module.css';
 
 const STATUS_FILTERS = ['All', 'Achieved', 'Working On', 'Want To Try'];
@@ -35,20 +36,28 @@ export default function Library() {
         <div className={styles.subtitle}>Move Tracker</div>
       </div>
 
-      <div className={styles.searchWrapper}>
-        <input
-          className={styles.searchInput}
-          type="text"
-          placeholder="Search moves..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        {search && (
-          <button className={styles.clearSearch} onClick={() => setSearch('')}>
-            ×
-          </button>
-        )}
-      </div>
+      <Input
+        id="library-search"
+        name="library-search"
+        className={styles.searchWrapper}
+        inputClassName={styles.searchInput}
+        type="text"
+        placeholder="Search moves..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        rightIcon={
+          search ? (
+            <button
+              type="button"
+              className={styles.clearSearch}
+              onClick={() => setSearch('')}
+              aria-label="Clear search"
+            >
+              <X size={14} />
+            </button>
+          ) : null
+        }
+      />
 
       <div className={styles.filterRow}>
         {STATUS_FILTERS.map((s) => (
@@ -66,19 +75,21 @@ export default function Library() {
         <div className={styles.moveCount}>
           {filtered.length} move{filtered.length !== 1 ? 's' : ''}
         </div>
-        <button
+        <Button
+          variant="subtle"
+          size="sm"
           className={styles.sortToggle}
           onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
         >
           {sortDir === 'asc' ? 'A→Z' : 'Z→A'}
-        </button>
+        </Button>
       </div>
 
       {filtered.length === 0 ? (
         <div className={styles.emptyState}>No moves found</div>
       ) : (
         filtered.map((move) => (
-          <div
+          <Card
             key={move.id}
             className={styles.moveCard}
             onClick={() => navigate(`/move/${move.id}`)}
@@ -90,7 +101,7 @@ export default function Library() {
               </div>
             )}
             {move.status && <StatusPill status={move.status} />}
-          </div>
+          </Card>
         ))
       )}
     </div>

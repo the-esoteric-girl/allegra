@@ -10,3 +10,4 @@ export { default as IconButton } from './IconButton';
 export { default as BottomSheet } from './BottomSheet';
 export { default as ComboCard } from './ComboCard';
 export { default as ConfirmDialog } from './ConfirmDialog';
+export { default as Select } from './Select';

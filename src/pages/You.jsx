@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Button, ConfirmDialog } from '../components/ui';
+import { Button, ConfirmDialog, Select } from '../components/ui';
 import styles from './You.module.css';
 
 function formatDate(isoString) {
@@ -85,14 +85,16 @@ export default function You() {
       <section>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Sessions</h2>
-          <select
+          <Select
+            id="sessions-sort"
+            name="sessions-sort"
             value={sortOrder}
             onChange={e => setSortOrder(e.target.value)}
             className={styles.sortSelect}
           >
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
-          </select>
+          </Select>
         </div>
 
         {sortedSessions.length === 0 ? (
@@ -187,14 +189,17 @@ export default function You() {
                       )}
 
                       <div className={styles.deleteZone}>
-                        <button
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          leftIcon={<Trash2 size={14} />}
                           onClick={() => setSessionPendingDelete(session)}
                           className={styles.deleteButton}
                           data-testid={`delete-session-${session.id}`}
                         >
-                          <Trash2 size={14} />
                           Delete session
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   )}

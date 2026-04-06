@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../hooks/useApp';
-import { Button, StatusPill, ConfirmDialog } from '../components/ui';
+import { Button, StatusPill, ConfirmDialog, Select, Input } from '../components/ui';
 import styles from './MoveDetail.module.css';
 
 export default function MoveDetail() {
@@ -124,7 +124,7 @@ export default function MoveDetail() {
         <>
           <div className={styles.card}>
             <div className={styles.sectionLabel}>Status</div>
-            <select
+            <Select
               id="edit-status"
               name="edit-status"
               className={styles.select}
@@ -135,7 +135,7 @@ export default function MoveDetail() {
               <option value="want to try">want to try</option>
               <option value="working on">working on</option>
               <option value="achieved">achieved</option>
-            </select>
+            </Select>
           </div>
 
           <div className={styles.card}>
@@ -151,10 +151,11 @@ export default function MoveDetail() {
               </div>
             )}
             <div className={styles.addAliasRow}>
-              <input
+              <Input
                 id="add-alias"
                 name="add-alias"
-                className={styles.addAliasInput}
+                className={styles.addAliasField}
+                inputClassName={styles.addAliasInput}
                 value={newAlias}
                 onChange={(e) => { setNewAlias(e.target.value); setAliasError(''); }}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddAlias()}
@@ -188,10 +189,11 @@ export default function MoveDetail() {
             </div>
             {editingNote ? (
               <div className={styles.addNoteForm}>
-                <textarea
+                <Input
                   id="note-text"
                   name="note-text"
-                  className={styles.textarea}
+                  inputClassName={styles.textarea}
+                  multiline
                   rows={3}
                   placeholder="Add a technique tip..."
                   value={noteText}
