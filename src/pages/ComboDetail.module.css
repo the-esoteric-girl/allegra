@@ -1,0 +1,103 @@
+.page {
+  padding: var(--page-padding) var(--page-padding) var(--page-padding-bottom);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.stateText {
+  padding: var(--page-padding);
+  font: var(--text-body);
+  color: var(--color-text-secondary);
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.backButton {
+  justify-self: flex-start;
+}
+
+.headerTitle {
+  margin: 0;
+  font: var(--text-body-sm-medium);
+  color: var(--color-text-secondary);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.rightSlot {
+  justify-self: flex-end;
+}
+
+.comboName {
+  margin: 0;
+  font: var(--text-heading-2);
+  color: var(--color-text-primary);
+}
+
+.moveCount {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-secondary);
+  font: var(--text-body-sm);
+}
+
+.sequenceList {
+  display: flex;
+  flex-direction: column;
+}
+
+.sequenceCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  border: 1px solid var(--color-border);
+}
+
+.sequenceNumber {
+  font: var(--text-body-sm-medium);
+  color: var(--color-text-secondary);
+}
+
+.sequenceName {
+  font: var(--text-body);
+  color: var(--color-text-primary);
+}
+
+.connector {
+  display: flex;
+  justify-content: center;
+  color: var(--color-text-muted);
+  padding: var(--space-1) 0;
+}
+
+.emptyText {
+  margin: 0;
+  font: var(--text-body-sm);
+  color: var(--color-text-secondary);
+}
+
+.notesSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.notesText {
+  margin: 0;
+  font: var(--text-body);
+  color: var(--color-text-primary);
+  white-space: pre-wrap;
+}
+
+.deleteButton {
+  margin-top: var(--space-4);
+  align-self: flex-start;
+  color: var(--color-error-text) !important;
+}

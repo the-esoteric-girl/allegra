@@ -57,17 +57,51 @@ export function AppProvider({ children }) {
       .from('combos')
       .select('*')
       .order('created_at', { ascending: false });
+    console.log('[loadCombos] fetched:', data);
     if (data) setCombos(data);
   }
 
   async function createCombo(name, moveIds, notes) {
+    console.log('[createCombo] inserting:', { name, moveIds, notes });
+    console.log('[createCombo] move_ids type:', typeof moveIds, Array.isArray(moveIds));
     const { data, error } = await supabase
       .from('combos')
       .insert([{ name: name || null, move_ids: moveIds, notes: notes || null }])
       .select()
       .single();
+    console.log('[createCombo] result:', { data, error });
     if (data) await loadCombos();
     return { data, error };
+  }
+
+  async function updateCombo(id, updates) {
+    const { data, error } = await supabase
+      .from('combos')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) {
+      console.error(error);
+      setError(error);
+      return { data: null, error };
+    }
+    await loadCombos();
+    return { data, error: null };
+  }
+
+  async function deleteCombo(id) {
+    const { error } = await supabase
+      .from('combos')
+      .delete()
+      .eq('id', id);
+    if (error) {
+      console.error(error);
+      setError(error);
+      return { error };
+    }
+    await loadCombos();
+    return { error: null };
   }
 
   useEffect(() => {
@@ -187,7 +221,7 @@ export function AppProvider({ children }) {
       addMove, updateMove, deleteMove,
       sessions, loadSessions,
       createSession, addSessionEntry, deleteSessionEntry, deleteSession,
-      combos, loadCombos, createCombo,
+      combos, loadCombos, createCombo, updateCombo, deleteCombo,
       librarySearch, setLibrarySearch, libraryFilter, setLibraryFilter,
     }}>
       {children}
