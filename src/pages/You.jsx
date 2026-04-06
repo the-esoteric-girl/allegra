@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Button } from '../components/ui';
+import { Button, ConfirmDialog } from '../components/ui';
 import styles from './You.module.css';
 
 function formatDate(isoString) {
@@ -21,7 +21,8 @@ export default function You() {
   const navigate = useNavigate();
   const [sortOrder, setSortOrder] = useState('newest');
   const [expandedSessionId, setExpandedSessionId] = useState(null);
-  const [deletingSessionId, setDeletingSessionId] = useState(null);
+  const [sessionPendingDelete, setSessionPendingDelete] = useState(null);
+  const [deletingSession, setDeletingSession] = useState(false);
 
   const achievedCount = moves.filter(m => m.status === 'achieved').length;
   const workingOnCount = moves.filter(m => m.status === 'working on').length;
@@ -38,13 +39,14 @@ export default function You() {
 
   function toggleSession(id) {
     setExpandedSessionId(prev => (prev === id ? null : id));
-    setDeletingSessionId(null);
   }
 
   async function handleDeleteSession(id) {
+    setDeletingSession(true);
     await deleteSession(id);
+    setDeletingSession(false);
     setExpandedSessionId(null);
-    setDeletingSessionId(null);
+    setSessionPendingDelete(null);
   }
 
   async function handleSignOut() {
@@ -181,31 +183,13 @@ export default function You() {
                       )}
 
                       <div className={styles.deleteZone}>
-                        {deletingSessionId === session.id ? (
-                          <div className={styles.deleteConfirmRow}>
-                            <span className={styles.deleteConfirmText}>Delete this session?</span>
-                            <button
-                              onClick={() => handleDeleteSession(session.id)}
-                              className={styles.deleteConfirmButton}
-                            >
-                              Confirm
-                            </button>
-                            <button
-                              onClick={() => setDeletingSessionId(null)}
-                              className={styles.deleteCancelButton}
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => setDeletingSessionId(session.id)}
-                            className={styles.deleteButton}
-                          >
-                            <Trash2 size={14} />
-                            Delete session
-                          </button>
-                        )}
+                        <button
+                          onClick={() => setSessionPendingDelete(session)}
+                          className={styles.deleteButton}
+                        >
+                          <Trash2 size={14} />
+                          Delete session
+                        </button>
                       </div>
                     </div>
                   )}
@@ -215,6 +199,17 @@ export default function You() {
           </div>
         )}
       </section>
+
+      <ConfirmDialog
+        isOpen={Boolean(sessionPendingDelete)}
+        title="Delete session?"
+        message={sessionPendingDelete ? `This will permanently remove your session from ${formatDate(sessionPendingDelete.date)}.` : ''}
+        confirmLabel="Delete session"
+        cancelLabel="Keep session"
+        onCancel={() => setSessionPendingDelete(null)}
+        onConfirm={() => sessionPendingDelete && handleDeleteSession(sessionPendingDelete.id)}
+        loading={deletingSession}
+      />
     </div>
   );
 }

@@ -25,3 +25,6 @@ dist-ssr
 *.sln
 *.sw?
 .claude/
+playwright-report/
+test-results/
+blob-report/

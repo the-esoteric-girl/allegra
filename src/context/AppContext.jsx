@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { AppContext } from './appContextInstance';
 
-const DEFAULT_STATUS = 'want to try';
+const DEFAULT_STATUS = null;
+
+function normalizeStatus(status) {
+  if (status === '' || status === null || status === undefined) return null;
+  return status;
+}
 
 export function AppProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -332,6 +337,8 @@ export function AppProvider({ children }) {
 
     const ownerId = user_id ?? currentUserId;
 
+    const normalizedStatus = normalizeStatus(status);
+
     const { data: moveRow, error: moveError } = await supabase
       .from('moves')
       .insert({
@@ -339,7 +346,6 @@ export function AppProvider({ children }) {
         aliases,
         parent_move_id,
         user_id: ownerId,
-        status,
       })
       .select()
       .single();
@@ -350,23 +356,25 @@ export function AppProvider({ children }) {
       return null;
     }
 
-    const { error: userMoveError } = await supabase
-      .from('user_move_data')
-      .upsert({
-        user_id: currentUserId,
-        move_id: moveRow.id,
-        status,
-        note: null,
-      }, { onConflict: 'user_id,move_id' });
+    if (normalizedStatus !== null) {
+      const { error: userMoveError } = await supabase
+        .from('user_move_data')
+        .upsert({
+          user_id: currentUserId,
+          move_id: moveRow.id,
+          status: normalizedStatus,
+          note: null,
+        }, { onConflict: 'user_id,move_id' });
 
-    if (userMoveError) {
-      console.error(userMoveError);
-      setError(userMoveError);
-      return null;
+      if (userMoveError) {
+        console.error(userMoveError);
+        setError(userMoveError);
+        return null;
+      }
     }
 
     await fetchMoves(currentUserId);
-    return { ...moveRow, status, note: null };
+    return { ...moveRow, status: normalizedStatus, note: null };
   }
 
   async function updateMove(id, updates) {
@@ -379,6 +387,7 @@ export function AppProvider({ children }) {
     }
 
     const { status, note, ...moveUpdates } = updates || {};
+    const normalizedStatus = normalizeStatus(status);
 
     if (Object.keys(moveUpdates).length > 0) {
       const { error: moveError } = await supabase
@@ -395,26 +404,44 @@ export function AppProvider({ children }) {
 
     if (status !== undefined || note !== undefined) {
       const existingMove = moves.find((move) => move.id === id);
-      const resolvedStatus = status ?? existingMove?.status ?? DEFAULT_STATUS;
+      const resolvedStatus =
+        status !== undefined
+          ? normalizedStatus
+          : normalizeStatus(existingMove?.status);
+      const resolvedNote =
+        note !== undefined
+          ? note ?? null
+          : existingMove?.note ?? null;
 
-      const upsertPayload = {
-        user_id: currentUserId,
-        move_id: id,
-        status: resolvedStatus,
-      };
+      if (resolvedStatus === null && !resolvedNote) {
+        const { error: deleteUserMoveError } = await supabase
+          .from('user_move_data')
+          .delete()
+          .eq('user_id', currentUserId)
+          .eq('move_id', id);
 
-      if (note !== undefined) {
-        upsertPayload.note = note ?? null;
-      }
+        if (deleteUserMoveError) {
+          console.error(deleteUserMoveError);
+          setError(deleteUserMoveError);
+          return;
+        }
+      } else {
+        const upsertPayload = {
+          user_id: currentUserId,
+          move_id: id,
+          status: resolvedStatus,
+          note: resolvedNote,
+        };
 
-      const { error: userMoveError } = await supabase
-        .from('user_move_data')
-        .upsert(upsertPayload, { onConflict: 'user_id,move_id' });
+        const { error: userMoveError } = await supabase
+          .from('user_move_data')
+          .upsert(upsertPayload, { onConflict: 'user_id,move_id' });
 
-      if (userMoveError) {
-        console.error(userMoveError);
-        setError(userMoveError);
-        return;
+        if (userMoveError) {
+          console.error(userMoveError);
+          setError(userMoveError);
+          return;
+        }
       }
     }
 

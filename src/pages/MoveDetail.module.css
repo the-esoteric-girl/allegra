@@ -201,3 +201,8 @@
   display: flex;
   gap: var(--space-2);
 }
+
+.deleteButton {
+  margin-top: var(--space-2);
+  color: var(--color-error-text) !important;
+}

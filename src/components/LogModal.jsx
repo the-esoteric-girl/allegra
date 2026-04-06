@@ -4,8 +4,9 @@ import { useApp } from '../hooks/useApp';
 import { Button, StatusPill, StatusDot, IconButton, Pill, BottomSheet } from './ui';
 import styles from './LogModal.module.css';
 
-const STATUS_OPTIONS = ['want to try', 'working on', 'achieved'];
+const STATUS_OPTIONS = ['', 'want to try', 'working on', 'achieved'];
 const STATUS_LABELS = {
+  '': 'No status',
   'want to try': 'Want to try',
   'working on': 'Working on',
   'achieved': 'Achieved',
@@ -56,7 +57,7 @@ export default function LogModal({
   const [pendingIds, setPendingIds] = useState([]);
   const [statusPickerFor, setStatusPickerFor] = useState(null);
   const [createMoveMode, setCreateMoveMode] = useState(false);
-  const [createForm, setCreateForm] = useState({ name: '', alias: '', status: 'want to try' });
+  const [createForm, setCreateForm] = useState({ name: '', alias: '', status: '' });
   const [expandedSummaryNotes, setExpandedSummaryNotes] = useState([]);
 
   const searchInputRef = useRef(null);
@@ -158,8 +159,8 @@ export default function LogModal({
       const move = moves.find(m => m.id === id);
       return {
         moveId: id,
-        previousStatus: move.status,
-        currentStatus: move.status,
+        previousStatus: move?.status || '',
+        currentStatus: move?.status || '',
         note: move.note || '',
         savedNote: move.note || '',
       };
@@ -185,7 +186,7 @@ export default function LogModal({
       savedNote: '',
     }]);
     setCreateMoveMode(false);
-    setCreateForm({ name: '', alias: '', status: 'want to try' });
+    setCreateForm({ name: '', alias: '', status: '' });
     setMode('logging');
     setSearchQuery('');
     setSearchFilter('all');
@@ -542,7 +543,7 @@ export default function LogModal({
                         <button
                           className={styles.createMoveLink}
                           onClick={() => {
-                            setCreateForm({ name: searchQuery, alias: '', status: 'want to try' });
+                            setCreateForm({ name: searchQuery, alias: '', status: '' });
                             setCreateMoveMode(true);
                           }}
                         >

@@ -27,3 +27,8 @@
   background-color: var(--color-want-bg);
   color: var(--color-want-text);
 }
+
+.none {
+  background-color: var(--color-surface-blue);
+  color: var(--color-text-secondary);
+}

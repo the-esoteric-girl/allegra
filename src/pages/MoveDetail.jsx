@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../hooks/useApp';
-import { Button, StatusPill } from '../components/ui';
+import { Button, StatusPill, ConfirmDialog } from '../components/ui';
 import styles from './MoveDetail.module.css';
 
 export default function MoveDetail() {
   const { id } = useParams();
-  const { moves, loading, updateMove } = useApp();
+  const { moves, loading, updateMove, deleteMove } = useApp();
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
   const [editStatus, setEditStatus] = useState('');
@@ -16,6 +16,8 @@ export default function MoveDetail() {
   const [aliasConflict, setAliasConflict] = useState(null);
   const [editingNote, setEditingNote] = useState(false);
   const [noteText, setNoteText] = useState('');
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   function toTitleCase(str) {
     return str.replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
@@ -28,7 +30,7 @@ export default function MoveDetail() {
   if (!move) return <p>Move not found</p>;
 
   function handleEditClick() {
-    setEditStatus(move.status);
+    setEditStatus(move.status || '');
     setEditAliases(move.aliases ? [...move.aliases] : []);
     setNewAlias('');
     setAliasError('');
@@ -91,6 +93,13 @@ export default function MoveDetail() {
     setEditingNote(false);
   }
 
+  async function handleDeleteMove() {
+    setDeleting(true);
+    await deleteMove(move.id);
+    setDeleting(false);
+    navigate('/');
+  }
+
   return (
     <div className={styles.page}>
       <Button variant="ghost" size="sm" className={styles.backButton} onClick={() => navigate('/')}>
@@ -107,7 +116,7 @@ export default function MoveDetail() {
 
       {!editing && (
         <div className={styles.statusRow}>
-          <StatusPill status={move.status} />
+          <StatusPill status={move.status || ''} />
         </div>
       )}
 
@@ -122,6 +131,7 @@ export default function MoveDetail() {
               value={editStatus}
               onChange={(e) => setEditStatus(e.target.value)}
             >
+              <option value="">no status</option>
               <option value="want to try">want to try</option>
               <option value="working on">working on</option>
               <option value="achieved">achieved</option>
@@ -202,8 +212,23 @@ export default function MoveDetail() {
               <Button variant="subtle" size="sm" onClick={handleEditNote}>+ Add note</Button>
             )}
           </div>
+
+          <Button variant="ghost" className={styles.deleteButton} onClick={() => setIsDeleteDialogOpen(true)}>
+            Delete move
+          </Button>
         </>
       )}
+
+      <ConfirmDialog
+        isOpen={isDeleteDialogOpen}
+        title="Delete move?"
+        message={`"${move.name}" will be permanently removed from your library.`}
+        confirmLabel="Delete move"
+        cancelLabel="Keep move"
+        onCancel={() => setIsDeleteDialogOpen(false)}
+        onConfirm={handleDeleteMove}
+        loading={deleting}
+      />
     </div>
   );
 }

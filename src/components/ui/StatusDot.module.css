@@ -15,3 +15,7 @@
 .wantToTry {
   background-color: var(--color-want);
 }
+
+.none {
+  border: 1.5px solid var(--color-border-subtle);
+}

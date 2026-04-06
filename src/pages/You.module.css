@@ -224,39 +224,6 @@
   padding-top: 0.75rem;
 }
 
-.deleteConfirmRow {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-}
-
-.deleteConfirmText {
-  font-size: 0.8125rem;
-  color: var(--color-text-secondary);
-}
-
-.deleteConfirmButton {
-  font-size: 0.8125rem;
-  font-family: var(--font-main);
-  padding: 0.3125rem 0.75rem;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: #c0392b;
-  color: #fff;
-  cursor: pointer;
-}
-
-.deleteCancelButton {
-  font-size: 0.8125rem;
-  font-family: var(--font-main);
-  padding: 0.3125rem 0.75rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border-subtle);
-  background: transparent;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-}
-
 .deleteButton {
   display: flex;
   align-items: center;

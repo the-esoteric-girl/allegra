@@ -19,7 +19,7 @@ export default function Library() {
         (move.aliases || []).some((alias) => alias.toLowerCase().includes(query));
       const matchesStatus =
         statusFilter === 'All' ||
-        move.status.toLowerCase() === statusFilter.toLowerCase();
+        (move.status || '').toLowerCase() === statusFilter.toLowerCase();
       return matchesSearch && matchesStatus;
     })
     .sort((a, b) =>
@@ -89,7 +89,7 @@ export default function Library() {
                 {move.aliases.join(', ')}
               </div>
             )}
-            <StatusPill status={move.status} />
+            {move.status && <StatusPill status={move.status} />}
           </div>
         ))
       )}

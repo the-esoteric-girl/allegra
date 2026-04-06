@@ -1,22 +1,26 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowDown, Layers, Pencil, ChevronLeft } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Card, Button, SectionLabel, IconButton } from '../components/ui';
+import { Card, Button, SectionLabel, IconButton, ConfirmDialog } from '../components/ui';
 import styles from './ComboDetail.module.css';
 
 export default function ComboDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { combos, moves, loading, deleteCombo } = useApp();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const combo = combos.find((item) => String(item.id) === id);
   const moveMap = useMemo(() => Object.fromEntries(moves.map((move) => [move.id, move])), [moves]);
   const sequence = combo?.move_ids || [];
 
-  async function handleDelete() {
+  async function handleDeleteConfirm() {
     if (!combo) return;
+    setDeleting(true);
     const { error } = await deleteCombo(combo.id);
+    setDeleting(false);
     if (!error) navigate('/combos');
   }
 
@@ -85,9 +89,20 @@ export default function ComboDetail() {
         </div>
       )}
 
-      <Button variant="ghost" className={styles.deleteButton} onClick={handleDelete}>
+      <Button variant="ghost" className={styles.deleteButton} onClick={() => setIsDeleteDialogOpen(true)}>
         Delete combo
       </Button>
+
+      <ConfirmDialog
+        isOpen={isDeleteDialogOpen}
+        title="Delete combo?"
+        message={`"${combo.name || 'Untitled combo'}" will be removed permanently.`}
+        confirmLabel="Delete combo"
+        cancelLabel="Keep combo"
+        onCancel={() => setIsDeleteDialogOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        loading={deleting}
+      />
     </div>
   );
 }
