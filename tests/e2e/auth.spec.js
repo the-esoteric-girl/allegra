@@ -6,13 +6,13 @@ test.describe('Auth', () => {
   test('shows validation errors for empty fields', async ({ page }) => {
     await page.goto('/auth');
 
-    await page.locator('form').getByRole('button', { name: 'Sign in' }).click();
+    await page.getByTestId('auth-submit').click();
     await expect(page.getByText('Email and password are required.')).toBeVisible();
 
-    await page.getByRole('button', { name: 'Sign up' }).click();
+    await page.getByTestId('auth-mode-signup').click();
     await page.locator('#auth-email').fill('new-user@example.com');
     await page.locator('#auth-password').fill('password123!');
-    await page.getByRole('button', { name: 'Create account' }).click();
+    await page.getByTestId('auth-submit').click();
     await expect(page.getByText('Username is required for sign up.')).toBeVisible();
   });
 

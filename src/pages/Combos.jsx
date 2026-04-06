@@ -17,7 +17,7 @@ export default function Combos() {
         <div className={styles.subtitle}>Build your sequences</div>
       </div>
 
-      <Button onClick={() => setIsModalOpen(true)} fullWidth>
+      <Button onClick={() => setIsModalOpen(true)} fullWidth data-testid="combos-new-button">
         + New combo
       </Button>
 

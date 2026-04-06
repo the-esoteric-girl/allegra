@@ -34,12 +34,17 @@ export default function ComboModal({ isOpen, onClose }) {
 
   const bottomAction = editor.isAddPanel
     ? (
-      <Button fullWidth onClick={editor.confirmAddMoves} disabled={editor.pendingIds.length === 0}>
+      <Button
+        fullWidth
+        onClick={editor.confirmAddMoves}
+        disabled={editor.pendingIds.length === 0}
+        data-testid="combo-add-moves-submit"
+      >
         + {addBtnLabel}
       </Button>
     )
     : editor.moveIds.length > 0
-      ? <Button fullWidth onClick={handleCreate}>Create combo</Button>
+      ? <Button fullWidth onClick={handleCreate} data-testid="combo-create-submit">Create combo</Button>
       : null;
 
   return (
@@ -52,6 +57,7 @@ export default function ComboModal({ isOpen, onClose }) {
           icon={<ChevronLeft size={20} />}
           label={editor.isAddPanel ? 'Back' : 'Close'}
           onClick={editor.isAddPanel ? editor.closeAddMoves : resetAndClose}
+          data-testid={editor.isAddPanel ? 'combo-add-back' : 'combo-close'}
         />
       }
       rightAction={
@@ -60,6 +66,7 @@ export default function ComboModal({ isOpen, onClose }) {
             icon={<Trash2 size={18} />}
             label="Discard combo"
             onClick={resetAndClose}
+            data-testid="combo-discard"
           />
         ) : undefined
       }

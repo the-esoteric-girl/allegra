@@ -25,21 +25,21 @@ test.describe('Core app flows', () => {
   test('log modal can create move and log a session', async ({ page }) => {
     const moveName = `E2E Move ${Date.now()}`;
 
-    await page.getByRole('button', { name: 'Log' }).click();
+    await page.getByTestId('bottom-nav-log').click();
     await expect(page.getByRole('heading', { name: 'Log session' })).toBeVisible();
 
-    await page.getByRole('button', { name: 'Add move' }).click();
+    await page.getByTestId('log-empty-add-move').click();
     await page.locator('#add-move-search').fill(moveName);
     await expect(page.getByText(`No results for "${moveName}"`)).toBeVisible();
-    await page.getByRole('button', { name: '+ Create custom move' }).click();
+    await page.getByTestId('log-create-custom-move').click();
 
     await page.locator('#create-name').fill(moveName);
-    await page.getByRole('button', { name: 'Create move' }).click();
+    await page.getByTestId('log-create-move-submit').click();
 
-    await page.getByPlaceholder("How's the session going?").fill('Logged via Playwright');
-    await page.getByRole('button', { name: 'Review session' }).click();
+    await page.getByTestId('log-session-notes').fill('Logged via Playwright');
+    await page.getByTestId('log-review-session').click();
     await expect(page.getByRole('heading', { name: 'Session summary' })).toBeVisible();
-    await page.getByRole('button', { name: 'Log session' }).click();
+    await page.getByTestId('log-session-submit').click();
     await expect(page.getByRole('heading', { name: 'Session summary' })).not.toBeVisible();
   });
 
@@ -47,7 +47,7 @@ test.describe('Core app flows', () => {
     const comboName = `E2E Combo ${Date.now()}`;
 
     await page.getByRole('link', { name: 'Combos' }).click();
-    await page.getByRole('button', { name: '+ New combo' }).click();
+    await page.getByTestId('combos-new-button').click();
     await expect(page.getByRole('heading', { name: 'New combo' })).toBeVisible();
 
     await page.locator('#combo-name').fill(comboName);
@@ -56,14 +56,14 @@ test.describe('Core app flows', () => {
     const firstMoveRow = page.locator('[class*="moveRow"]').first();
     await expect(firstMoveRow).toBeVisible();
     await firstMoveRow.click();
-    await page.getByRole('button', { name: /\+ Add 1 move/ }).click();
-    await page.getByRole('button', { name: 'Create combo' }).click();
+    await page.getByTestId('combo-add-moves-submit').click();
+    await page.getByTestId('combo-create-submit').click();
 
     await page.getByText(comboName).first().click();
     await expect(page.getByRole('heading', { name: 'Combo', exact: true })).toBeVisible();
-    await page.getByRole('button', { name: 'Delete combo' }).click();
-    await expect(page.getByRole('heading', { name: 'Delete combo?' })).toBeVisible();
-    await page.getByRole('button', { name: 'Delete combo' }).last().click();
+    await page.getByTestId('delete-combo-trigger').click();
+    await expect(page.getByTestId('delete-combo-dialog-title')).toBeVisible();
+    await page.getByTestId('delete-combo-dialog-confirm').click();
     await expect(page).toHaveURL(/\/combos$/);
   });
 });

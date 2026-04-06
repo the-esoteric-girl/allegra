@@ -89,7 +89,12 @@ export default function ComboDetail() {
         </div>
       )}
 
-      <Button variant="ghost" className={styles.deleteButton} onClick={() => setIsDeleteDialogOpen(true)}>
+      <Button
+        variant="ghost"
+        className={styles.deleteButton}
+        onClick={() => setIsDeleteDialogOpen(true)}
+        data-testid="delete-combo-trigger"
+      >
         Delete combo
       </Button>
 
@@ -102,6 +107,7 @@ export default function ComboDetail() {
         onCancel={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDeleteConfirm}
         loading={deleting}
+        testIdPrefix="delete-combo-dialog"
       />
     </div>
   );

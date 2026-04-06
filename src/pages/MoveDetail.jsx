@@ -213,7 +213,12 @@ export default function MoveDetail() {
             )}
           </div>
 
-          <Button variant="ghost" className={styles.deleteButton} onClick={() => setIsDeleteDialogOpen(true)}>
+          <Button
+            variant="ghost"
+            className={styles.deleteButton}
+            onClick={() => setIsDeleteDialogOpen(true)}
+            data-testid="delete-move-trigger"
+          >
             Delete move
           </Button>
         </>
@@ -228,6 +233,7 @@ export default function MoveDetail() {
         onCancel={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDeleteMove}
         loading={deleting}
+        testIdPrefix="delete-move-dialog"
       />
     </div>
   );

@@ -17,7 +17,15 @@ function formatDate(date) {
   return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }
 
-function AutoTextarea({ value, onChange, onBlur, placeholder, className, autoFocus }) {
+function AutoTextarea({
+  value,
+  onChange,
+  onBlur,
+  placeholder,
+  className,
+  autoFocus,
+  ...props
+}) {
   const ref = useRef(null);
   useEffect(() => {
     if (!ref.current) return;
@@ -34,6 +42,7 @@ function AutoTextarea({ value, onChange, onBlur, placeholder, className, autoFoc
       className={className}
       rows={1}
       autoFocus={autoFocus}
+      {...props}
     />
   );
 }
@@ -222,6 +231,7 @@ export default function LogModal({
         icon={<ChevronLeft size={20} />}
         onClick={() => setMode('logging')}
         label="Back"
+        data-testid="log-summary-back"
       />
     );
     rightAction = (
@@ -229,6 +239,7 @@ export default function LogModal({
         icon={<Trash2 size={18} />}
         onClick={onDiscard}
         label="Discard session"
+        data-testid="log-discard-session"
       />
     );
   } else if (mode === 'addMoves' && createMoveMode) {
@@ -238,6 +249,7 @@ export default function LogModal({
         icon={<ChevronLeft size={20} />}
         onClick={() => setCreateMoveMode(false)}
         label="Back"
+        data-testid="log-create-move-back"
       />
     );
     rightAction = null;
@@ -248,6 +260,7 @@ export default function LogModal({
         icon={<ChevronLeft size={20} />}
         onClick={dismissAddMoves}
         label="Back"
+        data-testid="log-add-moves-back"
       />
     );
     rightAction = null;
@@ -260,6 +273,7 @@ export default function LogModal({
           icon={<ChevronRight size={20} />}
           onClick={() => setMode('summary')}
           label="Review session"
+          data-testid="log-review-session"
         />
       )
       : null;
@@ -270,17 +284,17 @@ export default function LogModal({
   let bottomAction;
   if (mode === 'summary') {
     bottomAction = (
-      <Button variant="primary" fullWidth onClick={handleSaveSession}>
+      <Button variant="primary" fullWidth onClick={handleSaveSession} data-testid="log-session-submit">
         Log session
       </Button>
     );
   } else if (mode === 'addMoves' && createMoveMode) {
     bottomAction = (
       <div className={styles.createFormActions}>
-        <Button variant="primary" fullWidth onClick={handleCreateMove}>
+        <Button variant="primary" fullWidth onClick={handleCreateMove} data-testid="log-create-move-submit">
           Create move
         </Button>
-        <Button variant="ghost" fullWidth onClick={() => setCreateMoveMode(false)}>
+        <Button variant="ghost" fullWidth onClick={() => setCreateMoveMode(false)} data-testid="log-create-move-cancel">
           Cancel
         </Button>
       </div>
@@ -293,6 +307,7 @@ export default function LogModal({
           fullWidth
           leftIcon={<Plus size={16} />}
           onClick={handleConfirmAddMoves}
+          data-testid="log-add-selected-moves"
         >
           Add {newPendingCount} {newPendingCount === 1 ? 'move' : 'moves'}
         </Button>
@@ -306,6 +321,7 @@ export default function LogModal({
           fullWidth
           leftIcon={<Plus size={16} />}
           onClick={() => { setMode('addMoves'); setPendingIds([]); }}
+          data-testid="log-open-add-moves"
         >
           Add move
         </Button>
@@ -389,6 +405,7 @@ export default function LogModal({
                     onChange={e => setSessionNotes(e.target.value)}
                     placeholder="How's the session going?"
                     className={styles.sessionNoteTextarea}
+                    data-testid="log-session-notes"
                   />
                 </div>
 
@@ -400,6 +417,7 @@ export default function LogModal({
                       variant="primary"
                       leftIcon={<Plus size={16} />}
                       onClick={() => { setMode('addMoves'); setPendingIds([]); }}
+                      data-testid="log-empty-add-move"
                     >
                       Add move
                     </Button>
@@ -546,6 +564,7 @@ export default function LogModal({
                             setCreateForm({ name: searchQuery, alias: '', status: '' });
                             setCreateMoveMode(true);
                           }}
+                          data-testid="log-create-custom-move"
                         >
                           + Create custom move
                         </button>

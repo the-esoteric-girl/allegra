@@ -6,12 +6,14 @@ export default function IconButton({
   variant = 'default',
   size = 'default',
   label,
+  ...props
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={label}
+      {...props}
       className={[
         styles.button,
         variant === 'ghost' ? styles.ghost : styles.default,

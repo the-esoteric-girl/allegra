@@ -17,12 +17,14 @@ export default function Button({
   leftIcon,
   type = 'button',
   className,
+  ...props
 }) {
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
+      {...props}
       className={[
         styles.button,
         variantClass[variant] ?? styles.primary,

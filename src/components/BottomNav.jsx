@@ -14,7 +14,7 @@ export default function BottomNav({ onLogPress }) {
         )}
       </NavLink>
 
-      <button onClick={onLogPress} className={styles.item}>
+      <button onClick={onLogPress} className={styles.item} data-testid="bottom-nav-log">
         <PlusCircle size={22} strokeWidth={1.8} />
         <span>Log</span>
       </button>

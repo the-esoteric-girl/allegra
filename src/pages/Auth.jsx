@@ -64,6 +64,7 @@ export default function Auth() {
             variant={mode === 'signin' ? 'primary' : 'ghost'}
             size="sm"
             onClick={() => setMode('signin')}
+            data-testid="auth-mode-signin"
           >
             Sign in
           </Button>
@@ -71,6 +72,7 @@ export default function Auth() {
             variant={mode === 'signup' ? 'primary' : 'ghost'}
             size="sm"
             onClick={() => setMode('signup')}
+            data-testid="auth-mode-signup"
           >
             Sign up
           </Button>
@@ -107,7 +109,7 @@ export default function Auth() {
 
           {formError && <p className={styles.error}>{formError}</p>}
 
-          <Button type="submit" fullWidth disabled={submitting}>
+          <Button type="submit" fullWidth disabled={submitting} data-testid="auth-submit">
             {submitting
               ? (mode === 'signup' ? 'Creating account...' : 'Signing in...')
               : (mode === 'signup' ? 'Create account' : 'Sign in')}

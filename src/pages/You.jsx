@@ -112,7 +112,11 @@ export default function You() {
 
               return (
                 <div key={session.id} className={styles.sessionCard}>
-                  <div className={styles.sessionCardHeader} onClick={() => toggleSession(session.id)}>
+                  <div
+                    className={styles.sessionCardHeader}
+                    onClick={() => toggleSession(session.id)}
+                    data-testid={`session-toggle-${session.id}`}
+                  >
                     <div className={styles.sessionCardLeft}>
                       <div className={styles.sessionDateRow}>
                         <span className={styles.sessionDate}>{formatDate(session.date)}</span>
@@ -186,6 +190,7 @@ export default function You() {
                         <button
                           onClick={() => setSessionPendingDelete(session)}
                           className={styles.deleteButton}
+                          data-testid={`delete-session-${session.id}`}
                         >
                           <Trash2 size={14} />
                           Delete session
@@ -209,6 +214,7 @@ export default function You() {
         onCancel={() => setSessionPendingDelete(null)}
         onConfirm={() => sessionPendingDelete && handleDeleteSession(sessionPendingDelete.id)}
         loading={deletingSession}
+        testIdPrefix="delete-session-dialog"
       />
     </div>
   );

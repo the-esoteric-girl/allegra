@@ -8,6 +8,8 @@
   width: 2.8125rem;
   height: 2.8125rem;
   border: none;
+  color: var(--color-text-secondary);
+  transition: color 0.15s ease;
 }
 
 .sm {
@@ -21,4 +23,8 @@
 
 .ghost {
   background: transparent;
+}
+
+.button:hover {
+  color: var(--color-text-primary);
 }

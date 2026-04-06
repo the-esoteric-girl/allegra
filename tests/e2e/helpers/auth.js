@@ -14,18 +14,18 @@ export async function signIn(page, { email, password }) {
   // If session is already active, /auth redirects to the app.
   if (!page.url().includes('/auth')) return;
 
-  await page.getByRole('button', { name: 'Sign in' }).first().click();
+  await page.getByTestId('auth-mode-signin').click();
   await page.locator('#auth-email').fill(email);
   await page.locator('#auth-password').fill(password);
-  await page.locator('form').getByRole('button', { name: 'Sign in' }).click();
+  await page.getByTestId('auth-submit').click();
   await expect(page).toHaveURL((url) => url.pathname !== '/auth');
 }
 
 export async function signUp(page, { email, password, username }) {
   await page.goto('/auth');
-  await page.getByRole('button', { name: 'Sign up' }).click();
+  await page.getByTestId('auth-mode-signup').click();
   await page.locator('#auth-username').fill(username);
   await page.locator('#auth-email').fill(email);
   await page.locator('#auth-password').fill(password);
-  await page.getByRole('button', { name: 'Create account' }).click();
+  await page.getByTestId('auth-submit').click();
 }
