@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { useApp } from '../context/useApp';
-import { Button } from '../components/ui';
+import { useNavigate } from 'react-router-dom';
+import { useApp } from '../hooks/useApp';
+import { Button, ComboCard } from '../components/ui';
 import ComboModal from '../components/ComboModal';
 import styles from './Combos.module.css';
 
 export default function Combos() {
-  const { combos, moves } = useApp();
+  const { combos, moves, loading } = useApp();
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const moveMap = Object.fromEntries(moves.map(m => [m.id, m]));
+  const navigate = useNavigate();
 
   return (
     <div className={styles.page}>
@@ -21,7 +21,11 @@ export default function Combos() {
         + New combo
       </Button>
 
-      {combos.length === 0 ? (
+      {loading ? (
+        <div className={styles.emptyState}>
+          <p className={styles.emptyBody}>Loading…</p>
+        </div>
+      ) : combos.length === 0 ? (
         <div className={styles.emptyState}>
           <p className={styles.emptyHeading}>No combos yet</p>
           <p className={styles.emptyBody}>
@@ -30,23 +34,14 @@ export default function Combos() {
         </div>
       ) : (
         <div className={styles.comboList}>
-          {combos.map(combo => {
-            const comboMoves = (combo.move_ids || []).map(id => moveMap[id]).filter(Boolean);
-            const displayName = combo.name || 'Untitled combo';
-            return (
-              <div key={combo.id} className={styles.comboCard}>
-                <div className={styles.comboName}>{displayName}</div>
-                <div className={styles.comboMeta}>
-                  {comboMoves.length} move{comboMoves.length !== 1 ? 's' : ''}
-                </div>
-                {comboMoves.length > 0 && (
-                  <div className={styles.comboPreview}>
-                    {comboMoves.map(m => m.name).join(' → ')}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          {combos.map(combo => (
+            <ComboCard
+              key={combo.id}
+              combo={combo}
+              moves={moves}
+              onClick={() => navigate(`/combos/${combo.id}`)}
+            />
+          ))}
         </div>
       )}
 

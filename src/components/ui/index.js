@@ -8,3 +8,4 @@ export { default as SectionLabel } from './SectionLabel';
 export { default as Divider } from './Divider';
 export { default as IconButton } from './IconButton';
 export { default as BottomSheet } from './BottomSheet';
+export { default as ComboCard } from './ComboCard';

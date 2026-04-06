@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   DndContext,
   closestCenter,
@@ -16,7 +15,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { ChevronLeft, Trash2, GripVertical, X, Search, ArrowDown } from 'lucide-react';
-import { useApp } from '../context/useApp';
+import { useApp } from '../hooks/useApp';
 import { BottomSheet, IconButton, Button, Pill, Input, SectionLabel } from './ui';
 import styles from './ComboModal.module.css';
 
@@ -43,7 +42,6 @@ function SortableCard({ id, name, onRemove }) {
 }
 
 export default function ComboModal({ isOpen, onClose }) {
-  const navigate = useNavigate();
   const { moves, createCombo } = useApp();
 
   const [view, setView] = useState('main');
@@ -102,9 +100,12 @@ export default function ComboModal({ isOpen, onClose }) {
   }
 
   async function handleCreate() {
-    await createCombo(comboName.trim(), moveIds, notes.trim());
+    const { error } = await createCombo(comboName.trim(), moveIds, notes.trim());
+    if (error) {
+      console.error('Failed to save combo:', error);
+      return;
+    }
     resetAndClose();
-    navigate('/combos');
   }
 
   const moveMap = useMemo(() => Object.fromEntries(moves.map(m => [m.id, m])), [moves]);

@@ -66,7 +66,7 @@ export function AppProvider({ children }) {
       .insert([{ name: name || null, move_ids: moveIds, notes: notes || null }])
       .select()
       .single();
-    if (data) setCombos(prev => [data, ...prev]);
+    if (data) await loadCombos();
     return { data, error };
   }
 
