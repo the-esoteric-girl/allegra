@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Plus, X } from 'lucide-react';
+import { ChevronDown, ChevronLeft, Edit3, Plus, X } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Button, StatusPill, ConfirmDialog, Select, Input, Field, IconButton, PageHeader, Card, ComboCard, BottomSheet, MovePickerPanel, EmptyState, PageState } from '../components/ui';
+import { Button, StatusPill, StatusOptionButton, ConfirmDialog, Input, IconButton, PageHeader, Card, ComboCard, BottomSheet, MovePickerPanel, EmptyState, PageState } from '../components/ui';
 import { filterMovesBySearchAndStatus, sortMoves } from '../lib/moveListControls';
 import { MOVE_STATUS_VALUES, getStatusLabel } from '../lib/statusConfig';
 import styles from './MoveDetail.module.css';
@@ -17,17 +17,16 @@ export default function MoveDetail() {
   const { user, moves, combos, transitions, loading, updateMove, deleteMove, addTransition, deleteTransition } = useApp();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('info');
-  const [editing, setEditing] = useState(false);
-  const [editStatus, setEditStatus] = useState('');
-  const [editAliases, setEditAliases] = useState([]);
+  const [showStatusMenu, setShowStatusMenu] = useState(false);
+  const [statusUpdating, setStatusUpdating] = useState(false);
+  const [statusError, setStatusError] = useState('');
+  const [aliasInputVisible, setAliasInputVisible] = useState(false);
   const [newAlias, setNewAlias] = useState('');
   const [aliasError, setAliasError] = useState('');
   const [aliasConflict, setAliasConflict] = useState(null);
   const [editingNote, setEditingNote] = useState(false);
   const [noteText, setNoteText] = useState('');
-  const [savingDetails, setSavingDetails] = useState(false);
   const [savingNote, setSavingNote] = useState(false);
-  const [saveError, setSaveError] = useState('');
   const [noteError, setNoteError] = useState('');
   const [deleteError, setDeleteError] = useState('');
   const [exitActionError, setExitActionError] = useState('');
@@ -45,7 +44,7 @@ export default function MoveDetail() {
     return str.replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
   }
 
-  if (loading) return <PageState text="Loading..." />;
+  if (loading || !Array.isArray(moves)) return <PageState text="Loading..." />;
 
   const move = moves.find((m) => String(m.id) === id);
 
@@ -70,32 +69,74 @@ export default function MoveDetail() {
     exitSortBy
   );
 
-  function handleEditClick() {
-    setActiveTab('info');
-    setEditStatus(move.status || '');
-    setEditAliases(move.aliases ? [...move.aliases] : []);
-    setNewAlias('');
-    setAliasError('');
-    setAliasConflict(null);
-    setSaveError('');
-    setEditing(true);
+  const statusMenuRef = useRef(null);
+
+  useEffect(() => {
+    if (!showStatusMenu) return undefined;
+
+    function handleClickOutside(event) {
+      if (statusMenuRef.current && !statusMenuRef.current.contains(event.target)) {
+        setShowStatusMenu(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showStatusMenu]);
+
+  async function handleStatusChange(nextStatus) {
+    if (statusUpdating) return;
+
+    setStatusError('');
+    setStatusUpdating(true);
+
+    try {
+      const result = await updateMove(move.id, { status: nextStatus || null });
+      if (!result.ok) {
+        setStatusError('Could not update status. Please try again.');
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      setStatusError('Could not update status. Please try again.');
+    } finally {
+      setStatusUpdating(false);
+      setShowStatusMenu(false);
+    }
   }
 
-  function addAlias(titled) {
-    setEditAliases((prev) => [...prev, titled]);
-    setNewAlias('');
+  async function persistAlias(titled) {
+    const aliases = Array.isArray(move.aliases) ? move.aliases : [];
+    const nextAliases = [...aliases, titled];
+
     setAliasError('');
     setAliasConflict(null);
+
+    try {
+      const result = await updateMove(move.id, { aliases: nextAliases });
+      if (!result.ok) {
+        setAliasError('Could not add alias. Please try again.');
+        return;
+      }
+      setNewAlias('');
+      setAliasInputVisible(false);
+    } catch (error) {
+      console.error(error);
+      setAliasError('Could not add alias. Please try again.');
+    }
   }
 
-  function handleAddAlias() {
+  async function handleAddAlias() {
     const trimmed = newAlias.trim();
     if (!trimmed) return;
     const titled = toTitleCase(trimmed);
-    if (editAliases.some((a) => a.toLowerCase() === trimmed.toLowerCase())) {
+    const aliases = Array.isArray(move.aliases) ? move.aliases : [];
+
+    if (aliases.some((a) => a.toLowerCase() === trimmed.toLowerCase())) {
       setAliasError('Alias already exists');
       return;
     }
+
     const nameConflict = moves.find(
       (m) => String(m.id) !== id && m.name.toLowerCase() === titled.toLowerCase()
     );
@@ -103,6 +144,7 @@ export default function MoveDetail() {
       setAliasConflict({ titled, message: `${titled} already exists as a move in your library. Are you sure you want to add it as an alias?` });
       return;
     }
+
     const aliasConflictMove = moves.find(
       (m) => String(m.id) !== id && m.aliases && m.aliases.some((a) => a.toLowerCase() === titled.toLowerCase())
     );
@@ -110,39 +152,23 @@ export default function MoveDetail() {
       setAliasConflict({ titled, message: `${titled} already exists as an alias for ${aliasConflictMove.name}. Are you sure you want to add it as an alias?` });
       return;
     }
-    addAlias(titled);
+
+    await persistAlias(titled);
   }
 
-  function handleRemoveAlias(index) {
-    setEditAliases(editAliases.filter((_, i) => i !== index));
-  }
-
-  async function handleSave() {
-    if (savingDetails) return;
-
-    setSaveError('');
-    setSavingDetails(true);
+  async function handleRemoveAlias(index) {
+    const aliases = Array.isArray(move.aliases) ? move.aliases : [];
+    const nextAliases = aliases.filter((_, i) => i !== index);
 
     try {
-      const result = await updateMove(move.id, { status: editStatus, aliases: editAliases });
+      const result = await updateMove(move.id, { aliases: nextAliases });
       if (!result.ok) {
-        setSaveError('Could not save changes. Please try again.');
-        return;
+        setAliasError('Could not remove alias. Please try again.');
       }
-      setEditing(false);
     } catch (error) {
       console.error(error);
-      setSaveError('Could not save changes. Please try again.');
-    } finally {
-      setSavingDetails(false);
+      setAliasError('Could not remove alias. Please try again.');
     }
-  }
-
-  function handleCancel() {
-    setSaveError('');
-    setAliasError('');
-    setAliasConflict(null);
-    setEditing(false);
   }
 
   function handleEditNote() {
@@ -258,7 +284,7 @@ export default function MoveDetail() {
   return (
     <div className={styles.page}>
       <PageHeader
-        title="Move"
+        title={move.name || 'Move'}
         leftAction={(
           <IconButton
             icon={<ChevronLeft size={18} />}
@@ -295,85 +321,133 @@ export default function MoveDetail() {
         ))}
       </div>
 
-      {activeTab === 'info' && !editing && (
-        <div className={styles.statusRow}>
-          <StatusPill status={move.status || ''} />
-          <Button variant="subtle" size="sm" onClick={handleEditClick}>Edit details</Button>
-        </div>
-      )}
-
-      {activeTab === 'info' && (editing ? (
+      {activeTab === 'info' && (
         <>
-          <Card className={styles.card}>
-            <Field label="Status" htmlFor="edit-status" labelClassName={styles.sectionLabel}>
-              <Select
-                id="edit-status"
-                name="edit-status"
-                className={styles.select}
-                value={editStatus}
-                onChange={(e) => setEditStatus(e.target.value)}
+          <div className={styles.statusRow}>
+            <div className={styles.statusPickerWrap} ref={statusMenuRef}>
+              <button
+                type="button"
+                className={styles.statusPickerBtn}
+                onClick={() => setShowStatusMenu((prev) => !prev)}
               >
-                <option value="">no status</option>
-                {MOVE_STATUS_VALUES.map((status) => (
-                  <option key={status} value={status}>
-                    {getStatusLabel(status).toLowerCase()}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-          </Card>
+                <StatusPill status={move.status || ''} size="sm" />
+                <span className={styles.statusPickerLabel}>{getStatusLabel(move.status || '').toLowerCase()}</span>
+                <ChevronDown size={14} className={styles.statusPickerChevron} />
+              </button>
+              {showStatusMenu && (
+                <div className={styles.statusPickerDropdown}>
+                  {['', ...MOVE_STATUS_VALUES].map((status) => (
+                    <StatusOptionButton
+                      key={status}
+                      status={status}
+                      label={status ? getStatusLabel(status) : 'No status'}
+                      selected={status === (move.status || '')}
+                      variant="menu"
+                      showCheck
+                      onClick={() => handleStatusChange(status)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          {statusError && <p className={styles.actionError}>{statusError}</p>}
 
           <Card className={styles.card}>
-            <div className={styles.sectionLabel}>Alternate names</div>
-            {editAliases.length > 0 && (
-              <div className={styles.aliasTags}>
-                {editAliases.map((alias, i) => (
-                  <span key={i} className={styles.aliasTag}>
-                    {alias}
-                    <button className={styles.aliasRemove} onClick={() => handleRemoveAlias(i)} type="button">×</button>
-                  </span>
-                ))}
-              </div>
-            )}
-            <div className={styles.addAliasRow}>
-              <Input
-                id="add-alias"
-                name="add-alias"
-                className={styles.addAliasField}
-                inputClassName={styles.addAliasInput}
-                value={newAlias}
-                onChange={(e) => { setNewAlias(e.target.value); setAliasError(''); setAliasConflict(null); }}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddAlias()}
-                placeholder="Add alias"
-              />
-              <Button variant="primary" size="sm" onClick={handleAddAlias} disabled={savingDetails}>Add</Button>
+            <div className={styles.cardHeader}>
+              <span className={styles.sectionLabel}>Alternate names</span>
             </div>
-            {aliasError && <p className={styles.aliasError}>{aliasError}</p>}
-            {aliasConflict && (
-              <div>
-                <p className={styles.aliasWarning}>{aliasConflict.message}</p>
-                <div className={styles.conflictButtons}>
-                  <Button variant="primary" size="sm" onClick={() => addAlias(aliasConflict.titled)}>Add Anyway</Button>
-                  <Button variant="subtle" size="sm" onClick={() => { setAliasConflict(null); setNewAlias(''); }}>Cancel</Button>
+            <div className={styles.aliasSection}>
+              {move.aliases && move.aliases.length > 0 ? (
+                <div className={styles.aliasTags}>
+                  {move.aliases.map((alias, index) => (
+                    <span key={index} className={styles.aliasTag}>
+                      {alias}
+                      <button
+                        className={styles.aliasRemove}
+                        onClick={() => handleRemoveAlias(index)}
+                        type="button"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    leftIcon={<Plus size={14} />}
+                    onClick={() => {
+                      setAliasInputVisible(true);
+                      setAliasError('');
+                      setAliasConflict(null);
+                    }}
+                  >
+                    Add alias
+                  </Button>
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className={styles.aliasEmpty}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    leftIcon={<Plus size={14} />}
+                    onClick={() => {
+                      setAliasInputVisible(true);
+                      setAliasError('');
+                      setAliasConflict(null);
+                    }}
+                  >
+                    Add alias
+                  </Button>
+                </div>
+              )}
+
+              {aliasInputVisible && (
+                <div className={styles.addAliasRow}>
+                  <Input
+                    id="add-alias"
+                    name="add-alias"
+                    className={styles.addAliasField}
+                    inputClassName={styles.addAliasInput}
+                    value={newAlias}
+                    onChange={(e) => { setNewAlias(e.target.value); setAliasError(''); setAliasConflict(null); }}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddAlias()}
+                    placeholder="Add alias"
+                  />
+                  <Button variant="primary" size="sm" onClick={handleAddAlias}>
+                    Add
+                  </Button>
+                </div>
+              )}
+
+              {aliasError && <p className={styles.aliasError}>{aliasError}</p>}
+              {aliasConflict && (
+                <div>
+                  <p className={styles.aliasWarning}>{aliasConflict.message}</p>
+                  <div className={styles.conflictButtons}>
+                    <Button variant="primary" size="sm" onClick={() => persistAlias(aliasConflict.titled)}>
+                      Add Anyway
+                    </Button>
+                    <Button
+                      variant="subtle"
+                      size="sm"
+                      onClick={() => {
+                        setAliasConflict(null);
+                        setNewAlias('');
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
           </Card>
 
-          <div className={styles.buttonRow}>
-            <Button variant="primary" size="sm" onClick={handleSave} disabled={savingDetails}>
-              {savingDetails ? 'Saving...' : 'Save'}
-            </Button>
-            <Button variant="subtle" size="sm" onClick={handleCancel} disabled={savingDetails}>Cancel</Button>
-          </div>
-          {saveError && <p className={styles.actionError}>{saveError}</p>}
-        </>
-      ) : (
-        <>
           <Card className={styles.card}>
             <div className={styles.cardHeader}>
               <span className={styles.sectionLabel}>Note</span>
-              <Button variant="subtle" size="sm" onClick={handleEditNote}>Edit</Button>
+              <Button variant="subtle" size="sm" leftIcon={<Edit3 size={14} />} onClick={handleEditNote}>Edit</Button>
             </div>
             {editingNote ? (
               <div className={styles.addNoteForm}>
@@ -396,15 +470,14 @@ export default function MoveDetail() {
                 </div>
                 {noteError && <p className={styles.actionError}>{noteError}</p>}
               </div>
-            ) : move.note ? (
-              <div className={styles.noteEntry}>
-                <div className={styles.notesText}>{move.note}</div>
-                <Button variant="ghost" size="sm" className={styles.noteEditButton} onClick={handleEditNote}>Edit note</Button>
-              </div>
             ) : (
-              <Button variant="subtle" size="sm" leftIcon={<Plus size={16} />} onClick={handleEditNote}>
-                Add note
-              </Button>
+              <div className={styles.noteEntry}>
+                {move.note ? (
+                  <div className={styles.notesText}>{move.note}</div>
+                ) : (
+                  <div className={styles.notesPlaceholder}>No note yet. Tap edit to add one.</div>
+                )}
+              </div>
             )}
           </Card>
 
@@ -458,7 +531,7 @@ export default function MoveDetail() {
             </>
           )}
         </>
-      ))}
+      )}
 
       {activeTab === 'combos' && (
         <div className={styles.combosSection}>
