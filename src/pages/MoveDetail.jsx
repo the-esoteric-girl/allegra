@@ -7,7 +7,7 @@ import styles from './MoveDetail.module.css';
 
 export default function MoveDetail() {
   const { id } = useParams();
-  const { moves, loading, updateMove, deleteMove } = useApp();
+  const { moves, combos, loading, updateMove, deleteMove } = useApp();
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
   const [editStatus, setEditStatus] = useState('');
@@ -29,6 +29,8 @@ export default function MoveDetail() {
   const move = moves.find((m) => String(m.id) === id);
 
   if (!move) return <p>Move not found</p>;
+
+  const relatedCombos = combos.filter(c => c.move_ids?.includes(move.id));
 
   function handleEditClick() {
     setEditStatus(move.status || '');
@@ -103,20 +105,20 @@ export default function MoveDetail() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
-        <PageHeader
-          title="Move"
-          leftAction={(
-            <IconButton
-              icon={<ChevronLeft size={18} />}
-              variant="ghost"
-              label="Back to library"
-              onClick={() => navigate('/')}
-            />
-          )}
-          className={styles.headerInner}
-        />
-      </div>
+      <PageHeader
+        title="Move"
+        leftAction={(
+          <IconButton
+            icon={<ChevronLeft size={18} />}
+            variant="ghost"
+            label="Back to library"
+            onClick={() => navigate('/')}
+          />
+        )}
+        bleed
+        noBorder
+        className={styles.pageHeader}
+      />
 
       <div className={styles.moveName}>{move.name}</div>
 
@@ -229,6 +231,23 @@ export default function MoveDetail() {
               </Button>
             )}
           </div>
+
+          {relatedCombos.length > 0 && (
+            <div className={styles.card}>
+              <div className={styles.sectionLabel}>Appears in</div>
+              {relatedCombos.map(combo => (
+                <button
+                  key={combo.id}
+                  type="button"
+                  className={styles.comboLink}
+                  onClick={() => navigate(`/combos/${combo.id}`)}
+                >
+                  <span className={styles.comboLinkName}>{combo.name || 'Untitled combo'}</span>
+                  <span className={styles.comboLinkMeta}>{combo.move_ids.length} move{combo.move_ids.length !== 1 ? 's' : ''}</span>
+                </button>
+              ))}
+            </div>
+          )}
 
           <Button
             variant="ghost"

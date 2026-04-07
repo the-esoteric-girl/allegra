@@ -2,12 +2,26 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Button, ComboCard } from '../components/ui';
+import { Button, ComboCard, Select } from '../components/ui';
 import ComboModal from '../components/ComboModal';
 import styles from './Combos.module.css';
 
+function sortCombos(list, sortBy) {
+  return [...list].sort((a, b) => {
+    switch (sortBy) {
+      case 'created-asc': return a.created_at < b.created_at ? -1 : 1;
+      case 'name-asc': return (a.name || '').localeCompare(b.name || '');
+      case 'name-desc': return (b.name || '').localeCompare(a.name || '');
+      case 'moves-desc': return (b.move_ids?.length ?? 0) - (a.move_ids?.length ?? 0);
+      case 'moves-asc': return (a.move_ids?.length ?? 0) - (b.move_ids?.length ?? 0);
+      case 'created-desc':
+      default: return a.created_at > b.created_at ? -1 : 1;
+    }
+  });
+}
+
 export default function Combos() {
-  const { combos, moves, loading } = useApp();
+  const { combos, moves, loading, combosSortBy, setCombosSortBy } = useApp();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -39,16 +53,37 @@ export default function Combos() {
           </p>
         </div>
       ) : (
-        <div className={styles.comboList}>
-          {combos.map(combo => (
-            <ComboCard
-              key={combo.id}
-              combo={combo}
-              moves={moves}
-              onClick={() => navigate(`/combos/${combo.id}`)}
-            />
-          ))}
-        </div>
+        <>
+          <div className={styles.controls}>
+            <span className={styles.comboCount}>
+              {combos.length} combo{combos.length !== 1 ? 's' : ''}
+            </span>
+            <Select
+              id="combos-sort"
+              name="combos-sort"
+              value={combosSortBy}
+              onChange={e => setCombosSortBy(e.target.value)}
+              className={styles.sortSelect}
+            >
+              <option value="created-desc">Newest</option>
+              <option value="created-asc">Oldest</option>
+              <option value="moves-desc">Most moves</option>
+              <option value="moves-asc">Fewest moves</option>
+              <option value="name-asc">A → Z</option>
+              <option value="name-desc">Z → A</option>
+            </Select>
+          </div>
+          <div className={styles.comboList}>
+            {sortCombos(combos, combosSortBy).map(combo => (
+              <ComboCard
+                key={combo.id}
+                combo={combo}
+                moves={moves}
+                onClick={() => navigate(`/combos/${combo.id}`)}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       <ComboModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />

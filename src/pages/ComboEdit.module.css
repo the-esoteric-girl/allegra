@@ -15,9 +15,6 @@
   margin-bottom: var(--space-2);
 }
 
-.headerInner {
-  border-bottom: none;
-}
 
 .headerTitle {
   margin: 0;

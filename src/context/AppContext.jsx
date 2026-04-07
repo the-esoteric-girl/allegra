@@ -18,6 +18,7 @@ export function AppProvider({ children }) {
   const [error, setError] = useState(null);
   const [librarySearch, setLibrarySearch] = useState('');
   const [libraryFilter, setLibraryFilter] = useState('All');
+  const [combosSortBy, setCombosSortBy] = useState('created-desc');
 
   async function getCurrentUserId() {
     if (user?.id) return user.id;
@@ -584,6 +585,8 @@ export function AppProvider({ children }) {
       setLibrarySearch,
       libraryFilter,
       setLibraryFilter,
+      combosSortBy,
+      setCombosSortBy,
     }}
     >
       {children}

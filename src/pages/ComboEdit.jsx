@@ -42,33 +42,32 @@ export default function ComboEdit() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
-        <PageHeader
-          title="Edit combo"
-          leftAction={(
-            <Button
-              variant="ghost"
-              size="sm"
-              leftIcon={<ChevronLeft size={16} />}
-              onClick={() => navigate(`/combos/${combo.id}`)}
-              className={styles.headerButton}
-            >
-              Cancel
-            </Button>
-          )}
-          rightAction={(
-            <Button
-              size="sm"
-              onClick={handleSave}
-              disabled={editor.moveIds.length === 0}
-              className={styles.saveButton}
-            >
-              Save
-            </Button>
-          )}
-          className={styles.headerInner}
-        />
-      </div>
+      <PageHeader
+        title="Edit combo"
+        leftAction={(
+          <Button
+            variant="ghost"
+            size="sm"
+            leftIcon={<ChevronLeft size={16} />}
+            onClick={() => navigate(`/combos/${combo.id}`)}
+            className={styles.headerButton}
+          >
+            Cancel
+          </Button>
+        )}
+        rightAction={(
+          <Button
+            size="sm"
+            onClick={handleSave}
+            disabled={editor.moveIds.length === 0}
+            className={styles.saveButton}
+          >
+            Save
+          </Button>
+        )}
+        noBorder
+        className={styles.header}
+      />
 
       <ComboEditorPanels editor={editor} mode="edit" showInlineAddButton={editor.isAddPanel} />
     </div>

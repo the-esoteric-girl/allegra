@@ -46,6 +46,22 @@
   line-height: 1.6;
 }
 
+/* ── Controls ── */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.comboCount {
+  font: var(--text-body-sm);
+  color: var(--color-text-secondary);
+}
+
+.sortSelect {
+  width: auto;
+}
+
 /* ── Combo list ── */
 .comboList {
   display: flex;

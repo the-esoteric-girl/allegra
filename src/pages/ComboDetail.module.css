@@ -11,13 +11,6 @@
   color: var(--color-text-secondary);
 }
 
-.header {
-  margin: calc(-1 * var(--page-padding)) calc(-1 * var(--page-padding)) 0;
-}
-
-.headerInner {
-  border-bottom: none;
-}
 
 .comboName {
   margin: 0;

@@ -29,28 +29,27 @@ export default function ComboDetail() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
-        <PageHeader
-          title="Combo"
-          leftAction={(
-            <IconButton
-              icon={<ChevronLeft size={18} />}
-              variant="ghost"
-              label="Back to combos"
-              onClick={() => navigate('/combos')}
-            />
-          )}
-          rightAction={(
-            <IconButton
-              icon={<Pencil size={18} />}
-              variant="ghost"
-              label="Edit combo"
-              onClick={() => navigate(`/combos/${combo.id}/edit`)}
-            />
-          )}
-          className={styles.headerInner}
-        />
-      </div>
+      <PageHeader
+        title="Combo"
+        leftAction={(
+          <IconButton
+            icon={<ChevronLeft size={18} />}
+            variant="ghost"
+            label="Back to combos"
+            onClick={() => navigate('/combos')}
+          />
+        )}
+        rightAction={(
+          <IconButton
+            icon={<Pencil size={18} />}
+            variant="ghost"
+            label="Edit combo"
+            onClick={() => navigate(`/combos/${combo.id}/edit`)}
+          />
+        )}
+        bleed
+        noBorder
+      />
 
       <h2 className={styles.comboName}>{combo.name || 'Untitled combo'}</h2>
 

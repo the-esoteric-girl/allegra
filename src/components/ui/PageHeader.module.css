@@ -34,3 +34,12 @@
   height: 2.8125rem;
   display: inline-block;
 }
+
+.bleed {
+  margin-top: calc(-1 * var(--page-padding));
+  margin-inline: calc(-1 * var(--page-padding));
+}
+
+.noBorder {
+  border-bottom: none;
+}
