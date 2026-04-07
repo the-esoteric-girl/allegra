@@ -8,9 +8,7 @@
 
 .moveName {
   font-size: 1.75rem;
-  font-weight: 300;
-  letter-spacing: 0.05em;
-  font-style: italic;
+  font-weight: 700;
   color: var(--color-text-primary);
   margin-bottom: var(--space-1);
 }
@@ -22,6 +20,9 @@
 }
 
 .statusRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   margin-bottom: var(--section-gap);
 }
 
@@ -211,4 +212,10 @@
 .deleteButton {
   margin-top: var(--space-2);
   color: var(--color-error-text) !important;
+}
+
+.actionError {
+  font-size: 0.8125rem;
+  color: var(--color-error-text);
+  margin-top: var(--space-2);
 }

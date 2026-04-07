@@ -22,11 +22,9 @@
 
 .title {
   margin: 0;
-  font: var(--text-body-sm-medium);
-  color: var(--color-text-secondary);
+  font: var(--text-heading-4);
+  color: var(--color-text-primary);
   text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
 }
 
 .spacer {

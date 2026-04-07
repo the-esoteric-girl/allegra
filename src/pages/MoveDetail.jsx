@@ -17,6 +17,11 @@ export default function MoveDetail() {
   const [aliasConflict, setAliasConflict] = useState(null);
   const [editingNote, setEditingNote] = useState(false);
   const [noteText, setNoteText] = useState('');
+  const [savingDetails, setSavingDetails] = useState(false);
+  const [savingNote, setSavingNote] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [noteError, setNoteError] = useState('');
+  const [deleteError, setDeleteError] = useState('');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -38,6 +43,7 @@ export default function MoveDetail() {
     setNewAlias('');
     setAliasError('');
     setAliasConflict(null);
+    setSaveError('');
     setEditing(true);
   }
 
@@ -78,29 +84,78 @@ export default function MoveDetail() {
   }
 
   async function handleSave() {
-    await updateMove(move.id, { status: editStatus, aliases: editAliases });
-    setEditing(false);
+    if (savingDetails) return;
+
+    setSaveError('');
+    setSavingDetails(true);
+
+    try {
+      const success = await updateMove(move.id, { status: editStatus, aliases: editAliases });
+      if (success === false) {
+        setSaveError('Could not save changes. Please try again.');
+        return;
+      }
+      setEditing(false);
+    } catch (error) {
+      console.error(error);
+      setSaveError('Could not save changes. Please try again.');
+    } finally {
+      setSavingDetails(false);
+    }
   }
 
   function handleCancel() {
+    setSaveError('');
+    setAliasError('');
+    setAliasConflict(null);
     setEditing(false);
   }
 
   function handleEditNote() {
+    setNoteError('');
     setNoteText(move.note || '');
     setEditingNote(true);
   }
 
   async function handleSaveNote() {
-    await updateMove(move.id, { note: noteText.trim() || null });
-    setEditingNote(false);
+    if (savingNote) return;
+
+    setNoteError('');
+    setSavingNote(true);
+
+    try {
+      const success = await updateMove(move.id, { note: noteText.trim() || null });
+      if (success === false) {
+        setNoteError('Could not save note. Please try again.');
+        return;
+      }
+      setEditingNote(false);
+    } catch (error) {
+      console.error(error);
+      setNoteError('Could not save note. Please try again.');
+    } finally {
+      setSavingNote(false);
+    }
   }
 
   async function handleDeleteMove() {
+    if (deleting) return;
+
+    setDeleteError('');
     setDeleting(true);
-    await deleteMove(move.id);
-    setDeleting(false);
-    navigate('/');
+    try {
+      const success = await deleteMove(move.id);
+      if (success === false) {
+        setDeleteError('Could not delete move. Please try again.');
+        return;
+      }
+      navigate('/');
+    } catch (error) {
+      console.error(error);
+      setDeleteError('Could not delete move. Please try again.');
+    } finally {
+      setDeleting(false);
+    }
   }
 
   return (
@@ -131,6 +186,7 @@ export default function MoveDetail() {
       {!editing && (
         <div className={styles.statusRow}>
           <StatusPill status={move.status || ''} />
+          <Button variant="subtle" size="sm" onClick={handleEditClick}>Edit details</Button>
         </div>
       )}
 
@@ -160,7 +216,7 @@ export default function MoveDetail() {
                 {editAliases.map((alias, i) => (
                   <span key={i} className={styles.aliasTag}>
                     {alias}
-                    <button className={styles.aliasRemove} onClick={() => handleRemoveAlias(i)}>×</button>
+                    <button className={styles.aliasRemove} onClick={() => handleRemoveAlias(i)} type="button">×</button>
                   </span>
                 ))}
               </div>
@@ -172,11 +228,11 @@ export default function MoveDetail() {
                 className={styles.addAliasField}
                 inputClassName={styles.addAliasInput}
                 value={newAlias}
-                onChange={(e) => { setNewAlias(e.target.value); setAliasError(''); }}
+                onChange={(e) => { setNewAlias(e.target.value); setAliasError(''); setAliasConflict(null); }}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddAlias()}
                 placeholder="Add alias"
               />
-              <Button variant="primary" size="sm" onClick={handleAddAlias}>Add</Button>
+              <Button variant="primary" size="sm" onClick={handleAddAlias} disabled={savingDetails}>Add</Button>
             </div>
             {aliasError && <p className={styles.aliasError}>{aliasError}</p>}
             {aliasConflict && (
@@ -191,16 +247,19 @@ export default function MoveDetail() {
           </div>
 
           <div className={styles.buttonRow}>
-            <Button variant="primary" size="sm" onClick={handleSave}>Save</Button>
-            <Button variant="subtle" size="sm" onClick={handleCancel}>Cancel</Button>
+            <Button variant="primary" size="sm" onClick={handleSave} disabled={savingDetails}>
+              {savingDetails ? 'Saving...' : 'Save'}
+            </Button>
+            <Button variant="subtle" size="sm" onClick={handleCancel} disabled={savingDetails}>Cancel</Button>
           </div>
+          {saveError && <p className={styles.actionError}>{saveError}</p>}
         </>
       ) : (
         <>
           <div className={styles.card}>
             <div className={styles.cardHeader}>
               <span className={styles.sectionLabel}>Note</span>
-              <Button variant="subtle" size="sm" onClick={handleEditClick}>Edit</Button>
+              <Button variant="subtle" size="sm" onClick={handleEditNote}>Edit</Button>
             </div>
             {editingNote ? (
               <div className={styles.addNoteForm}>
@@ -216,9 +275,12 @@ export default function MoveDetail() {
                   autoFocus
                 />
                 <div className={styles.addNoteButtons}>
-                  <Button variant="primary" size="sm" onClick={handleSaveNote}>Save</Button>
-                  <Button variant="subtle" size="sm" onClick={() => setEditingNote(false)}>Cancel</Button>
+                  <Button variant="primary" size="sm" onClick={handleSaveNote} disabled={savingNote}>
+                    {savingNote ? 'Saving...' : 'Save'}
+                  </Button>
+                  <Button variant="subtle" size="sm" onClick={() => setEditingNote(false)} disabled={savingNote}>Cancel</Button>
                 </div>
+                {noteError && <p className={styles.actionError}>{noteError}</p>}
               </div>
             ) : move.note ? (
               <div className={styles.noteEntry}>
@@ -252,11 +314,12 @@ export default function MoveDetail() {
           <Button
             variant="ghost"
             className={styles.deleteButton}
-            onClick={() => setIsDeleteDialogOpen(true)}
+            onClick={() => { setDeleteError(''); setIsDeleteDialogOpen(true); }}
             data-testid="delete-move-trigger"
           >
             Delete move
           </Button>
+          {deleteError && <p className={styles.actionError}>{deleteError}</p>}
         </>
       )}
 

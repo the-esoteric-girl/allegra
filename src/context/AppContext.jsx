@@ -384,7 +384,7 @@ export function AppProvider({ children }) {
     if (!currentUserId) {
       const noUserError = new Error('You need to be signed in to update a move.');
       setError(noUserError);
-      return;
+      return false;
     }
 
     const { status, note, ...moveUpdates } = updates || {};
@@ -399,7 +399,7 @@ export function AppProvider({ children }) {
       if (moveError) {
         console.error(moveError);
         setError(moveError);
-        return;
+        return false;
       }
     }
 
@@ -424,7 +424,7 @@ export function AppProvider({ children }) {
         if (deleteUserMoveError) {
           console.error(deleteUserMoveError);
           setError(deleteUserMoveError);
-          return;
+          return false;
         }
       } else {
         const upsertPayload = {
@@ -441,12 +441,13 @@ export function AppProvider({ children }) {
         if (userMoveError) {
           console.error(userMoveError);
           setError(userMoveError);
-          return;
+          return false;
         }
       }
     }
 
     await fetchMoves(currentUserId);
+    return true;
   }
 
   async function deleteMove(id) {
@@ -458,10 +459,11 @@ export function AppProvider({ children }) {
     if (moveError) {
       console.error(moveError);
       setError(moveError);
-      return;
+      return false;
     }
 
     await fetchMoves();
+    return true;
   }
 
   async function createSession(notes = '') {
