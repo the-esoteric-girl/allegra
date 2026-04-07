@@ -26,7 +26,7 @@ directly from components or pages.
 | status         | text      | "want to try" \| "working on" \| "achieved"        |
 | parent_move_id | uuid      | self-referencing FK for variations (nullable)      |
 | note           | text      | single note field, default empty string            |
-| user_id        | uuid      | nullable — reserved for future custom moves        |
+| user_id        | uuid      | nullable; user-created/custom moves set owner id   |
 
 ### combos
 
@@ -62,10 +62,10 @@ directly from components or pages.
 | Column        | Type    | Notes                          |
 |---------------|---------|--------------------------------|
 | id            | uuid    | primary key                    |
+| user_id       | uuid    | FK → auth.users.id             |
 | from_move_id  | uuid    | FK → moves.id                  |
 | to_move_id    | uuid    | FK → moves.id                  |
-| notes         | text    | —                              |
-| bidirectional | boolean | default true                   |
+| created_at    | timestamp | auto-set by Supabase         |
 
 ---
 
@@ -73,13 +73,15 @@ directly from components or pages.
 
 ```js
 const {
+  user,               // Auth user | null
+
   // Moves
   moves,              // Move[]
   loading,            // boolean
   error,              // error | null
   addMove,            // ({ name, aliases, status, parent_move_id }) => Move | null
-  updateMove,         // (id, updates) => void
-  deleteMove,         // (id) => void
+  updateMove,         // (id, updates) => boolean
+  deleteMove,         // (id) => boolean
 
   // Sessions
   sessions,           // Session[] (each has .entries array)
@@ -93,6 +95,12 @@ const {
   combos,             // Combo[]
   loadCombos,         // () => void
   createCombo,        // (name, moveIds, notes) => { data, error }
+
+  // Transitions
+  transitions,        // Transition[]
+  loadTransitions,    // () => boolean
+  addTransition,      // (fromMoveId, toMoveId) => boolean
+  deleteTransition,   // (fromMoveId, toMoveId) => boolean
 
   // Library UI state
   librarySearch,      // string
@@ -136,3 +144,4 @@ Note datestamp format:
 - Aliases are always stored in title case
 - `fetchMoves()` re-fetches the full moves list after any mutation
   (add, update, delete) to keep state fresh
+- Exits are curated via `transitions`; they are not auto-derived from combos

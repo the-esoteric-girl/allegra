@@ -34,6 +34,17 @@ BottomSheet slides up from the bottom of the screen.
 Modals are NOT routes. They are controlled by boolean state in the
 parent component or AppContext.
 
+## Route state convention
+
+For detail-to-detail navigation where Back should return to the source
+detail page, pass route state:
+
+- navigate to target with `state: { backTo: <sourcePath> }`
+- target page back action uses `navigate(location.state?.backTo || <fallback>)`
+
+Example: MoveDetail -> ComboDetail should return to the originating
+MoveDetail, not always `/combos`.
+
 ## Plan before building
 
 Before writing any code, plan with the user:

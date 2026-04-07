@@ -228,7 +228,8 @@ export function AppProvider({ children }) {
 
     const { data, error: transitionsError } = await supabase
       .from('transitions')
-      .select('*');
+      .select('*')
+      .eq('user_id', currentUserId);
 
     if (transitionsError) {
       console.error(transitionsError);
@@ -370,6 +371,7 @@ export function AppProvider({ children }) {
     const { error: transitionError } = await supabase
       .from('transitions')
       .insert({
+        user_id: currentUserId,
         from_move_id: fromMoveId,
         to_move_id: toMoveId,
       });
@@ -398,6 +400,7 @@ export function AppProvider({ children }) {
     const { error: transitionError } = await supabase
       .from('transitions')
       .delete()
+      .eq('user_id', currentUserId)
       .eq('from_move_id', fromMoveId)
       .eq('to_move_id', toMoveId);
 

@@ -13,7 +13,7 @@ const TABS = [
 
 export default function MoveDetail() {
   const { id } = useParams();
-  const { moves, combos, transitions, loading, updateMove, deleteMove, addTransition, deleteTransition } = useApp();
+  const { user, moves, combos, transitions, loading, updateMove, deleteMove, addTransition, deleteTransition } = useApp();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('info');
   const [editing, setEditing] = useState(false);
@@ -51,6 +51,7 @@ export default function MoveDetail() {
   if (!move) return <p>Move not found</p>;
 
   const relatedCombos = combos.filter(c => c.move_ids?.includes(move.id));
+  const canDeleteMove = Boolean(user?.id && move?.user_id && String(move.user_id) === String(user.id));
   const moveMap = Object.fromEntries(moves.map((m) => [String(m.id), m]));
   const exits = transitions
     .filter((item) => String(item.from_move_id) === String(move.id))
@@ -172,6 +173,7 @@ export default function MoveDetail() {
   }
 
   async function handleDeleteMove() {
+    if (!canDeleteMove) return;
     if (deleting) return;
 
     setDeleteError('');
@@ -432,15 +434,19 @@ export default function MoveDetail() {
             {exitActionError && <p className={styles.actionError}>{exitActionError}</p>}
           </Card>
 
-          <Button
-            variant="ghost"
-            className={styles.deleteButton}
-            onClick={() => { setDeleteError(''); setIsDeleteDialogOpen(true); }}
-            data-testid="delete-move-trigger"
-          >
-            Delete move
-          </Button>
-          {deleteError && <p className={styles.actionError}>{deleteError}</p>}
+          {canDeleteMove && (
+            <>
+              <Button
+                variant="ghost"
+                className={styles.deleteButton}
+                onClick={() => { setDeleteError(''); setIsDeleteDialogOpen(true); }}
+                data-testid="delete-move-trigger"
+              >
+                Delete move
+              </Button>
+              {deleteError && <p className={styles.actionError}>{deleteError}</p>}
+            </>
+          )}
         </>
       ))}
 
@@ -457,7 +463,7 @@ export default function MoveDetail() {
                     key={combo.id}
                     combo={combo}
                     moves={moves}
-                    onClick={() => navigate(`/combos/${combo.id}`)}
+                    onClick={() => navigate(`/combos/${combo.id}`, { state: { backTo: `/move/${move.id}` } })}
                   />
                 ))}
               </div>

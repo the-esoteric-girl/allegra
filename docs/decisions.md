@@ -46,6 +46,25 @@ LogModal and ComboModal are not routes. They are bottom sheets
 controlled by boolean state. This keeps the URL clean and avoids
 complicating back navigation.
 
+### Curated exits are manual, not combo-derived
+
+Move exits are explicitly curated by the user via the Exits UI and
+stored in `transitions`. They are not auto-generated from combo
+adjacency. Reason: users may reserve exits for special/unique links and
+should not have data churn when combos are edited or deleted.
+
+### Move deletion policy
+
+Only custom moves can be deleted by the user. Base/library moves are
+non-deletable in the UI. Rule of thumb: delete affordance appears only
+when `move.user_id === currentUser.id`.
+
+### Sequence numbering style
+
+Sequence indexes are rendered in a left gutter outside cards as plain
+numbers (`1`, `2`, `3`), with no punctuation. This improves scanability
+and reduces visual noise.
+
 ### CSS Modules for components, global tokens in index.css
 
 Component styles use CSS Modules for scoping. Design tokens (colours,
@@ -74,11 +93,10 @@ directly from AppContext.
 to survive navigation. This is a known bug fix — search would reset on
 back navigation without this.
 
-### Transitions bidirectional by default
+### Transition direction is explicit
 
-The `bidirectional` field on transitions defaults to `true`. Validate
-in user interviews whether this assumption holds before building
-direction-specific UI.
+Transitions are directional (`from_move_id` -> `to_move_id`) and scoped
+to a user. Directionality is explicit in schema and UI.
 
 ---
 
@@ -100,8 +118,8 @@ without a v2 design pass.
 Not in v1.
 
 ### User accounts / auth
-Not in v1. `user_id` field on moves is reserved but always null.
-Future: custom moves visible only to their creator.
+Auth is active. Custom/user-scoped data should always be filtered by
+`user_id` in AppContext queries.
 
 ### Floorwork as a category
 Explicitly out of scope for v1.

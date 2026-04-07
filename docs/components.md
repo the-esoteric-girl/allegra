@@ -87,7 +87,7 @@ Filter pill for toggling active/inactive states.
 
 ### Card
 
-White surface container with shadow.
+Shared surface container with configurable tone/elevation.
 
 ```jsx
 <Card onClick={() => navigate(`/move/${id}`)}>
@@ -95,11 +95,16 @@ White surface container with shadow.
 </Card>
 <Card padding="sm">...</Card>
 <Card padding="none">...</Card>
+<Card tone="blueTint">...</Card>
+<Card tone="pinkTint">...</Card>
+<Card tone="default" elevation="shadow">...</Card>
 ```
 
 | Prop      | Type      | Default    | Values                        |
 |-----------|-----------|------------|-------------------------------|
 | padding   | string    | "default"  | "default" \| "sm" \| "none"  |
+| tone      | string    | "default"  | "default" \| "blueTint" \| "pinkTint" |
+| elevation | string    | "auto"     | "auto" \| "shadow" \| "flat" |
 | onClick   | function  | —          | Makes card clickable          |
 | className | string    | —          | Additional CSS class          |
 

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowDown, Layers, Pencil, ChevronLeft, Trash2 } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
 import { Card, Button, SectionLabel, IconButton, ConfirmDialog, PageHeader } from '../components/ui';
@@ -8,6 +8,7 @@ import styles from './ComboDetail.module.css';
 export default function ComboDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { combos, moves, loading, updateCombo, deleteCombo } = useApp();
 
   const combo = combos.find((item) => String(item.id) === id);
@@ -58,8 +59,8 @@ export default function ComboDetail() {
           <IconButton
             icon={<ChevronLeft size={18} />}
             variant="ghost"
-            label="Back to combos"
-            onClick={isEditing ? handleEditCancel : () => navigate('/combos')}
+            label="Back"
+            onClick={isEditing ? handleEditCancel : () => navigate(location.state?.backTo || '/combos')}
           />
         )}
         rightAction={(
@@ -113,10 +114,12 @@ export default function ComboDetail() {
           <div className={styles.sequenceList}>
             {sequence.map((moveId, index) => (
               <div key={`${moveId}-${index}`}>
-                <Card className={styles.sequenceCard}>
-                  <span className={styles.sequenceNumber}>{index + 1}.</span>
-                  <span className={styles.sequenceName}>{moveMap[moveId]?.name || 'Unknown move'}</span>
-                </Card>
+                <div className={styles.sequenceRow}>
+                  <span className={styles.sequenceNumber}>{index + 1}</span>
+                  <Card className={styles.sequenceCard}>
+                    <span className={styles.sequenceName}>{moveMap[moveId]?.name || 'Unknown move'}</span>
+                  </Card>
+                </div>
                 {index < sequence.length - 1 && (
                   <div className={styles.connector}>
                     <ArrowDown size={16} />
