@@ -14,6 +14,7 @@ export function AppProvider({ children }) {
   const [moves, setMoves] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [combos, setCombos] = useState([]);
+  const [transitions, setTransitions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [librarySearch, setLibrarySearch] = useState('');
@@ -215,12 +216,38 @@ export function AppProvider({ children }) {
     setCombos(data || []);
   }
 
+  async function loadTransitions(userIdOverride) {
+    const currentUserId = userIdOverride !== undefined
+      ? userIdOverride
+      : await getCurrentUserId();
+
+    if (!currentUserId) {
+      setTransitions([]);
+      return true;
+    }
+
+    const { data, error: transitionsError } = await supabase
+      .from('transitions')
+      .select('*');
+
+    if (transitionsError) {
+      console.error(transitionsError);
+      setError(transitionsError);
+      setTransitions([]);
+      return false;
+    }
+
+    setTransitions(data || []);
+    return true;
+  }
+
   async function refreshAllData(userIdOverride) {
     setLoading(true);
     await Promise.all([
       fetchMoves(userIdOverride),
       loadSessions(userIdOverride),
       loadCombos(userIdOverride),
+      loadTransitions(userIdOverride),
     ]);
     setLoading(false);
   }
@@ -319,6 +346,69 @@ export function AppProvider({ children }) {
 
     await loadCombos();
     return { error: null };
+  }
+
+  async function addTransition(fromMoveId, toMoveId) {
+    const currentUserId = await getCurrentUserId();
+
+    if (!currentUserId) {
+      const noUserError = new Error('You need to be signed in to add a transition.');
+      setError(noUserError);
+      return false;
+    }
+
+    if (!fromMoveId || !toMoveId) return false;
+    if (String(fromMoveId) === String(toMoveId)) return false;
+
+    const alreadyExists = transitions.some((item) =>
+      String(item.from_move_id) === String(fromMoveId) &&
+      String(item.to_move_id) === String(toMoveId)
+    );
+
+    if (alreadyExists) return true;
+
+    const { error: transitionError } = await supabase
+      .from('transitions')
+      .insert({
+        from_move_id: fromMoveId,
+        to_move_id: toMoveId,
+      });
+
+    if (transitionError) {
+      console.error(transitionError);
+      setError(transitionError);
+      return false;
+    }
+
+    await loadTransitions();
+    return true;
+  }
+
+  async function deleteTransition(fromMoveId, toMoveId) {
+    const currentUserId = await getCurrentUserId();
+
+    if (!currentUserId) {
+      const noUserError = new Error('You need to be signed in to remove a transition.');
+      setError(noUserError);
+      return false;
+    }
+
+    if (!fromMoveId || !toMoveId) return false;
+
+    const { error: transitionError } = await supabase
+      .from('transitions')
+      .delete()
+      .eq('from_move_id', fromMoveId)
+      .eq('to_move_id', toMoveId);
+
+    if (transitionError) {
+      console.error(transitionError);
+      setError(transitionError);
+      return false;
+    }
+
+    await loadTransitions();
+    return true;
   }
 
   async function addMove({
@@ -584,6 +674,7 @@ export function AppProvider({ children }) {
       moves,
       sessions,
       combos,
+      transitions,
       loading,
       error,
       addMove,
@@ -599,6 +690,9 @@ export function AppProvider({ children }) {
       createCombo,
       updateCombo,
       deleteCombo,
+      loadTransitions,
+      addTransition,
+      deleteTransition,
       signIn,
       signUp,
       signOut,

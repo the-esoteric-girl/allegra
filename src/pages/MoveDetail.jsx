@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Plus } from 'lucide-react';
+import { ChevronLeft, Plus, X } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Button, StatusPill, ConfirmDialog, Select, Input, Field, IconButton, PageHeader, Card } from '../components/ui';
+import { Button, StatusPill, ConfirmDialog, Select, Input, Field, IconButton, PageHeader, Card, ComboCard, BottomSheet, MoveListControls, MoveSelectRow } from '../components/ui';
+import { filterMovesBySearchAndStatus, sortMoves } from '../lib/moveListControls';
 import styles from './MoveDetail.module.css';
 
 const TABS = [
@@ -12,7 +13,7 @@ const TABS = [
 
 export default function MoveDetail() {
   const { id } = useParams();
-  const { moves, combos, loading, updateMove, deleteMove } = useApp();
+  const { moves, combos, transitions, loading, updateMove, deleteMove, addTransition, deleteTransition } = useApp();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('info');
   const [editing, setEditing] = useState(false);
@@ -28,6 +29,14 @@ export default function MoveDetail() {
   const [saveError, setSaveError] = useState('');
   const [noteError, setNoteError] = useState('');
   const [deleteError, setDeleteError] = useState('');
+  const [exitActionError, setExitActionError] = useState('');
+  const [isExitPickerOpen, setIsExitPickerOpen] = useState(false);
+  const [exitSearchQuery, setExitSearchQuery] = useState('');
+  const [exitStatusFilter, setExitStatusFilter] = useState('any');
+  const [exitSortBy, setExitSortBy] = useState('alpha-asc');
+  const [pendingExitIds, setPendingExitIds] = useState([]);
+  const [addingExits, setAddingExits] = useState(false);
+  const [removingExitIds, setRemovingExitIds] = useState([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -42,6 +51,22 @@ export default function MoveDetail() {
   if (!move) return <p>Move not found</p>;
 
   const relatedCombos = combos.filter(c => c.move_ids?.includes(move.id));
+  const moveMap = Object.fromEntries(moves.map((m) => [String(m.id), m]));
+  const exits = transitions
+    .filter((item) => String(item.from_move_id) === String(move.id))
+    .map((item) => moveMap[String(item.to_move_id)])
+    .filter(Boolean);
+  const existingExitIds = new Set(exits.map((item) => String(item.id)));
+  const exitCandidates = sortMoves(
+    filterMovesBySearchAndStatus(
+      moves.filter((item) =>
+        String(item.id) !== String(move.id) &&
+        !existingExitIds.has(String(item.id))
+      ),
+      { searchQuery: exitSearchQuery, statusFilter: exitStatusFilter }
+    ),
+    exitSortBy
+  );
 
   function handleEditClick() {
     setActiveTab('info');
@@ -164,6 +189,60 @@ export default function MoveDetail() {
     } finally {
       setDeleting(false);
     }
+  }
+
+  function openExitPicker() {
+    setExitActionError('');
+    setPendingExitIds([]);
+    setExitSearchQuery('');
+    setExitStatusFilter('any');
+    setExitSortBy('alpha-asc');
+    setIsExitPickerOpen(true);
+  }
+
+  function togglePendingExit(exitMoveId) {
+    setPendingExitIds((prev) =>
+      prev.includes(exitMoveId)
+        ? prev.filter((item) => item !== exitMoveId)
+        : [...prev, exitMoveId]
+    );
+  }
+
+  async function handleAddExits() {
+    if (pendingExitIds.length === 0 || addingExits) return;
+
+    setExitActionError('');
+    setAddingExits(true);
+
+    let hasError = false;
+    for (const toMoveId of pendingExitIds) {
+      const success = await addTransition(move.id, toMoveId);
+      if (!success) hasError = true;
+    }
+
+    setAddingExits(false);
+
+    if (hasError) {
+      setExitActionError('Could not add one or more exits. Please try again.');
+      return;
+    }
+
+    setIsExitPickerOpen(false);
+    setPendingExitIds([]);
+  }
+
+  async function handleRemoveExit(toMoveId) {
+    if (removingExitIds.includes(toMoveId)) return;
+
+    setExitActionError('');
+    setRemovingExitIds((prev) => [...prev, toMoveId]);
+
+    const success = await deleteTransition(move.id, toMoveId);
+    if (!success) {
+      setExitActionError('Could not remove exit. Please try again.');
+    }
+
+    setRemovingExitIds((prev) => prev.filter((item) => item !== toMoveId));
   }
 
   return (
@@ -289,7 +368,7 @@ export default function MoveDetail() {
                 <Input
                   id="note-text"
                   name="note-text"
-                  inputClassName={styles.textarea}
+                  inputClassName={styles.noteTextarea}
                   multiline
                   rows={3}
                   placeholder="Add a technique tip..."
@@ -317,6 +396,42 @@ export default function MoveDetail() {
             )}
           </Card>
 
+          <Card className={styles.card} tone="blueTint">
+            <div className={styles.cardHeader}>
+              <span className={styles.sectionLabel}>Exits to</span>
+              <Button variant="subtle" size="sm" leftIcon={<Plus size={14} />} onClick={openExitPicker}>
+                Add
+              </Button>
+            </div>
+            {exits.length > 0 ? (
+              <div className={styles.exitPills}>
+                {exits.map((exitMove) => (
+                  <div key={exitMove.id} className={styles.exitPillItem}>
+                    <button
+                      type="button"
+                      className={styles.exitPill}
+                      onClick={() => navigate(`/move/${exitMove.id}`)}
+                    >
+                      {exitMove.name}
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.exitPillRemove}
+                      onClick={() => handleRemoveExit(exitMove.id)}
+                      aria-label={`Remove exit to ${exitMove.name}`}
+                      disabled={removingExitIds.includes(exitMove.id)}
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className={styles.emptyStateText}>No exits yet. Add one to start linking transitions.</p>
+            )}
+            {exitActionError && <p className={styles.actionError}>{exitActionError}</p>}
+          </Card>
+
           <Button
             variant="ghost"
             className={styles.deleteButton}
@@ -330,25 +445,86 @@ export default function MoveDetail() {
       ))}
 
       {activeTab === 'combos' && (
-        <Card className={styles.card}>
-          <div className={styles.sectionLabel}>Appears in</div>
+        <div className={styles.combosSection}>
           {relatedCombos.length > 0 ? (
-            relatedCombos.map((combo) => (
-              <button
-                key={combo.id}
-                type="button"
-                className={styles.comboLink}
-                onClick={() => navigate(`/combos/${combo.id}`)}
-              >
-                <span className={styles.comboLinkName}>{combo.name || 'Untitled combo'}</span>
-                <span className={styles.comboLinkMeta}>{combo.move_ids.length} move{combo.move_ids.length !== 1 ? 's' : ''}</span>
-              </button>
-            ))
+            <>
+              <div className={styles.comboCount}>
+                {relatedCombos.length} combo{relatedCombos.length !== 1 ? 's' : ''}
+              </div>
+              <div className={styles.comboList}>
+                {relatedCombos.map((combo) => (
+                  <ComboCard
+                    key={combo.id}
+                    combo={combo}
+                    moves={moves}
+                    onClick={() => navigate(`/combos/${combo.id}`)}
+                  />
+                ))}
+              </div>
+            </>
           ) : (
-            <p className={styles.emptyStateText}>No combos yet for this move.</p>
+            <div className={styles.emptyState}>
+              <p className={styles.emptyHeading}>No combos yet</p>
+              <p className={styles.emptyBody}>This move has not been added to any combos yet.</p>
+            </div>
           )}
-        </Card>
+        </div>
       )}
+
+      <BottomSheet
+        isOpen={isExitPickerOpen}
+        onClose={() => setIsExitPickerOpen(false)}
+        title="Add exits"
+        leftAction={(
+          <IconButton
+            icon={<ChevronLeft size={20} />}
+            label="Close add exits"
+            onClick={() => setIsExitPickerOpen(false)}
+          />
+        )}
+        bottomAction={(
+          <Button
+            fullWidth
+            onClick={handleAddExits}
+            disabled={pendingExitIds.length === 0 || addingExits}
+            leftIcon={<Plus size={16} />}
+          >
+            {addingExits
+              ? 'Adding...'
+              : `Add ${pendingExitIds.length} exit${pendingExitIds.length !== 1 ? 's' : ''}`}
+          </Button>
+        )}
+      >
+        <div className={styles.exitPickerContent}>
+          <MoveListControls
+            idPrefix="move-exit-picker"
+            searchValue={exitSearchQuery}
+            onSearchChange={setExitSearchQuery}
+            onSearchClear={() => setExitSearchQuery('')}
+            statusFilter={exitStatusFilter}
+            onStatusFilterChange={setExitStatusFilter}
+            sortBy={exitSortBy}
+            onSortByChange={setExitSortBy}
+            searchPlaceholder="Search moves..."
+          />
+
+          <div className={styles.exitPickerList}>
+            {exitCandidates.map((candidate, index) => (
+              <div key={candidate.id}>
+                <MoveSelectRow
+                  label={candidate.name}
+                  selected={pendingExitIds.includes(candidate.id)}
+                  onClick={() => togglePendingExit(candidate.id)}
+                />
+                {index < exitCandidates.length - 1 && <div className={styles.exitPickerDivider} />}
+              </div>
+            ))}
+            {exitCandidates.length === 0 && (
+              <p className={styles.emptyStateText}>No available moves to add.</p>
+            )}
+          </div>
+        </div>
+      </BottomSheet>
 
       <ConfirmDialog
         isOpen={isDeleteDialogOpen}
