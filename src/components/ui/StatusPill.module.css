@@ -9,7 +9,7 @@
 }
 
 .sm {
-  font-size: 0.75rem;
+  font: var(--text-caption);
   padding: 0.1875rem 0.5rem;
 }
 

@@ -99,7 +99,7 @@ const {
   // Transitions
   transitions,        // Transition[]
   loadTransitions,    // () => boolean
-  addTransition,      // (fromMoveId, toMoveId) => boolean
+  addTransition,      // (fromMoveId, toMoveId) => { ok: boolean, error: Error | object | null }
   deleteTransition,   // (fromMoveId, toMoveId) => boolean
 
   // Library UI state

@@ -7,14 +7,13 @@
 }
 
 .moveName {
-  font-size: 1.75rem;
-  font-weight: 700;
+  font: var(--text-heading-2);
   color: var(--color-text-primary);
   margin-bottom: var(--space-1);
 }
 
 .aliases {
-  font-size: 0.75rem;
+  font: var(--text-caption);
   color: var(--color-text-secondary);
   margin-bottom: var(--space-4);
 }
@@ -65,15 +64,14 @@
 }
 
 .sectionLabel {
-  font-size: 0.75rem;
+  font: var(--text-caption);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-text-secondary);
 }
 
 .notesText {
-  font-size: 0.9375rem;
-  line-height: 1.6;
+  font: var(--text-body);
   color: var(--color-text-primary);
   white-space: pre-wrap;
 }
@@ -92,8 +90,7 @@
   background: var(--color-surface-blue);
   border: 1.5px solid transparent;
   border-radius: var(--radius-lg);
-  font: var(--text-body);
-  line-height: 1.6;
+  font: var(--text-body-sm);
   resize: vertical;
 }
 
@@ -119,8 +116,7 @@
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-pill);
   padding: var(--space-1) var(--space-3);
-  font-size: 0.75rem;
-  font-family: var(--font-main);
+  font: var(--text-caption);
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
@@ -129,11 +125,10 @@
 
 .aliasRemove {
   color: var(--color-text-muted);
-  font-size: 0.875rem;
+  font: var(--text-body-sm);
   background: none;
   border: none;
   padding: 0;
-  line-height: 1;
   cursor: pointer;
 }
 
@@ -157,16 +152,15 @@
 }
 
 .aliasError {
-  font-size: 0.8125rem;
+  font: var(--text-body-sm);
   color: var(--color-error-text);
   margin-top: var(--space-2);
 }
 
 .aliasWarning {
-  font-size: 0.8125rem;
+  font: var(--text-body-sm);
   color: var(--color-caution-text);
   margin-top: var(--space-2);
-  line-height: 1.5;
 }
 
 .conflictButtons {
@@ -184,7 +178,7 @@
 }
 
 .noteDateHeader {
-  font-size: 0.75rem;
+  font: var(--text-caption);
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -234,16 +228,14 @@
 
 .emptyHeading {
   margin: 0;
-  font-size: 1.0625rem;
-  font-weight: 600;
+  font: var(--text-body-semibold);
   color: var(--color-text-primary);
 }
 
 .emptyBody {
   margin: 0;
-  font-size: 0.875rem;
+  font: var(--text-body-sm);
   color: var(--color-text-secondary);
-  line-height: 1.6;
 }
 
 .emptyStateText {
@@ -322,7 +314,16 @@
 }
 
 .actionError {
-  font-size: 0.8125rem;
+  font: var(--text-body-sm);
   color: var(--color-error-text);
   margin-top: var(--space-2);
+}
+
+@media (max-width: 360px) {
+  .statusRow,
+  .addAliasRow,
+  .conflictButtons,
+  .addNoteButtons {
+    flex-wrap: wrap;
+  }
 }

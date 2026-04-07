@@ -68,7 +68,7 @@
 .sortButton {
   min-height: 2rem;
   height: 2rem;
-  font-size: 0.75rem;
+  font: var(--text-caption);
   letter-spacing: 0.04em;
   color: var(--color-text-secondary);
   padding: 0.25rem 0.5rem;

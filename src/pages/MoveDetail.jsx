@@ -216,16 +216,23 @@ export default function MoveDetail() {
     setExitActionError('');
     setAddingExits(true);
 
-    let hasError = false;
+    let firstError = null;
     for (const toMoveId of pendingExitIds) {
-      const success = await addTransition(move.id, toMoveId);
-      if (!success) hasError = true;
+      const result = await addTransition(move.id, toMoveId);
+      if (!result?.ok && !firstError) firstError = result?.error ?? new Error('Unknown transition error');
     }
 
     setAddingExits(false);
 
-    if (hasError) {
-      setExitActionError('Could not add one or more exits. Please try again.');
+    if (firstError) {
+      const isPermissionError = firstError.code === '42501'
+        || firstError.status === 403
+        || String(firstError.message || '').toLowerCase().includes('permission denied');
+      if (isPermissionError) {
+        setExitActionError('Could not add exits because database permissions blocked this action (403). Please update your Supabase RLS policy for transitions inserts.');
+      } else {
+        setExitActionError('Could not add one or more exits. Please try again.');
+      }
       return;
     }
 

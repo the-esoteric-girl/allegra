@@ -355,18 +355,28 @@ export function AppProvider({ children }) {
     if (!currentUserId) {
       const noUserError = new Error('You need to be signed in to add a transition.');
       setError(noUserError);
-      return false;
+      return { ok: false, error: noUserError };
     }
 
-    if (!fromMoveId || !toMoveId) return false;
-    if (String(fromMoveId) === String(toMoveId)) return false;
+    if (!fromMoveId || !toMoveId) {
+      return {
+        ok: false,
+        error: new Error('Missing move id for transition.'),
+      };
+    }
+    if (String(fromMoveId) === String(toMoveId)) {
+      return {
+        ok: false,
+        error: new Error('A move cannot transition to itself.'),
+      };
+    }
 
     const alreadyExists = transitions.some((item) =>
       String(item.from_move_id) === String(fromMoveId) &&
       String(item.to_move_id) === String(toMoveId)
     );
 
-    if (alreadyExists) return true;
+    if (alreadyExists) return { ok: true, error: null };
 
     const { error: transitionError } = await supabase
       .from('transitions')
@@ -377,13 +387,17 @@ export function AppProvider({ children }) {
       });
 
     if (transitionError) {
+      if (transitionError.code === '23505') {
+        await loadTransitions(currentUserId);
+        return { ok: true, error: null };
+      }
       console.error(transitionError);
       setError(transitionError);
-      return false;
+      return { ok: false, error: transitionError };
     }
 
-    await loadTransitions();
-    return true;
+    await loadTransitions(currentUserId);
+    return { ok: true, error: null };
   }
 
   async function deleteTransition(fromMoveId, toMoveId) {

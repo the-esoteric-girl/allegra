@@ -13,8 +13,7 @@
 
 .sessionDate {
   margin: 0;
-  font-size: 1.75rem;
-  font-weight: 700;
+  font: var(--text-heading-2);
   color: var(--color-text-primary);
 }
 

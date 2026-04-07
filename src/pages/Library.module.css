@@ -7,13 +7,12 @@
 }
 
 .appName {
-  font-size: 1.75rem;
-  font-weight: 700;
+  font: var(--text-heading-2);
   color: var(--color-text-primary);
 }
 
 .subtitle {
-  font-size: 0.75rem;
+  font: var(--text-caption);
   color: var(--color-text-secondary);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -54,7 +53,7 @@
 }
 
 .moveCount {
-  font-size: 0.75rem;
+  font: var(--text-caption);
   color: var(--color-text-secondary);
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -66,14 +65,13 @@
 }
 
 .moveName {
-  font-size: 1.0625rem;
-  font-weight: 500;
+  font: var(--text-body-semibold);
   color: var(--color-text-primary);
   margin-bottom: 0.25rem;
 }
 
 .moveAliases {
-  font-size: 0.75rem;
+  font: var(--text-caption);
   color: var(--color-text-secondary);
   margin-bottom: 0.5rem;
 }
@@ -82,6 +80,6 @@
 .emptyState {
   text-align: center;
   padding: 2.5rem 0;
-  font-size: 0.9375rem;
+  font: var(--text-body);
   color: var(--color-text-secondary);
 }

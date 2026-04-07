@@ -67,17 +67,14 @@
 
 .emptyTitle {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
+  font: var(--text-body-semibold);
   color: var(--color-text-secondary);
-  font-family: var(--font-main);
 }
 
 .emptySubtitle {
   margin: 0;
-  font-size: 0.875rem;
+  font: var(--text-body-sm);
   color: var(--color-text-secondary);
-  font-family: var(--font-main);
 }
 
 /* ── Entry cards ─────────────────────────────────────────────────────────── */
@@ -102,10 +99,9 @@
 
 .entryName {
   flex: 1;
-  font-size: 0.9375rem;
+  font: var(--text-body-semibold);
   font-weight: 700;
   color: var(--color-text-primary);
-  font-family: var(--font-main);
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -157,15 +153,13 @@
   width: 100%;
   box-sizing: border-box;
   padding: 0;
-  font-size: 0.875rem;
-  font-family: var(--font-main);
+  font: var(--text-body-sm);
   color: var(--color-text-secondary);
   background: transparent;
   border: none;
   outline: none;
   resize: none;
   overflow: hidden;
-  line-height: 1.6;
   min-height: 1.375rem;
 }
 
@@ -197,16 +191,14 @@
 }
 
 .summaryMetaLabel {
-  font-size: 0.75rem;
+  font: var(--text-caption);
   color: var(--color-text-secondary);
-  font-family: var(--font-main);
 }
 
 .summaryMetaValue {
-  font-size: 0.9375rem;
+  font: var(--text-body-semibold);
   font-weight: 700;
   color: var(--color-text-primary);
-  font-family: var(--font-main);
 }
 
 .summaryNotesBlock {
@@ -217,10 +209,8 @@
 
 .summaryNotesText {
   margin: 0;
-  font-size: 0.875rem;
+  font: var(--text-body-sm);
   color: var(--color-text-primary);
-  font-family: var(--font-main);
-  line-height: 1.6;
 }
 
 .summaryEntries {
@@ -243,18 +233,15 @@
 }
 
 .summaryEntryName {
-  font-size: 0.9375rem;
+  font: var(--text-body-semibold);
   font-weight: 700;
   color: var(--color-text-primary);
-  font-family: var(--font-main);
 }
 
 .summaryEntryNote {
   margin: 0;
-  font-size: 0.875rem;
+  font: var(--text-body-sm);
   color: var(--color-text-secondary);
-  font-family: var(--font-main);
-  line-height: 1.6;
   cursor: pointer;
 }
 
@@ -327,13 +314,12 @@
 
 .noResultsText {
   margin: 0;
-  font-size: 0.875rem;
+  font: var(--text-body-sm);
   color: var(--color-text-secondary);
-  font-family: var(--font-main);
 }
 
 .createMoveLink {
-  font-size: 0.875rem;
+  font: var(--text-body-sm);
   color: var(--color-blue);
   padding: 0.25rem 0.5rem;
   height: auto;
@@ -355,8 +341,7 @@
   width: 100%;
   box-sizing: border-box;
   padding: var(--space-3) var(--space-4);
-  font-size: 0.9375rem;
-  font-family: var(--font-main);
+  font: var(--text-body);
   color: var(--color-text-primary);
   background: var(--color-surface-blue);
   border: 1.5px solid transparent;

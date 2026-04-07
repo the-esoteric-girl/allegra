@@ -10,13 +10,12 @@
 }
 
 .pageTitle {
-  font-size: 1.75rem;
-  font-weight: 700;
+  font: var(--text-heading-2);
   color: var(--color-text-primary);
 }
 
 .subtitle {
-  font-size: 0.75rem;
+  font: var(--text-caption);
   color: var(--color-text-secondary);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -33,15 +32,13 @@
 }
 
 .emptyHeading {
-  font-size: 1.0625rem;
-  font-weight: 600;
+  font: var(--text-body-semibold);
   color: var(--color-text-primary);
 }
 
 .emptyBody {
-  font-size: 0.875rem;
+  font: var(--text-body-sm);
   color: var(--color-text-secondary);
-  line-height: 1.6;
 }
 
 /* ── Controls ── */
@@ -78,21 +75,26 @@
 }
 
 .comboName {
-  font-size: 1.0625rem;
-  font-weight: 500;
+  font: var(--text-body-semibold);
   color: var(--color-text-primary);
 }
 
 .comboMeta {
-  font-size: 0.75rem;
+  font: var(--text-caption);
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .comboPreview {
-  font-size: 0.8125rem;
+  font: var(--text-body-sm);
   color: var(--color-text-secondary);
   margin-top: var(--space-1);
-  line-height: 1.5;
+}
+
+@media (max-width: 360px) {
+  .controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

@@ -49,17 +49,15 @@
 }
 
 .title {
-  font-size: 0.9375rem;
+  font: var(--text-body-semibold);
   font-weight: 700;
   color: var(--color-text-primary);
-  font-family: var(--font-main);
 }
 
 .subtitle {
   margin: 0.125rem 0 0;
-  font-size: 0.8125rem;
+  font: var(--text-body-sm);
   color: var(--color-text-secondary);
-  font-family: var(--font-main);
 }
 
 .discardBtn {

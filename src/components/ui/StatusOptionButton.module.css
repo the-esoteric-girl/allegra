@@ -45,5 +45,6 @@
   background: var(--color-surface-blue);
   border-color: var(--color-blue);
   color: var(--color-text-primary);
+  font: var(--text-body-sm);
   font-weight: 600;
 }
