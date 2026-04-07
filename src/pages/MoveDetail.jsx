@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Plus, X } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Button, StatusPill, ConfirmDialog, Select, Input, Field, IconButton, PageHeader, Card, ComboCard, BottomSheet, MoveListControls, MoveSelectRow } from '../components/ui';
+import { Button, StatusPill, ConfirmDialog, Select, Input, Field, IconButton, PageHeader, Card, ComboCard, BottomSheet, MovePickerPanel, EmptyState, PageState } from '../components/ui';
 import { filterMovesBySearchAndStatus, sortMoves } from '../lib/moveListControls';
+import { MOVE_STATUS_VALUES, getStatusLabel } from '../lib/statusConfig';
 import styles from './MoveDetail.module.css';
 
 const TABS = [
@@ -44,11 +45,11 @@ export default function MoveDetail() {
     return str.replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
   }
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <PageState text="Loading..." />;
 
   const move = moves.find((m) => String(m.id) === id);
 
-  if (!move) return <p>Move not found</p>;
+  if (!move) return <PageState text="Move not found." />;
 
   const relatedCombos = combos.filter(c => c.move_ids?.includes(move.id));
   const canDeleteMove = Boolean(user?.id && move?.user_id && String(move.user_id) === String(user.id));
@@ -123,8 +124,8 @@ export default function MoveDetail() {
     setSavingDetails(true);
 
     try {
-      const success = await updateMove(move.id, { status: editStatus, aliases: editAliases });
-      if (success === false) {
+      const result = await updateMove(move.id, { status: editStatus, aliases: editAliases });
+      if (!result.ok) {
         setSaveError('Could not save changes. Please try again.');
         return;
       }
@@ -158,8 +159,8 @@ export default function MoveDetail() {
     setSavingNote(true);
 
     try {
-      const success = await updateMove(move.id, { note: noteText.trim() || null });
-      if (success === false) {
+      const result = await updateMove(move.id, { note: noteText.trim() || null });
+      if (!result.ok) {
         setNoteError('Could not save note. Please try again.');
         return;
       }
@@ -179,8 +180,8 @@ export default function MoveDetail() {
     setDeleteError('');
     setDeleting(true);
     try {
-      const success = await deleteMove(move.id);
-      if (success === false) {
+      const result = await deleteMove(move.id);
+      if (!result.ok) {
         setDeleteError('Could not delete move. Please try again.');
         return;
       }
@@ -246,8 +247,8 @@ export default function MoveDetail() {
     setExitActionError('');
     setRemovingExitIds((prev) => [...prev, toMoveId]);
 
-    const success = await deleteTransition(move.id, toMoveId);
-    if (!success) {
+    const result = await deleteTransition(move.id, toMoveId);
+    if (!result.ok) {
       setExitActionError('Could not remove exit. Please try again.');
     }
 
@@ -313,9 +314,11 @@ export default function MoveDetail() {
                 onChange={(e) => setEditStatus(e.target.value)}
               >
                 <option value="">no status</option>
-                <option value="want to try">want to try</option>
-                <option value="working on">working on</option>
-                <option value="achieved">achieved</option>
+                {MOVE_STATUS_VALUES.map((status) => (
+                  <option key={status} value={status}>
+                    {getStatusLabel(status).toLowerCase()}
+                  </option>
+                ))}
               </Select>
             </Field>
           </Card>
@@ -476,10 +479,13 @@ export default function MoveDetail() {
               </div>
             </>
           ) : (
-            <div className={styles.emptyState}>
-              <p className={styles.emptyHeading}>No combos yet</p>
-              <p className={styles.emptyBody}>This move has not been added to any combos yet.</p>
-            </div>
+            <EmptyState
+              title="No combos yet"
+              body="This move has not been added to any combos yet."
+              className={styles.emptyState}
+              titleClassName={styles.emptyHeading}
+              bodyClassName={styles.emptyBody}
+            />
           )}
         </div>
       )}
@@ -508,35 +514,27 @@ export default function MoveDetail() {
           </Button>
         )}
       >
-        <div className={styles.exitPickerContent}>
-          <MoveListControls
-            idPrefix="move-exit-picker"
-            searchValue={exitSearchQuery}
-            onSearchChange={setExitSearchQuery}
-            onSearchClear={() => setExitSearchQuery('')}
-            statusFilter={exitStatusFilter}
-            onStatusFilterChange={setExitStatusFilter}
-            sortBy={exitSortBy}
-            onSortByChange={setExitSortBy}
-            searchPlaceholder="Search moves..."
-          />
-
-          <div className={styles.exitPickerList}>
-            {exitCandidates.map((candidate, index) => (
-              <div key={candidate.id}>
-                <MoveSelectRow
-                  label={candidate.name}
-                  selected={pendingExitIds.includes(candidate.id)}
-                  onClick={() => togglePendingExit(candidate.id)}
-                />
-                {index < exitCandidates.length - 1 && <div className={styles.exitPickerDivider} />}
-              </div>
-            ))}
-            {exitCandidates.length === 0 && (
-              <p className={styles.emptyStateText}>No available moves to add.</p>
-            )}
-          </div>
-        </div>
+        <MovePickerPanel
+          className={styles.exitPickerContent}
+          idPrefix="move-exit-picker"
+          searchValue={exitSearchQuery}
+          onSearchChange={setExitSearchQuery}
+          onSearchClear={() => setExitSearchQuery('')}
+          statusFilter={exitStatusFilter}
+          onStatusFilterChange={setExitStatusFilter}
+          sortBy={exitSortBy}
+          onSortByChange={setExitSortBy}
+          searchPlaceholder="Search moves..."
+          items={exitCandidates.map((candidate) => ({
+            id: candidate.id,
+            label: candidate.name,
+            selected: pendingExitIds.includes(candidate.id),
+          }))}
+          onToggleItem={(candidate) => togglePendingExit(candidate.id)}
+          listClassName={styles.exitPickerList}
+          dividerClassName={styles.exitPickerDivider}
+          emptyState={<p className={styles.emptyStateText}>No available moves to add.</p>}
+        />
       </BottomSheet>
 
       <ConfirmDialog

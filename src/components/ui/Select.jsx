@@ -1,4 +1,5 @@
 import styles from './Select.module.css';
+import { cn } from '../../lib/cn';
 
 export default function Select({ id, name, value, onChange, className, children, ...props }) {
   return (
@@ -8,7 +9,7 @@ export default function Select({ id, name, value, onChange, className, children,
       value={value}
       onChange={onChange}
       {...props}
-      className={[styles.select, className].filter(Boolean).join(' ')}
+      className={cn(styles.select, className)}
     >
       {children}
     </select>

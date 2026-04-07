@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../hooks/useApp';
-import { StatusPill, Card, MoveListControls } from '../components/ui';
+import { StatusPill, Card, MoveListControls, EmptyState } from '../components/ui';
 import { filterMovesBySearchAndStatus, sortMoves } from '../lib/moveListControls';
 import styles from './Library.module.css';
 
@@ -45,7 +45,7 @@ export default function Library() {
       </div>
 
       {filtered.length === 0 ? (
-        <div className={styles.emptyState}>No moves found</div>
+        <EmptyState body="No moves found" className={styles.emptyState} />
       ) : (
         filtered.map((move) => (
           <Card

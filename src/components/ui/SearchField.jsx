@@ -1,6 +1,7 @@
 import { Search, X } from 'lucide-react';
 import Input from './Input';
 import styles from './SearchField.module.css';
+import { cn } from '../../lib/cn';
 
 export default function SearchField({
   id,
@@ -23,7 +24,7 @@ export default function SearchField({
       placeholder={placeholder}
       inputRef={inputRef}
       className={className}
-      inputClassName={[styles.input, inputClassName].filter(Boolean).join(' ')}
+      inputClassName={cn(styles.input, inputClassName)}
       leftIcon={<Search size={16} />}
       rightIcon={
         value ? (

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useApp } from '../hooks/useApp';
-import { Button, Card, Input } from '../components/ui';
+import { Button, Card, Input, PageState } from '../components/ui';
 import styles from './Auth.module.css';
 
 export default function Auth() {
@@ -36,15 +36,15 @@ export default function Auth() {
       ? await signUp(trimmedEmail, password, trimmedUsername)
       : await signIn(trimmedEmail, password);
 
-    if (result.error) {
-      setFormError(result.error.message || 'Something went wrong.');
+    if (!result.ok) {
+      setFormError(result.error?.message || 'Something went wrong.');
     }
 
     setSubmitting(false);
   }
 
   if (loading) {
-    return <p className={styles.loading}>Loading...</p>;
+    return <PageState text="Loading..." className={styles.loading} />;
   }
 
   if (user) {

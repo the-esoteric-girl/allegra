@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowDown, Layers, Pencil, ChevronLeft, Trash2 } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Card, Button, SectionLabel, IconButton, ConfirmDialog, PageHeader } from '../components/ui';
+import { Card, Button, SectionLabel, IconButton, ConfirmDialog, DetailPageShell, PageState } from '../components/ui';
 import styles from './ComboDetail.module.css';
 
 export default function ComboDetail() {
@@ -35,56 +35,54 @@ export default function ComboDetail() {
   async function handleSave() {
     if (!combo) return;
     setSaving(true);
-    await updateCombo(combo.id, { name, notes });
+    const result = await updateCombo(combo.id, { name, notes });
     setSaving(false);
-    setIsEditing(false);
+    if (result.ok) setIsEditing(false);
   }
 
   async function handleDeleteConfirm() {
     if (!combo) return;
     setDeleting(true);
-    const { error } = await deleteCombo(combo.id);
+    const result = await deleteCombo(combo.id);
     setDeleting(false);
-    if (!error) navigate('/combos');
+    if (result.ok) navigate('/combos');
   }
 
-  if (loading) return <p className={styles.stateText}>Loading...</p>;
-  if (!combo) return <p className={styles.stateText}>Combo not found.</p>;
+  if (loading) return <PageState text="Loading..." className={styles.stateText} />;
+  if (!combo) return <PageState text="Combo not found." className={styles.stateText} />;
 
   return (
-    <div className={styles.page}>
-      <PageHeader
-        title="Combo"
-        leftAction={(
+    <DetailPageShell
+      title="Combo"
+      leftAction={(
+        <IconButton
+          icon={<ChevronLeft size={18} />}
+          variant="ghost"
+          label="Back"
+          onClick={isEditing ? handleEditCancel : () => navigate(location.state?.backTo || '/combos')}
+        />
+      )}
+      rightAction={(
+        isEditing ? (
           <IconButton
-            icon={<ChevronLeft size={18} />}
+            icon={<Trash2 size={18} />}
             variant="ghost"
-            label="Back"
-            onClick={isEditing ? handleEditCancel : () => navigate(location.state?.backTo || '/combos')}
+            label="Delete combo"
+            onClick={() => setIsDeleteDialogOpen(true)}
+            className={styles.deleteIcon}
           />
-        )}
-        rightAction={(
-          isEditing ? (
-            <IconButton
-              icon={<Trash2 size={18} />}
-              variant="ghost"
-              label="Delete combo"
-              onClick={() => setIsDeleteDialogOpen(true)}
-              className={styles.deleteIcon}
-            />
-          ) : (
-            <IconButton
-              icon={<Pencil size={18} />}
-              variant="ghost"
-              label="Edit combo"
-              onClick={handleEditEnter}
-            />
-          )
-        )}
-        bleed
-        noBorder
-      />
-
+        ) : (
+          <IconButton
+            icon={<Pencil size={18} />}
+            variant="ghost"
+            label="Edit combo"
+            onClick={handleEditEnter}
+          />
+        )
+      )}
+      className={styles.page}
+    >
+      
       {isEditing ? (
         <input
           id="combo-name"
@@ -175,6 +173,6 @@ export default function ComboDetail() {
         loading={deleting}
         testIdPrefix="delete-combo-dialog"
       />
-    </div>
+    </DetailPageShell>
   );
 }

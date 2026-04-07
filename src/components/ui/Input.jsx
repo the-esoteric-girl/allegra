@@ -1,4 +1,5 @@
 import styles from './Input.module.css';
+import { cn } from '../../lib/cn';
 
 export default function Input({
   placeholder,
@@ -17,15 +18,13 @@ export default function Input({
   type = 'text',
   ...props
 }) {
-  const wrapperClass = [
+  const wrapperClass = cn(
     styles.wrapper,
-    leftIcon ? styles.hasLeft : '',
-    rightIcon ? styles.hasRight : '',
+    leftIcon && styles.hasLeft,
+    rightIcon && styles.hasRight,
     className,
-    wrapperClassName,
-  ]
-    .filter(Boolean)
-    .join(' ');
+    wrapperClassName
+  );
 
   const sharedProps = {
     className: styles.input,
@@ -45,14 +44,14 @@ export default function Input({
           {...sharedProps}
           ref={inputRef}
           rows={rows}
-          className={[styles.input, inputClassName].filter(Boolean).join(' ')}
+          className={cn(styles.input, inputClassName)}
         />
       ) : (
         <input
           {...sharedProps}
           ref={inputRef}
           type={type}
-          className={[styles.input, inputClassName].filter(Boolean).join(' ')}
+          className={cn(styles.input, inputClassName)}
         />
       )}
       {rightIcon && <span className={styles.rightIcon}>{rightIcon}</span>}

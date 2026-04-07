@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../hooks/useApp';
 import { Button, Select } from '../components/ui';
+import { MOVE_STATUS_VALUES, getStatusLabel } from '../lib/statusConfig';
 import styles from './You.module.css';
 
 function formatDate(isoString) {
@@ -15,9 +16,12 @@ export default function You() {
   const navigate = useNavigate();
   const [sortOrder, setSortOrder] = useState('newest');
 
-  const achievedCount = moves.filter(m => m.status === 'achieved').length;
-  const workingOnCount = moves.filter(m => m.status === 'working on').length;
-  const wantToTryCount = moves.filter(m => m.status === 'want to try').length;
+  const statusCounts = Object.fromEntries(
+    MOVE_STATUS_VALUES.map((status) => [
+      status,
+      moves.filter((move) => move.status === status).length,
+    ])
+  );
 
   const sortedSessions = [...sessions].sort((a, b) => {
     if (sortOrder === 'newest') return a.date < b.date ? 1 : -1;
@@ -29,8 +33,8 @@ export default function You() {
   }
 
   async function handleSignOut() {
-    const { error } = await signOut();
-    if (!error) navigate('/auth');
+    const result = await signOut();
+    if (result.ok) navigate('/auth');
   }
 
   return (
@@ -51,13 +55,13 @@ export default function You() {
       {/* Stats */}
       <div className={styles.statsRow}>
         {[
-          { label: 'Achieved', count: achievedCount },
-          { label: 'Working on', count: workingOnCount },
-          { label: 'Want to try', count: wantToTryCount },
-        ].map(({ label, count }) => (
-          <div key={label} className={styles.statCard}>
+          { status: 'achieved', count: statusCounts.achieved },
+          { status: 'working on', count: statusCounts['working on'] },
+          { status: 'want to try', count: statusCounts['want to try'] },
+        ].map(({ status, count }) => (
+          <div key={status} className={styles.statCard}>
             <div className={styles.statCount}>{count}</div>
-            <div className={styles.statLabel}>{label}</div>
+            <div className={styles.statLabel}>{getStatusLabel(status)}</div>
           </div>
         ))}
       </div>

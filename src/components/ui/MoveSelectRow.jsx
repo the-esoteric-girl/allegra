@@ -1,5 +1,6 @@
 import { Check } from 'lucide-react';
 import styles from './MoveSelectRow.module.css';
+import { cn } from '../../lib/cn';
 
 export default function MoveSelectRow({
   label,
@@ -15,18 +16,18 @@ export default function MoveSelectRow({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={[styles.row, className].filter(Boolean).join(' ')}
+      className={cn(styles.row, className)}
     >
       <span
-        className={[
+        className={cn(
           styles.checkbox,
-          selected ? styles.checkboxSelected : '',
-          checkboxClassName,
-        ].filter(Boolean).join(' ')}
+          selected && styles.checkboxSelected,
+          checkboxClassName
+        )}
       >
         {selected && <Check size={11} strokeWidth={3} />}
       </span>
-      <span className={[styles.label, labelClassName].filter(Boolean).join(' ')}>
+      <span className={cn(styles.label, labelClassName)}>
         {label}
       </span>
     </button>

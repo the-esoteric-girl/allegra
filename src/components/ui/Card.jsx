@@ -1,4 +1,5 @@
 import styles from './Card.module.css';
+import { cn } from '../../lib/cn';
 
 const paddingClass = {
   default: styles.paddingDefault,
@@ -31,16 +32,14 @@ export default function Card({
 
   return (
     <div
-      className={[
+      className={cn(
         styles.card,
         paddingClass[padding] ?? styles.paddingDefault,
         toneClass[tone] ?? styles.toneDefault,
         elevationClass[resolvedElevation] ?? styles.elevationShadow,
-        onClick ? styles.clickable : '',
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+        onClick && styles.clickable,
+        className
+      )}
       onClick={onClick}
     >
       {children}

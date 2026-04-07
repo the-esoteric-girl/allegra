@@ -39,8 +39,8 @@
 }
 
 .confirmButton {
-  background: var(--coral-40) !important;
-  color: #fff !important;
+  background: var(--color-coral) !important;
+  color: var(--color-surface) !important;
 }
 
 .confirmButton:hover:not(:disabled) {

@@ -1,4 +1,5 @@
 import styles from './IconButton.module.css';
+import { cn } from '../../lib/cn';
 
 export default function IconButton({
   icon,
@@ -15,14 +16,12 @@ export default function IconButton({
       onClick={onClick}
       aria-label={label}
       {...props}
-      className={[
+      className={cn(
         styles.button,
         variant === 'ghost' ? styles.ghost : styles.default,
-        size === 'sm' ? styles.sm : '',
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+        size === 'sm' && styles.sm,
+        className
+      )}
     >
       {icon}
     </button>

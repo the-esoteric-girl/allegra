@@ -1,4 +1,5 @@
 import styles from './Field.module.css';
+import { cn } from '../../lib/cn';
 
 export default function Field({
   label,
@@ -11,9 +12,9 @@ export default function Field({
   contentClassName,
 }) {
   return (
-    <div className={[styles.field, className].filter(Boolean).join(' ')}>
+    <div className={cn(styles.field, className)}>
       {label && (
-        <label htmlFor={htmlFor} className={[styles.label, labelClassName].filter(Boolean).join(' ')}>
+        <label htmlFor={htmlFor} className={cn(styles.label, labelClassName)}>
           {label}
         </label>
       )}

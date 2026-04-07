@@ -79,28 +79,28 @@ const {
   moves,              // Move[]
   loading,            // boolean
   error,              // error | null
-  addMove,            // ({ name, aliases, status, parent_move_id }) => Move | null
-  updateMove,         // (id, updates) => boolean
-  deleteMove,         // (id) => boolean
+  addMove,            // ({ name, aliases, status, parent_move_id }) => { ok, data, error }
+  updateMove,         // (id, updates) => { ok, data, error }
+  deleteMove,         // (id) => { ok, data, error }
 
   // Sessions
   sessions,           // Session[] (each has .entries array)
   loadSessions,       // () => void
-  createSession,      // (notes?) => Session | null
-  addSessionEntry,    // (sessionId, moveId, previousStatus, newStatus, notesAdded) => Entry | null
-  deleteSessionEntry, // (sessionId, moveId) => void
-  deleteSession,      // (id) => void
+  createSession,      // (notes?) => { ok, data, error }
+  addSessionEntry,    // (sessionId, moveId, previousStatus, newStatus, notesAdded) => { ok, data, error }
+  deleteSessionEntry, // (sessionId, moveId) => { ok, data, error }
+  deleteSession,      // (id) => { ok, data, error }
 
   // Combos
   combos,             // Combo[]
   loadCombos,         // () => void
-  createCombo,        // (name, moveIds, notes) => { data, error }
+  createCombo,        // (name, moveIds, notes) => { ok, data, error }
 
   // Transitions
   transitions,        // Transition[]
   loadTransitions,    // () => boolean
-  addTransition,      // (fromMoveId, toMoveId) => { ok: boolean, error: Error | object | null }
-  deleteTransition,   // (fromMoveId, toMoveId) => boolean
+  addTransition,      // (fromMoveId, toMoveId) => { ok, data, error }
+  deleteTransition,   // (fromMoveId, toMoveId) => { ok, data, error }
 
   // Library UI state
   librarySearch,      // string

@@ -1,8 +1,9 @@
 import styles from './SectionLabel.module.css';
+import { cn } from '../../lib/cn';
 
 export default function SectionLabel({ children, className }) {
   return (
-    <p className={[styles.label, className].filter(Boolean).join(' ')}>
+    <p className={cn(styles.label, className)}>
       {children}
     </p>
   );

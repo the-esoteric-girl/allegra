@@ -4,6 +4,7 @@ import SearchField from './SearchField';
 import Pill from './Pill';
 import Button from './Button';
 import { MOVE_STATUS_FILTER_OPTIONS } from '../../lib/moveListControls';
+import { cn } from '../../lib/cn';
 import styles from './MoveListControls.module.css';
 
 export default function MoveListControls({
@@ -43,7 +44,7 @@ export default function MoveListControls({
   const isAscending = sortBy !== 'alpha-desc';
 
   return (
-    <div className={[styles.wrapper, className].filter(Boolean).join(' ')}>
+    <div className={cn(styles.wrapper, className)}>
       <SearchField
         id={`${idPrefix}-search`}
         name={`${idPrefix}-search`}
@@ -52,7 +53,7 @@ export default function MoveListControls({
         onChange={(e) => onSearchChange(e.target.value)}
         onClear={onSearchClear}
         inputRef={searchInputRef}
-        className={[styles.search, searchClassName].filter(Boolean).join(' ')}
+        className={cn(styles.search, searchClassName)}
         inputClassName={searchInputClassName}
       />
 
@@ -64,7 +65,7 @@ export default function MoveListControls({
             onClick={() => setIsStatusOpen((open) => !open)}
           >
             <span className={styles.statusPillLabel}>{activeStatusLabel}</span>
-            <ChevronDown size={14} className={[styles.statusChevron, isStatusOpen ? styles.statusChevronOpen : ''].join(' ')} />
+            <ChevronDown size={14} className={cn(styles.statusChevron, isStatusOpen && styles.statusChevronOpen)} />
           </Pill>
 
           {isStatusOpen && (
@@ -73,7 +74,7 @@ export default function MoveListControls({
                 <button
                   key={option.value}
                   type="button"
-                  className={[styles.statusOption, option.value === statusFilter ? styles.statusOptionActive : ''].filter(Boolean).join(' ')}
+                  className={cn(styles.statusOption, option.value === statusFilter && styles.statusOptionActive)}
                   onClick={() => {
                     onStatusFilterChange(option.value);
                     setIsStatusOpen(false);

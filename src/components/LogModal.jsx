@@ -1,17 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronRight, ChevronLeft, Trash2, X, Plus } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Button, StatusPill, IconButton, Pill, BottomSheet, Input, MoveSelectRow, Card, StatusOptionButton, MoveListControls } from './ui';
+import { Button, StatusPill, IconButton, BottomSheet, Input, Card, StatusOptionButton, MovePickerPanel, EmptyState } from './ui';
 import { filterMovesBySearchAndStatus, sortMoves } from '../lib/moveListControls';
+import { MOVE_STATUS_VALUES, getStatusLabel } from '../lib/statusConfig';
+import { cn } from '../lib/cn';
 import styles from './LogModal.module.css';
 
-const STATUS_OPTIONS = ['', 'want to try', 'working on', 'achieved'];
-const STATUS_LABELS = {
-  '': 'No status',
-  'want to try': 'Want to try',
-  'working on': 'Working on',
-  'achieved': 'Achieved',
-};
+const STATUS_OPTIONS = ['', ...MOVE_STATUS_VALUES];
 
 function formatDate(date) {
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -195,8 +191,9 @@ export default function LogModal({
     const name = createForm.name.trim();
     if (!name) return;
     const aliases = createForm.alias.trim() ? [createForm.alias.trim()] : [];
-    const newMove = await addMove({ name, aliases, status: createForm.status, user_id: null });
-    if (!newMove) return;
+    const moveResult = await addMove({ name, aliases, status: createForm.status, user_id: null });
+    if (!moveResult.ok) return;
+    const newMove = moveResult.data;
     setSessionEntries(prev => [...prev, {
       moveId: newMove.id,
       previousStatus: newMove.status,
@@ -214,8 +211,9 @@ export default function LogModal({
   }
 
   async function handleSaveSession() {
-    const session = await createSession(sessionNotes);
-    if (!session) return;
+    const sessionResult = await createSession(sessionNotes);
+    if (!sessionResult.ok) return;
+    const session = sessionResult.data;
     await Promise.all(
       sessionEntries.map(e => {
         const notesAdded = (e.savedNote || '').trim().length > 0;
@@ -388,10 +386,10 @@ export default function LogModal({
                   </div>
                   {noteText && (
                     <p
-                      className={[
+                      className={cn(
                         styles.summaryEntryNote,
-                        !isExpanded ? styles.summaryEntryNoteClamped : '',
-                      ].filter(Boolean).join(' ')}
+                        !isExpanded && styles.summaryEntryNoteClamped
+                      )}
                       onClick={() => setExpandedSummaryNotes(prev =>
                         isExpanded
                           ? prev.filter(id => id !== entry.moveId)
@@ -408,7 +406,7 @@ export default function LogModal({
         </div>
       ) : (
         <div className={styles.slidingWrapper}>
-          <div className={[styles.slidingTrack, mode === 'addMoves' ? styles.slidingTrackActive : ''].filter(Boolean).join(' ')}>
+          <div className={cn(styles.slidingTrack, mode === 'addMoves' && styles.slidingTrackActive)}>
 
             {/* ── Panel 1: Logging ── */}
             <div className={styles.panel}>
@@ -427,18 +425,23 @@ export default function LogModal({
                 </div>
 
                 {sessionEntries.length === 0 ? (
-                  <div className={styles.emptyState}>
-                    <p className={styles.emptyTitle}>It's a whole new world…</p>
-                    <p className={styles.emptySubtitle}>Add moves to start logging this session!</p>
-                    <Button
-                      variant="primary"
-                      leftIcon={<Plus size={16} />}
-                      onClick={() => { setMode('addMoves'); setPendingIds([]); }}
-                      data-testid="log-empty-add-move"
-                    >
-                      Add move
-                    </Button>
-                  </div>
+                  <EmptyState
+                    title="It's a whole new world…"
+                    body="Add moves to start logging this session!"
+                    className={styles.emptyState}
+                    titleClassName={styles.emptyTitle}
+                    bodyClassName={styles.emptySubtitle}
+                    action={(
+                      <Button
+                        variant="primary"
+                        leftIcon={<Plus size={16} />}
+                        onClick={() => { setMode('addMoves'); setPendingIds([]); }}
+                        data-testid="log-empty-add-move"
+                      >
+                        Add move
+                      </Button>
+                    )}
+                  />
                 ) : (
                   <div className={styles.entriesList}>
                     {sessionEntries.map(entry => {
@@ -466,7 +469,7 @@ export default function LogModal({
                                       <StatusOptionButton
                                         key={s}
                                         status={s}
-                                        label={STATUS_LABELS[s]}
+                                        label={getStatusLabel(s)}
                                         selected={s === entry.currentStatus}
                                         variant="menu"
                                         showCheck
@@ -530,7 +533,7 @@ export default function LogModal({
                       <StatusOptionButton
                         key={s}
                         status={s}
-                        label={STATUS_LABELS[s]}
+                        label={getStatusLabel(s)}
                         selected={createForm.status === s}
                         variant="list"
                         onClick={() => setCreateForm(f => ({ ...f, status: s }))}
@@ -540,37 +543,46 @@ export default function LogModal({
                 </div>
               ) : (
                 <>
-                  <div className={styles.addMovesControls}>
-                    <MoveListControls
-                      idPrefix="log-add"
-                      searchValue={searchQuery}
-                      onSearchChange={(next) => {
-                        setSearchQuery(next);
-                        setMoveScopeFilter('all');
-                      }}
-                      onSearchClear={() => setSearchQuery('')}
-                      statusFilter={moveStatusFilter}
-                      onStatusFilterChange={setMoveStatusFilter}
-                      sortBy={moveSortBy}
-                      onSortByChange={setMoveSortBy}
-                      searchPlaceholder="Search moves"
-                      searchInputRef={searchInputRef}
-                      searchClassName={styles.searchInputWrap}
-                      searchInputClassName={styles.searchInput}
-                    />
-                  </div>
-
-                  <div className={styles.scopeRow}>
-                    <Pill active={moveScopeFilter === 'all'} onClick={() => setMoveScopeFilter('all')}>
-                      All moves
-                    </Pill>
-                    <Pill active={moveScopeFilter === 'selected'} onClick={() => setMoveScopeFilter('selected')}>
-                      Selected
-                    </Pill>
-                  </div>
-
-                  <div className={styles.moveSearchList}>
-                    {noResults ? (
+                  <MovePickerPanel
+                    idPrefix="log-add"
+                    searchValue={searchQuery}
+                    onSearchChange={(next) => {
+                      setSearchQuery(next);
+                      setMoveScopeFilter('all');
+                    }}
+                    onSearchClear={() => setSearchQuery('')}
+                    statusFilter={moveStatusFilter}
+                    onStatusFilterChange={setMoveStatusFilter}
+                    sortBy={moveSortBy}
+                    onSortByChange={setMoveSortBy}
+                    searchPlaceholder="Search moves"
+                    searchInputRef={searchInputRef}
+                    controlsClassName={styles.addMovesControls}
+                    searchClassName={styles.searchInputWrap}
+                    searchInputClassName={styles.searchInput}
+                    scopeValue={moveScopeFilter}
+                    onScopeChange={setMoveScopeFilter}
+                    scopeOptions={[
+                      { value: 'all', label: 'All moves' },
+                      { value: 'selected', label: 'Selected' },
+                    ]}
+                    scopeClassName={styles.scopeRow}
+                    items={shownMoves.map((move) => {
+                      const inSession = sessionEntries.some((e) => e.moveId === move.id);
+                      return {
+                        id: move.id,
+                        label: move.name,
+                        selected: inSession || pendingIds.includes(move.id),
+                        disabled: inSession,
+                      };
+                    })}
+                    onToggleItem={(item) => togglePendingId(item.id)}
+                    listClassName={styles.moveSearchList}
+                    rowClassName={styles.moveSearchItem}
+                    checkboxClassName={styles.moveCheckbox}
+                    labelClassName={styles.moveSearchName}
+                    dividerClassName={styles.moveRowDivider}
+                    emptyState={noResults ? (
                       <div className={styles.noResultsState}>
                         <p className={styles.noResultsText}>No results for "{searchQuery}"</p>
                         <Button
@@ -588,27 +600,8 @@ export default function LogModal({
                           Create custom move
                         </Button>
                       </div>
-                    ) : (
-                      shownMoves.map((move, index) => {
-                        const inSession = sessionEntries.some(e => e.moveId === move.id);
-                        const isChecked = inSession || pendingIds.includes(move.id);
-                        return (
-                          <div key={move.id}>
-                            <MoveSelectRow
-                              label={move.name}
-                              selected={isChecked}
-                              onClick={() => togglePendingId(move.id)}
-                              className={styles.moveSearchItem}
-                              checkboxClassName={styles.moveCheckbox}
-                              labelClassName={styles.moveSearchName}
-                              disabled={inSession}
-                            />
-                            {index < shownMoves.length - 1 && <div className={styles.moveRowDivider} />}
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
+                    ) : null}
+                  />
                 </>
               )}
             </div>

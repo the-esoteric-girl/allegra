@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { fail, ok } from '../lib/actionResult';
 import { AppContext } from './appContextInstance';
 
 const DEFAULT_STATUS = null;
@@ -46,10 +47,10 @@ export function AppProvider({ children }) {
     if (signInError) {
       console.error(signInError);
       setError(signInError);
-      return { data: null, error: signInError };
+      return fail(signInError);
     }
 
-    return { data, error: null };
+    return ok(data);
   }
 
   async function signUp(email, password, username) {
@@ -61,7 +62,7 @@ export function AppProvider({ children }) {
     if (signUpError) {
       console.error(signUpError);
       setError(signUpError);
-      return { data: null, error: signUpError };
+      return fail(signUpError);
     }
 
     const userId = data?.user?.id ?? data?.session?.user?.id;
@@ -75,11 +76,11 @@ export function AppProvider({ children }) {
       if (profileError) {
         console.error(profileError);
         setError(profileError);
-        return { data: null, error: profileError };
+        return fail(profileError);
       }
     }
 
-    return { data, error: null };
+    return ok(data);
   }
 
   async function signOut() {
@@ -88,10 +89,10 @@ export function AppProvider({ children }) {
     if (signOutError) {
       console.error(signOutError);
       setError(signOutError);
-      return { error: signOutError };
+      return fail(signOutError);
     }
 
-    return { error: null };
+    return ok();
   }
 
   async function fetchMoves(userIdOverride) {
@@ -291,7 +292,7 @@ export function AppProvider({ children }) {
     if (!currentUserId) {
       const noUserError = new Error('You need to be signed in to create a combo.');
       setError(noUserError);
-      return { data: null, error: noUserError };
+      return fail(noUserError);
     }
 
     const { data, error: comboError } = await supabase
@@ -308,11 +309,11 @@ export function AppProvider({ children }) {
     if (comboError) {
       console.error(comboError);
       setError(comboError);
-      return { data: null, error: comboError };
+      return fail(comboError);
     }
 
     await loadCombos(currentUserId);
-    return { data, error: null };
+    return ok(data);
   }
 
   async function updateCombo(id, updates) {
@@ -326,11 +327,11 @@ export function AppProvider({ children }) {
     if (comboError) {
       console.error(comboError);
       setError(comboError);
-      return { data: null, error: comboError };
+      return fail(comboError);
     }
 
     await loadCombos();
-    return { data, error: null };
+    return ok(data);
   }
 
   async function deleteCombo(id) {
@@ -342,11 +343,11 @@ export function AppProvider({ children }) {
     if (comboError) {
       console.error(comboError);
       setError(comboError);
-      return { error: comboError };
+      return fail(comboError);
     }
 
     await loadCombos();
-    return { error: null };
+    return ok();
   }
 
   async function addTransition(fromMoveId, toMoveId) {
@@ -355,20 +356,14 @@ export function AppProvider({ children }) {
     if (!currentUserId) {
       const noUserError = new Error('You need to be signed in to add a transition.');
       setError(noUserError);
-      return { ok: false, error: noUserError };
+      return fail(noUserError);
     }
 
     if (!fromMoveId || !toMoveId) {
-      return {
-        ok: false,
-        error: new Error('Missing move id for transition.'),
-      };
+      return fail(new Error('Missing move id for transition.'));
     }
     if (String(fromMoveId) === String(toMoveId)) {
-      return {
-        ok: false,
-        error: new Error('A move cannot transition to itself.'),
-      };
+      return fail(new Error('A move cannot transition to itself.'));
     }
 
     const alreadyExists = transitions.some((item) =>
@@ -376,7 +371,7 @@ export function AppProvider({ children }) {
       String(item.to_move_id) === String(toMoveId)
     );
 
-    if (alreadyExists) return { ok: true, error: null };
+    if (alreadyExists) return ok();
 
     const { error: transitionError } = await supabase
       .from('transitions')
@@ -389,15 +384,15 @@ export function AppProvider({ children }) {
     if (transitionError) {
       if (transitionError.code === '23505') {
         await loadTransitions(currentUserId);
-        return { ok: true, error: null };
+        return ok();
       }
       console.error(transitionError);
       setError(transitionError);
-      return { ok: false, error: transitionError };
+      return fail(transitionError);
     }
 
     await loadTransitions(currentUserId);
-    return { ok: true, error: null };
+    return ok();
   }
 
   async function deleteTransition(fromMoveId, toMoveId) {
@@ -406,10 +401,10 @@ export function AppProvider({ children }) {
     if (!currentUserId) {
       const noUserError = new Error('You need to be signed in to remove a transition.');
       setError(noUserError);
-      return false;
+      return fail(noUserError);
     }
 
-    if (!fromMoveId || !toMoveId) return false;
+    if (!fromMoveId || !toMoveId) return fail(new Error('Missing move id for transition removal.'));
 
     const { error: transitionError } = await supabase
       .from('transitions')
@@ -421,11 +416,11 @@ export function AppProvider({ children }) {
     if (transitionError) {
       console.error(transitionError);
       setError(transitionError);
-      return false;
+      return fail(transitionError);
     }
 
     await loadTransitions();
-    return true;
+    return ok();
   }
 
   async function addMove({
@@ -440,7 +435,7 @@ export function AppProvider({ children }) {
     if (!currentUserId) {
       const noUserError = new Error('You need to be signed in to add a move.');
       setError(noUserError);
-      return null;
+      return fail(noUserError);
     }
 
     const ownerId = user_id ?? currentUserId;
@@ -461,7 +456,7 @@ export function AppProvider({ children }) {
     if (moveError) {
       console.error(moveError);
       setError(moveError);
-      return null;
+      return fail(moveError);
     }
 
     if (normalizedStatus !== null) {
@@ -477,12 +472,12 @@ export function AppProvider({ children }) {
       if (userMoveError) {
         console.error(userMoveError);
         setError(userMoveError);
-        return null;
+        return fail(userMoveError);
       }
     }
 
     await fetchMoves(currentUserId);
-    return { ...moveRow, status: normalizedStatus, note: null };
+    return ok({ ...moveRow, status: normalizedStatus, note: null });
   }
 
   async function updateMove(id, updates) {
@@ -491,7 +486,7 @@ export function AppProvider({ children }) {
     if (!currentUserId) {
       const noUserError = new Error('You need to be signed in to update a move.');
       setError(noUserError);
-      return false;
+      return fail(noUserError);
     }
 
     const { status, note, ...moveUpdates } = updates || {};
@@ -506,7 +501,7 @@ export function AppProvider({ children }) {
       if (moveError) {
         console.error(moveError);
         setError(moveError);
-        return false;
+        return fail(moveError);
       }
     }
 
@@ -531,7 +526,7 @@ export function AppProvider({ children }) {
         if (deleteUserMoveError) {
           console.error(deleteUserMoveError);
           setError(deleteUserMoveError);
-          return false;
+          return fail(deleteUserMoveError);
         }
       } else {
         const upsertPayload = {
@@ -548,13 +543,13 @@ export function AppProvider({ children }) {
         if (userMoveError) {
           console.error(userMoveError);
           setError(userMoveError);
-          return false;
+          return fail(userMoveError);
         }
       }
     }
 
     await fetchMoves(currentUserId);
-    return true;
+    return ok();
   }
 
   async function deleteMove(id) {
@@ -566,11 +561,11 @@ export function AppProvider({ children }) {
     if (moveError) {
       console.error(moveError);
       setError(moveError);
-      return false;
+      return fail(moveError);
     }
 
     await fetchMoves();
-    return true;
+    return ok();
   }
 
   async function createSession(notes = '') {
@@ -579,7 +574,7 @@ export function AppProvider({ children }) {
     if (!currentUserId) {
       const noUserError = new Error('You need to be signed in to create a session.');
       setError(noUserError);
-      return null;
+      return fail(noUserError);
     }
 
     const today = new Date().toISOString().slice(0, 10);
@@ -597,11 +592,11 @@ export function AppProvider({ children }) {
     if (sessionError) {
       console.error(sessionError);
       setError(sessionError);
-      return null;
+      return fail(sessionError);
     }
 
     await loadSessions(currentUserId);
-    return data;
+    return ok(data);
   }
 
   async function addSessionEntry(sessionId, moveId, previousStatus, newStatus, notesAdded) {
@@ -610,7 +605,7 @@ export function AppProvider({ children }) {
     if (!currentUserId) {
       const noUserError = new Error('You need to be signed in to add a session entry.');
       setError(noUserError);
-      return null;
+      return fail(noUserError);
     }
 
     const { data, error: entryError } = await supabase
@@ -629,11 +624,11 @@ export function AppProvider({ children }) {
     if (entryError) {
       console.error(entryError);
       setError(entryError);
-      return null;
+      return fail(entryError);
     }
 
     await loadSessions(currentUserId);
-    return data;
+    return ok(data);
   }
 
   async function deleteSessionEntry(sessionId, moveId) {
@@ -646,10 +641,11 @@ export function AppProvider({ children }) {
     if (entryError) {
       console.error(entryError);
       setError(entryError);
-      return;
+      return fail(entryError);
     }
 
     await loadSessions();
+    return ok();
   }
 
   async function updateSession(id, updates) {
@@ -663,11 +659,11 @@ export function AppProvider({ children }) {
     if (sessionError) {
       console.error(sessionError);
       setError(sessionError);
-      return { data: null, error: sessionError };
+      return fail(sessionError);
     }
 
     await loadSessions();
-    return { data, error: null };
+    return ok(data);
   }
 
   async function deleteSession(id) {
@@ -679,10 +675,11 @@ export function AppProvider({ children }) {
     if (sessionError) {
       console.error(sessionError);
       setError(sessionError);
-      return;
+      return fail(sessionError);
     }
 
     await loadSessions();
+    return ok();
   }
 
   return (

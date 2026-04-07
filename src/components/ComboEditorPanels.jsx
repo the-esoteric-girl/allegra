@@ -13,7 +13,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, X, ArrowDown, Plus } from 'lucide-react';
-import { Button, Pill, Input, SectionLabel, MoveSelectRow, Field, MoveListControls } from './ui';
+import { Button, Input, SectionLabel, Field, MovePickerPanel } from './ui';
 import styles from './ComboEditorPanels.module.css';
 
 function SortableCard({ id, name, onRemove }) {
@@ -160,7 +160,7 @@ export default function ComboEditorPanels({ editor, mode = 'create' }) {
 
         <div className={styles.panel}>
           <div className={styles.addContent}>
-            <MoveListControls
+            <MovePickerPanel
               idPrefix="combo-add"
               searchValue={searchQuery}
               onSearchChange={setSearchQuery}
@@ -170,39 +170,28 @@ export default function ComboEditorPanels({ editor, mode = 'create' }) {
               sortBy={sortBy}
               onSortByChange={setSortBy}
               searchPlaceholder="Search moves..."
-            />
-
-            <div className={styles.filterRow}>
-              <Pill active={!showSelected} onClick={() => setShowSelected(false)}>
-                All moves
-              </Pill>
-              <Pill active={showSelected} onClick={() => setShowSelected(true)}>
-                Selected
-              </Pill>
-            </div>
-
-            <div className={styles.moveList}>
-              {filteredMoves.map((move, index) => {
-                const selected = pendingIds.includes(move.id);
-                return (
-                  <div key={move.id}>
-                    <MoveSelectRow
-                      label={move.name}
-                      selected={selected}
-                      onClick={() => togglePending(move.id)}
-                      className={styles.moveRow}
-                      checkboxClassName={styles.checkbox}
-                      labelClassName={styles.moveName}
-                    />
-                    {index < filteredMoves.length - 1 && <div className={styles.divider} />}
-                  </div>
-                );
-              })}
-              {filteredMoves.length === 0 && (
+              scopeValue={showSelected ? 'selected' : 'all'}
+              onScopeChange={(next) => setShowSelected(next === 'selected')}
+              scopeOptions={[
+                { value: 'all', label: 'All moves' },
+                { value: 'selected', label: 'Selected' },
+              ]}
+              scopeClassName={styles.filterRow}
+              items={filteredMoves.map((move) => ({
+                id: move.id,
+                label: move.name,
+                selected: pendingIds.includes(move.id),
+              }))}
+              onToggleItem={(item) => togglePending(item.id)}
+              listClassName={styles.moveList}
+              rowClassName={styles.moveRow}
+              checkboxClassName={styles.checkbox}
+              labelClassName={styles.moveName}
+              dividerClassName={styles.divider}
+              emptyState={(
                 <p className={styles.noResults}>No moves found</p>
               )}
-            </div>
-
+            />
           </div>
         </div>
       </div>

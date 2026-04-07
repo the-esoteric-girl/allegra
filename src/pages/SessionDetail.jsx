@@ -8,8 +8,9 @@ import {
   SectionLabel,
   IconButton,
   ConfirmDialog,
-  PageHeader,
+  DetailPageShell,
   StatusPill,
+  PageState,
 } from '../components/ui';
 import styles from './SessionDetail.module.css';
 
@@ -48,58 +49,56 @@ export default function SessionDetail() {
   async function handleSave() {
     if (!session) return;
     setSaving(true);
-    await updateSession(session.id, { notes });
+    const result = await updateSession(session.id, { notes });
     setSaving(false);
-    setIsEditing(false);
+    if (result.ok) setIsEditing(false);
   }
 
   async function handleDeleteConfirm() {
     if (!session) return;
     setDeleting(true);
-    await deleteSession(session.id);
+    const result = await deleteSession(session.id);
     setDeleting(false);
-    navigate('/you');
+    if (result.ok) navigate('/you');
   }
 
-  if (loading) return <p className={styles.stateText}>Loading...</p>;
-  if (!session) return <p className={styles.stateText}>Session not found.</p>;
+  if (loading) return <PageState text="Loading..." className={styles.stateText} />;
+  if (!session) return <PageState text="Session not found." className={styles.stateText} />;
 
   const entries = session.entries || [];
 
   return (
-    <div className={styles.page}>
-      <PageHeader
-        title="Session summary"
-        leftAction={
+    <DetailPageShell
+      title="Session summary"
+      leftAction={
+        <IconButton
+          icon={<ChevronLeft size={18} />}
+          variant="ghost"
+          label="Back"
+          onClick={isEditing ? handleEditCancel : () => navigate('/you')}
+        />
+      }
+      rightAction={
+        isEditing ? (
           <IconButton
-            icon={<ChevronLeft size={18} />}
+            icon={<Trash2 size={18} />}
             variant="ghost"
-            label="Back"
-            onClick={isEditing ? handleEditCancel : () => navigate('/you')}
+            label="Delete session"
+            onClick={() => setIsDeleteDialogOpen(true)}
+            className={styles.deleteIcon}
           />
-        }
-        rightAction={
-          isEditing ? (
-            <IconButton
-              icon={<Trash2 size={18} />}
-              variant="ghost"
-              label="Delete session"
-              onClick={() => setIsDeleteDialogOpen(true)}
-              className={styles.deleteIcon}
-            />
-          ) : (
-            <IconButton
-              icon={<Pencil size={18} />}
-              variant="ghost"
-              label="Edit session"
-              onClick={handleEditEnter}
-            />
-          )
-        }
-        bleed
-        noBorder
-      />
-
+        ) : (
+          <IconButton
+            icon={<Pencil size={18} />}
+            variant="ghost"
+            label="Edit session"
+            onClick={handleEditEnter}
+          />
+        )
+      }
+      className={styles.page}
+    >
+      
       <h2 className={styles.sessionDate}>{formatDate(session.date)}</h2>
 
       <div className={styles.moveCount}>
@@ -175,6 +174,6 @@ export default function SessionDetail() {
         loading={deleting}
         testIdPrefix="delete-session-dialog"
       />
-    </div>
+    </DetailPageShell>
   );
 }

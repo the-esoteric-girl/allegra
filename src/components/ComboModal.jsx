@@ -14,14 +14,14 @@ export default function ComboModal({ isOpen, onClose }) {
   }
 
   async function handleCreate() {
-    const { error } = await createCombo(
+    const result = await createCombo(
       editor.comboName.trim(),
       editor.moveIds,
       editor.notes.trim()
     );
 
-    if (error) {
-      console.error('Failed to save combo:', error);
+    if (!result.ok) {
+      console.error('Failed to save combo:', result.error);
       return;
     }
 

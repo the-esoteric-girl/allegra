@@ -1,4 +1,5 @@
 import styles from './Button.module.css';
+import { cn } from '../../lib/cn';
 
 const variantClass = {
   primary: styles.primary,
@@ -25,16 +26,14 @@ export default function Button({
       onClick={onClick}
       disabled={disabled}
       {...props}
-      className={[
+      className={cn(
         styles.button,
         variantClass[variant] ?? styles.primary,
-        size === 'sm' ? styles.sm : '',
-        fullWidth ? styles.fullWidth : '',
-        disabled ? styles.disabled : '',
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+        size === 'sm' && styles.sm,
+        fullWidth && styles.fullWidth,
+        disabled && styles.disabled,
+        className
+      )}
     >
       {leftIcon && <span className={styles.leftIcon}>{leftIcon}</span>}
       {children}

@@ -1,6 +1,7 @@
 import { Check } from 'lucide-react';
 import StatusDot from './StatusDot';
 import styles from './StatusOptionButton.module.css';
+import { cn } from '../../lib/cn';
 
 export default function StatusOptionButton({
   status,
@@ -17,12 +18,12 @@ export default function StatusOptionButton({
       type="button"
       onClick={onClick}
       {...props}
-      className={[
+      className={cn(
         styles.option,
         variant === 'list' ? styles.list : styles.menu,
-        selected ? styles.selected : '',
-        className,
-      ].filter(Boolean).join(' ')}
+        selected && styles.selected,
+        className
+      )}
     >
       <StatusDot status={status} size={7} />
       <span className={styles.label}>{label}</span>

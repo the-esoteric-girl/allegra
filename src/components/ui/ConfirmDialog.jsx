@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
 import Button from './Button';
 import styles from './ConfirmDialog.module.css';
+import useModalBehavior from './useModalBehavior';
 
 export default function ConfirmDialog({
   isOpen,
@@ -13,18 +13,10 @@ export default function ConfirmDialog({
   loading = false,
   testIdPrefix = 'confirm-dialog',
 }) {
-  useEffect(() => {
-    if (!isOpen) return undefined;
-
-    function handleEscape(event) {
-      if (event.key === 'Escape' && !loading) {
-        onCancel?.();
-      }
-    }
-
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [isOpen, loading, onCancel]);
+  useModalBehavior({
+    isOpen,
+    onEscape: !loading ? onCancel : undefined,
+  });
 
   if (!isOpen) return null;
 

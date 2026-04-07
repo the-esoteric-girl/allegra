@@ -1,10 +1,6 @@
-export const MOVE_STATUS_FILTER_OPTIONS = [
-  { value: 'any', label: 'Any status' },
-  { value: 'none', label: 'No status' },
-  { value: 'want to try', label: 'Want to try' },
-  { value: 'working on', label: 'Working on' },
-  { value: 'achieved', label: 'Achieved' },
-];
+import { MOVE_STATUS_FILTER_OPTIONS } from './statusConfig';
+
+export { MOVE_STATUS_FILTER_OPTIONS };
 
 export function getMoveSortOptions({ includeCreatedSort = true } = {}) {
   const options = [

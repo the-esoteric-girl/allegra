@@ -1,0 +1,6 @@
+.state {
+  padding: var(--page-padding);
+  font: var(--text-body);
+  color: var(--color-text-secondary);
+}
+

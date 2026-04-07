@@ -4,7 +4,7 @@ import { ChevronLeft, Plus } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
 import { useComboEditor } from '../hooks/useComboEditor';
 import ComboEditorPanels from '../components/ComboEditorPanels';
-import { Button, PageHeader } from '../components/ui';
+import { Button, PageHeader, PageState } from '../components/ui';
 import styles from './ComboEdit.module.css';
 
 export default function ComboEdit() {
@@ -29,16 +29,16 @@ export default function ComboEdit() {
 
   async function handleSave() {
     if (!combo || editor.moveIds.length === 0) return;
-    const { error } = await updateCombo(combo.id, {
+    const result = await updateCombo(combo.id, {
       name: editor.comboName.trim() || null,
       move_ids: editor.moveIds,
       notes: editor.notes.trim() || null,
     });
-    if (!error) navigate(`/combos/${combo.id}`);
+    if (result.ok) navigate(`/combos/${combo.id}`);
   }
 
-  if (loading) return <p className={styles.stateText}>Loading...</p>;
-  if (!combo) return <p className={styles.stateText}>Combo not found.</p>;
+  if (loading) return <PageState text="Loading..." className={styles.stateText} />;
+  if (!combo) return <PageState text="Combo not found." className={styles.stateText} />;
 
   const addBtnLabel = editor.pendingIds.length === 0
     ? 'Add moves'

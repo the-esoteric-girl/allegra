@@ -2,23 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Button, ComboCard, Select } from '../components/ui';
+import { Button, ComboCard, Select, EmptyState } from '../components/ui';
 import ComboModal from '../components/ComboModal';
+import { sortCombos } from '../lib/comboListControls';
 import styles from './Combos.module.css';
-
-function sortCombos(list, sortBy) {
-  return [...list].sort((a, b) => {
-    switch (sortBy) {
-      case 'created-asc': return a.created_at < b.created_at ? -1 : 1;
-      case 'name-asc': return (a.name || '').localeCompare(b.name || '');
-      case 'name-desc': return (b.name || '').localeCompare(a.name || '');
-      case 'moves-desc': return (b.move_ids?.length ?? 0) - (a.move_ids?.length ?? 0);
-      case 'moves-asc': return (a.move_ids?.length ?? 0) - (b.move_ids?.length ?? 0);
-      case 'created-desc':
-      default: return a.created_at > b.created_at ? -1 : 1;
-    }
-  });
-}
 
 export default function Combos() {
   const { combos, moves, loading, combosSortBy, setCombosSortBy } = useApp();
@@ -42,16 +29,15 @@ export default function Combos() {
       </Button>
 
       {loading ? (
-        <div className={styles.emptyState}>
-          <p className={styles.emptyBody}>Loading…</p>
-        </div>
+        <EmptyState body="Loading…" className={styles.emptyState} bodyClassName={styles.emptyBody} />
       ) : combos.length === 0 ? (
-        <div className={styles.emptyState}>
-          <p className={styles.emptyHeading}>No combos yet</p>
-          <p className={styles.emptyBody}>
-            Chain moves into sequences, save your favourite combos, and build class material from your own library.
-          </p>
-        </div>
+        <EmptyState
+          title="No combos yet"
+          body="Chain moves into sequences, save your favourite combos, and build class material from your own library."
+          className={styles.emptyState}
+          titleClassName={styles.emptyHeading}
+          bodyClassName={styles.emptyBody}
+        />
       ) : (
         <>
           <div className={styles.controls}>
