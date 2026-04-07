@@ -19,6 +19,33 @@
   margin-bottom: var(--space-4);
 }
 
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--color-light-blue);
+  margin-bottom: var(--section-gap);
+}
+
+.tab {
+  flex: 1;
+  min-height: 2.25rem;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
+  font: var(--text-body-sm-medium);
+  cursor: pointer;
+}
+
+.tabActive {
+  composes: tab;
+  background: var(--color-text-primary);
+  color: var(--color-surface);
+}
+
 .statusRow {
   display: flex;
   align-items: center;
@@ -27,11 +54,7 @@
 }
 
 .card {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: var(--card-padding);
   margin-bottom: var(--section-gap);
-  box-shadow: var(--shadow-card);
 }
 
 .cardHeader {
@@ -207,6 +230,12 @@
 .comboLinkMeta {
   font: var(--text-body-sm);
   color: var(--color-text-muted);
+}
+
+.emptyStateText {
+  margin: var(--space-2) 0 0;
+  font: var(--text-body-sm);
+  color: var(--color-text-secondary);
 }
 
 .deleteButton {

@@ -1,7 +1,25 @@
 .card {
-  background: var(--color-surface);
   border-radius: var(--radius-lg);
+}
+
+.toneDefault {
+  background: var(--color-surface);
+}
+
+.toneBlueTint {
+  background: var(--color-surface-blue);
+}
+
+.tonePinkTint {
+  background: var(--color-light-pink);
+}
+
+.elevationShadow {
   box-shadow: var(--shadow-card);
+}
+
+.elevationFlat {
+  box-shadow: none;
 }
 
 .paddingDefault {
@@ -23,4 +41,8 @@
 
 .clickable:hover {
   box-shadow: var(--shadow-card-hover);
+}
+
+.elevationFlat.clickable:hover {
+  box-shadow: none;
 }

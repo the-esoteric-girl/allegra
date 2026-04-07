@@ -2,13 +2,19 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Plus } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Button, StatusPill, ConfirmDialog, Select, Input, Field, IconButton, PageHeader } from '../components/ui';
+import { Button, StatusPill, ConfirmDialog, Select, Input, Field, IconButton, PageHeader, Card } from '../components/ui';
 import styles from './MoveDetail.module.css';
+
+const TABS = [
+  { id: 'info', label: 'Info' },
+  { id: 'combos', label: 'Combos' },
+];
 
 export default function MoveDetail() {
   const { id } = useParams();
   const { moves, combos, loading, updateMove, deleteMove } = useApp();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('info');
   const [editing, setEditing] = useState(false);
   const [editStatus, setEditStatus] = useState('');
   const [editAliases, setEditAliases] = useState([]);
@@ -38,6 +44,7 @@ export default function MoveDetail() {
   const relatedCombos = combos.filter(c => c.move_ids?.includes(move.id));
 
   function handleEditClick() {
+    setActiveTab('info');
     setEditStatus(move.status || '');
     setEditAliases(move.aliases ? [...move.aliases] : []);
     setNewAlias('');
@@ -112,6 +119,7 @@ export default function MoveDetail() {
   }
 
   function handleEditNote() {
+    setActiveTab('info');
     setNoteError('');
     setNoteText(move.note || '');
     setEditingNote(true);
@@ -183,16 +191,31 @@ export default function MoveDetail() {
         </div>
       )}
 
-      {!editing && (
+      <div className={styles.tabs} role="tablist" aria-label="Move detail sections">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.id}
+            className={activeTab === tab.id ? styles.tabActive : styles.tab}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === 'info' && !editing && (
         <div className={styles.statusRow}>
           <StatusPill status={move.status || ''} />
           <Button variant="subtle" size="sm" onClick={handleEditClick}>Edit details</Button>
         </div>
       )}
 
-      {editing ? (
+      {activeTab === 'info' && (editing ? (
         <>
-          <div className={styles.card}>
+          <Card className={styles.card}>
             <Field label="Status" htmlFor="edit-status" labelClassName={styles.sectionLabel}>
               <Select
                 id="edit-status"
@@ -207,9 +230,9 @@ export default function MoveDetail() {
                 <option value="achieved">achieved</option>
               </Select>
             </Field>
-          </div>
+          </Card>
 
-          <div className={styles.card}>
+          <Card className={styles.card}>
             <div className={styles.sectionLabel}>Alternate names</div>
             {editAliases.length > 0 && (
               <div className={styles.aliasTags}>
@@ -244,7 +267,7 @@ export default function MoveDetail() {
                 </div>
               </div>
             )}
-          </div>
+          </Card>
 
           <div className={styles.buttonRow}>
             <Button variant="primary" size="sm" onClick={handleSave} disabled={savingDetails}>
@@ -256,7 +279,7 @@ export default function MoveDetail() {
         </>
       ) : (
         <>
-          <div className={styles.card}>
+          <Card className={styles.card}>
             <div className={styles.cardHeader}>
               <span className={styles.sectionLabel}>Note</span>
               <Button variant="subtle" size="sm" onClick={handleEditNote}>Edit</Button>
@@ -292,24 +315,7 @@ export default function MoveDetail() {
                 Add note
               </Button>
             )}
-          </div>
-
-          {relatedCombos.length > 0 && (
-            <div className={styles.card}>
-              <div className={styles.sectionLabel}>Appears in</div>
-              {relatedCombos.map(combo => (
-                <button
-                  key={combo.id}
-                  type="button"
-                  className={styles.comboLink}
-                  onClick={() => navigate(`/combos/${combo.id}`)}
-                >
-                  <span className={styles.comboLinkName}>{combo.name || 'Untitled combo'}</span>
-                  <span className={styles.comboLinkMeta}>{combo.move_ids.length} move{combo.move_ids.length !== 1 ? 's' : ''}</span>
-                </button>
-              ))}
-            </div>
-          )}
+          </Card>
 
           <Button
             variant="ghost"
@@ -321,6 +327,27 @@ export default function MoveDetail() {
           </Button>
           {deleteError && <p className={styles.actionError}>{deleteError}</p>}
         </>
+      ))}
+
+      {activeTab === 'combos' && (
+        <Card className={styles.card}>
+          <div className={styles.sectionLabel}>Appears in</div>
+          {relatedCombos.length > 0 ? (
+            relatedCombos.map((combo) => (
+              <button
+                key={combo.id}
+                type="button"
+                className={styles.comboLink}
+                onClick={() => navigate(`/combos/${combo.id}`)}
+              >
+                <span className={styles.comboLinkName}>{combo.name || 'Untitled combo'}</span>
+                <span className={styles.comboLinkMeta}>{combo.move_ids.length} move{combo.move_ids.length !== 1 ? 's' : ''}</span>
+              </button>
+            ))
+          ) : (
+            <p className={styles.emptyStateText}>No combos yet for this move.</p>
+          )}
+        </Card>
       )}
 
       <ConfirmDialog
