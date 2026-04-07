@@ -1,14 +1,9 @@
 .page {
-  padding: 1.5rem 1rem 5rem;
+  padding: var(--page-padding) var(--page-padding) var(--page-padding-bottom);
 }
 
-.heading {
-  font-size: 1.75rem;
-  font-weight: 300;
-  font-style: italic;
-  letter-spacing: 0.05em;
-  color: var(--color-text-primary);
-  margin-bottom: 1.5rem;
+.header {
+  margin-bottom: var(--section-gap);
 }
 
 .headingRow {
@@ -17,13 +12,14 @@
   align-items: center;
 }
 
-.headingRow .heading {
-  margin-bottom: 0;
+.pageTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
 }
 
 .userMeta {
   margin-top: var(--space-1);
-  margin-bottom: var(--space-6);
   font: var(--text-body-sm);
   color: var(--color-text-secondary);
 }
@@ -95,19 +91,9 @@
   background: var(--color-surface);
   box-shadow: var(--shadow-card);
   text-align: left;
-}
-
-.sessionCardHeader {
+  border: none;
+  width: 100%;
   cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
-
-.sessionCardLeft {
-  flex: 1;
-  min-width: 0;
 }
 
 .sessionDateRow {
@@ -149,90 +135,3 @@
   -webkit-box-orient: vertical;
 }
 
-.sessionChevron {
-  flex-shrink: 0;
-  color: var(--color-text-muted);
-  padding-top: 0.125rem;
-}
-
-.sessionExpanded {
-  margin-top: 0.75rem;
-}
-
-.sessionNotes {
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
-  margin: 0 0 0.75rem;
-}
-
-.noMoves {
-  font-size: 0.8125rem;
-  color: var(--color-text-secondary);
-}
-
-.entryList {
-  list-style: none;
-  margin: 0 0 1rem;
-  padding: 0;
-}
-
-.entryItem {
-  padding: 0.625rem 0;
-  border-top: 1px solid var(--color-border-subtle);
-  font-size: 0.875rem;
-}
-
-.entryRow {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.entryMoveName {
-  color: var(--color-blue);
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.entryStatusChange {
-  color: var(--color-text-secondary);
-  font-size: 0.8125rem;
-}
-
-.entryNoteAdded {
-  font-size: 0.75rem;
-  color: var(--color-blue);
-  background: var(--color-surface-blue);
-  padding: 0.125rem 0.375rem;
-  border-radius: var(--radius-sm);
-}
-
-.entryNoteText {
-  font-size: 0.8125rem;
-  color: var(--color-text-secondary);
-  margin: 0.375rem 0 0;
-  padding-left: 0.125rem;
-}
-
-.deleteZone {
-  border-top: 1px solid var(--color-border-subtle);
-  padding-top: 0.75rem;
-}
-
-.deleteButton {
-  justify-content: flex-start;
-  gap: 0.375rem;
-  min-height: 0;
-  height: auto;
-  padding: 0.3125rem 0.75rem !important;
-  border-radius: var(--radius-sm) !important;
-  border: 1px solid var(--color-border-subtle) !important;
-  background: transparent !important;
-  color: var(--color-text-secondary) !important;
-  font: var(--text-body-sm);
-}
-
-.deleteButton:hover {
-  color: var(--color-text-primary) !important;
-}

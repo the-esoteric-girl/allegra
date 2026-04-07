@@ -543,6 +543,24 @@ export function AppProvider({ children }) {
     await loadSessions();
   }
 
+  async function updateSession(id, updates) {
+    const { data, error: sessionError } = await supabase
+      .from('sessions')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (sessionError) {
+      console.error(sessionError);
+      setError(sessionError);
+      return { data: null, error: sessionError };
+    }
+
+    await loadSessions();
+    return { data, error: null };
+  }
+
   async function deleteSession(id) {
     const { error: sessionError } = await supabase
       .from('sessions')
@@ -573,6 +591,7 @@ export function AppProvider({ children }) {
       createSession,
       addSessionEntry,
       deleteSessionEntry,
+      updateSession,
       deleteSession,
       loadCombos,
       createCombo,

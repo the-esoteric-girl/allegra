@@ -11,8 +11,7 @@
   color: var(--color-text-secondary);
 }
 
-
-.comboName {
+.sessionDate {
   margin: 0;
   font-size: 1.75rem;
   font-weight: 700;
@@ -33,22 +32,11 @@
   gap: var(--space-2);
 }
 
-.nameInput {
-  width: 100%;
-  box-sizing: border-box;
-  padding: var(--space-3) var(--card-padding);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  font-size: 1.75rem;
-  font-weight: 700;
+.notesText {
+  margin: 0;
+  font: var(--text-body);
   color: var(--color-text-primary);
-  outline: none;
-}
-
-.nameInput:focus {
-  box-shadow: 0 0 0 2px var(--color-brand);
-  border-color: transparent;
+  white-space: pre-wrap;
 }
 
 .notesTextarea {
@@ -69,41 +57,21 @@
   border-color: transparent;
 }
 
-.deleteIcon {
-  color: var(--color-error-text) !important;
-}
-
-.saveButton {
-  margin-top: var(--space-2);
-}
-
-.sequenceList {
+.moveList {
   display: flex;
   flex-direction: column;
+  gap: var(--space-2);
 }
 
-.sequenceCard {
+.moveCard {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  border: 1px solid var(--color-border);
+  justify-content: space-between;
 }
 
-.sequenceNumber {
-  font: var(--text-body-sm-medium);
-  color: var(--color-text-secondary);
-}
-
-.sequenceName {
+.moveName {
   font: var(--text-body);
   color: var(--color-text-primary);
-}
-
-.connector {
-  display: flex;
-  justify-content: center;
-  color: var(--color-text-muted);
-  padding: var(--space-1) 0;
 }
 
 .emptyText {
@@ -112,9 +80,10 @@
   color: var(--color-text-secondary);
 }
 
-.notesText {
-  margin: 0;
-  font: var(--text-body);
-  color: var(--color-text-primary);
-  white-space: pre-wrap;
+.deleteIcon {
+  color: var(--color-error-text) !important;
+}
+
+.saveButton {
+  margin-top: var(--space-2);
 }

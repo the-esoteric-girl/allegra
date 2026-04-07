@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Plus } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
 import { useComboEditor } from '../hooks/useComboEditor';
 import ComboEditorPanels from '../components/ComboEditorPanels';
@@ -40,36 +40,67 @@ export default function ComboEdit() {
   if (loading) return <p className={styles.stateText}>Loading...</p>;
   if (!combo) return <p className={styles.stateText}>Combo not found.</p>;
 
+  const addBtnLabel = editor.pendingIds.length === 0
+    ? 'Add moves'
+    : `Add ${editor.pendingIds.length} move${editor.pendingIds.length !== 1 ? 's' : ''}`;
+
   return (
     <div className={styles.page}>
       <PageHeader
-        title="Edit combo"
-        leftAction={(
-          <Button
-            variant="ghost"
-            size="sm"
-            leftIcon={<ChevronLeft size={16} />}
-            onClick={() => navigate(`/combos/${combo.id}`)}
-            className={styles.headerButton}
-          >
-            Cancel
-          </Button>
-        )}
-        rightAction={(
-          <Button
-            size="sm"
-            onClick={handleSave}
-            disabled={editor.moveIds.length === 0}
-            className={styles.saveButton}
-          >
-            Save
-          </Button>
-        )}
+        title={editor.isAddPanel ? 'Add moves' : 'Edit combo'}
+        leftAction={
+          editor.isAddPanel ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon={<ChevronLeft size={16} />}
+              onClick={editor.closeAddMoves}
+              className={styles.headerButton}
+            >
+              Back
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon={<ChevronLeft size={16} />}
+              onClick={() => navigate(`/combos/${combo.id}`)}
+              className={styles.headerButton}
+            >
+              Cancel
+            </Button>
+          )
+        }
+        rightAction={
+          !editor.isAddPanel ? (
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={editor.moveIds.length === 0}
+              className={styles.saveButton}
+            >
+              Save
+            </Button>
+          ) : null
+        }
         noBorder
         className={styles.header}
       />
 
-      <ComboEditorPanels editor={editor} mode="edit" showInlineAddButton={editor.isAddPanel} />
+      <ComboEditorPanels editor={editor} mode="edit" />
+
+      {editor.isAddPanel && (
+        <div className={styles.bottomAction}>
+          <Button
+            fullWidth
+            leftIcon={<Plus size={16} />}
+            onClick={editor.confirmAddMoves}
+            disabled={editor.pendingIds.length === 0}
+          >
+            {addBtnLabel}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

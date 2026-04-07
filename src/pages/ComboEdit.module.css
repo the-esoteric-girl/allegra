@@ -31,3 +31,11 @@
 .saveButton {
   justify-self: flex-end;
 }
+
+.bottomAction {
+  position: sticky;
+  bottom: 0;
+  padding: var(--space-3) var(--page-padding);
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+}

@@ -6,6 +6,7 @@ import Combos from './pages/Combos';
 import ComboDetail from './pages/ComboDetail';
 import ComboEdit from './pages/ComboEdit';
 import You from './pages/You';
+import SessionDetail from './pages/SessionDetail';
 import Auth from './pages/Auth';
 import BottomNav from './components/BottomNav';
 import LogModal from './components/LogModal';
@@ -104,6 +105,7 @@ function App() {
         <Route path="/combos/:id" element={<ComboDetail />} />
         <Route path="/combos/:id/edit" element={<ComboEdit />} />
         <Route path="/you" element={<You />} />
+        <Route path="/sessions/:id" element={<SessionDetail />} />
       </Route>
     </Routes>
   );

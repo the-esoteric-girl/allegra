@@ -43,7 +43,7 @@ function SortableCard({ id, name, onRemove }) {
   );
 }
 
-export default function ComboEditorPanels({ editor, mode = 'create', showInlineAddButton = false }) {
+export default function ComboEditorPanels({ editor, mode = 'create' }) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
@@ -60,7 +60,6 @@ export default function ComboEditorPanels({ editor, mode = 'create', showInlineA
     removeFromSequence,
     handleDragEnd,
     pendingIds,
-    confirmAddMoves,
     searchQuery,
     setSearchQuery,
     showSelected,
@@ -204,17 +203,6 @@ export default function ComboEditorPanels({ editor, mode = 'create', showInlineA
               )}
             </div>
 
-            {showInlineAddButton && (
-              <Button
-                fullWidth
-                leftIcon={<Plus size={16} />}
-                onClick={confirmAddMoves}
-                disabled={pendingIds.length === 0}
-                className={styles.mobileAddButton}
-              >
-                Add {pendingIds.length} move{pendingIds.length !== 1 ? 's' : ''}
-              </Button>
-            )}
           </div>
         </div>
       </div>
