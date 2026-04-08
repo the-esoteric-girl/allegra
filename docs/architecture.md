@@ -60,3 +60,33 @@ Before writing any code, plan with the user:
 - Supabase for database (PostgreSQL)
 - Lucide React for icons
 - CSS Modules for component styles, global tokens in index.css
+
+## Before building any UI element
+
+Before writing any new UI code, always:
+
+1. Search src/components/ui/ for an existing component
+   that handles this use case
+2. Search the codebase for existing implementations
+   of similar UI patterns
+3. If a component exists — use it, extend it if needed
+4. If similar UI exists in 2+ places — extract it 
+   into a shared component before adding a third
+5. Never implement inline what should be a component
+
+Common components that MUST be used (never inline):
+  Filter pills     → Pill from ui/
+  Search inputs    → Input from ui/
+  Section labels   → SectionLabel from ui/
+  Cards            → Card from ui/
+  Status dots      → StatusDot from ui/
+  Status pills     → StatusPill from ui/
+  Buttons          → Button from ui/
+  Modals/sheets    → BottomSheet from ui/
+  Move lists       → MoveList from ui/
+  Move cards       → MoveCard from ui/
+
+If you find yourself writing CSS for something that 
+should use a CSS variable, stop and use the variable.
+If you find yourself copying styles from another 
+component, stop and extract a shared component.

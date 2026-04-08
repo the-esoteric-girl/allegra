@@ -63,7 +63,8 @@
 }
 
 .sortSelect {
-  width: auto;
+  width: 10rem;
+  min-width: 10rem;
   min-height: 2rem;
   padding: 0.25rem 0.5rem;
   font: var(--text-body-sm);

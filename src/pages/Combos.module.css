@@ -54,7 +54,8 @@
 }
 
 .sortSelect {
-  width: auto;
+  width: 10rem;
+  min-width: 10rem;
 }
 
 /* ── Combo list ── */

@@ -49,15 +49,14 @@ export default function Combos() {
               name="combos-sort"
               value={combosSortBy}
               onChange={e => setCombosSortBy(e.target.value)}
+              options={[
+                { value: 'created-desc', label: 'Newest' },
+                { value: 'created-asc', label: 'Oldest' },
+                { value: 'moves-desc', label: 'Most moves' },
+                { value: 'moves-asc', label: 'Fewest moves' },
+              ]}
               className={styles.sortSelect}
-            >
-              <option value="created-desc">Newest</option>
-              <option value="created-asc">Oldest</option>
-              <option value="moves-desc">Most moves</option>
-              <option value="moves-asc">Fewest moves</option>
-              <option value="name-asc">A → Z</option>
-              <option value="name-desc">Z → A</option>
-            </Select>
+            />
           </div>
           <div className={styles.comboList}>
             {sortCombos(combos, combosSortBy).map(combo => (

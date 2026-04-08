@@ -8,24 +8,39 @@
   margin: 0;
 }
 
-.row {
+.pillRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
-  position: relative;
+  flex-wrap: wrap;
+}
+
+.scopeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.actionsRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .statusWrap {
   position: relative;
 }
 
-.statusPill {
+.statusFilterPill {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
   min-height: 2rem;
-  padding: 0.25rem 0.625rem;
+  padding: 0.25rem 0.75rem;
 }
 
 .statusPillLabel {
@@ -43,7 +58,7 @@
 .statusMenu {
   position: absolute;
   top: calc(100% + var(--space-1));
-  left: 0;
+  right: 0;
   min-width: 11.5rem;
   background: var(--color-surface);
   border: 1px solid var(--color-border-subtle);
@@ -65,11 +80,3 @@
   background: var(--color-surface-blue);
 }
 
-.sortButton {
-  min-height: 2rem;
-  height: 2rem;
-  font: var(--text-caption);
-  letter-spacing: 0.04em;
-  color: var(--color-text-secondary);
-  padding: 0.25rem 0.5rem;
-}

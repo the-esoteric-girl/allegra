@@ -154,6 +154,19 @@ Shared select/dropdown field rendered on blue surface background.
   <option value="newest">Newest first</option>
   <option value="oldest">Oldest first</option>
 </Select>
+
+// With options array and label
+<Select
+  id="combos-sort"
+  name="combos-sort"
+  label="Sort by"
+  value={sortBy}
+  onChange={...}
+  options={[
+    { value: 'created-desc', label: 'Newest' },
+    { value: 'created-asc', label: 'Oldest' },
+  ]}
+/>
 ```
 
 | Prop      | Type     | Default | Values                |
@@ -162,7 +175,11 @@ Shared select/dropdown field rendered on blue surface background.
 | name      | string   | —       | required              |
 | value     | string   | —       | selected option value |
 | onChange  | function | —       | —                     |
+| label     | string   | —       | label text shown above select |
+| options   | array    | —       | `[{label, value}]` array of options |
 | className | string   | —       | additional CSS class  |
+
+When `options` prop is provided, `<option>` children are ignored. When `label` is provided, select is wrapped in a container with label above.
 
 ---
 

@@ -116,6 +116,9 @@ export default function LogModal({
     moveSortBy
   );
 
+  const hasSelectedScope = moves.some((move) =>
+    sessionEntries.some((e) => e.moveId === move.id) || pendingIds.includes(move.id)
+  );
   const noResults = q && shownMoves.length === 0 && moveScopeFilter === 'all';
   const newPendingCount = pendingIds.filter(id => !sessionEntries.some(e => e.moveId === id)).length;
 
@@ -563,8 +566,8 @@ export default function LogModal({
                     scopeValue={moveScopeFilter}
                     onScopeChange={setMoveScopeFilter}
                     scopeOptions={[
-                      { value: 'all', label: 'All moves' },
-                      { value: 'selected', label: 'Selected' },
+                      { value: 'all', label: 'All' },
+                      ...(hasSelectedScope ? [{ value: 'selected', label: 'Selected' }] : []),
                     ]}
                     scopeClassName={styles.scopeRow}
                     items={shownMoves.map((move) => {

@@ -1,6 +1,7 @@
 import MoveListControls from './MoveListControls';
 import MoveSelectRow from './MoveSelectRow';
 import Pill from './Pill';
+import Select from './Select';
 import { cn } from '../../lib/cn';
 import styles from './MovePickerPanel.module.css';
 
@@ -41,28 +42,33 @@ export default function MovePickerPanel({
         onSearchClear={onSearchClear}
         statusFilter={statusFilter}
         onStatusFilterChange={onStatusFilterChange}
-        sortBy={sortBy}
-        onSortByChange={onSortByChange}
+        scopeOptions={scopeOptions}
+        scopeValue={scopeValue}
+        onScopeChange={onScopeChange}
         searchPlaceholder={searchPlaceholder}
         searchInputRef={searchInputRef}
         className={cn(styles.controls, controlsClassName)}
         searchClassName={searchClassName}
         searchInputClassName={searchInputClassName}
+        scopeClassName={scopeClassName}
       />
 
-      {Array.isArray(scopeOptions) && scopeOptions.length > 0 && onScopeChange ? (
-        <div className={cn(styles.scopeRow, scopeClassName)}>
-          {scopeOptions.map((option) => (
-            <Pill
-              key={option.value}
-              active={scopeValue === option.value}
-              onClick={() => onScopeChange(option.value)}
-            >
-              {option.label}
-            </Pill>
-          ))}
+      {sortBy && onSortByChange && (
+        <div className={styles.sortRow}>
+          <Select
+            id={`${idPrefix}-sort`}
+            name={`${idPrefix}-sort`}
+            value={sortBy}
+            onChange={(e) => onSortByChange(e.target.value)}
+            options={[
+              { value: 'alpha-asc', label: 'A→Z' },
+              { value: 'alpha-desc', label: 'Z→A' },
+              { value: 'status', label: 'Status' },
+            ]}
+            className={styles.sortSelect}
+          />
         </div>
-      ) : null}
+      )}
 
       <div className={cn(styles.list, listClassName)}>
         {items.length === 0 && emptyState}

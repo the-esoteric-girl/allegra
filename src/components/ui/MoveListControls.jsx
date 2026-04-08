@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import SearchField from './SearchField';
+import Select from './Select';
 import Pill from './Pill';
-import Button from './Button';
-import { MOVE_STATUS_FILTER_OPTIONS } from '../../lib/moveListControls';
 import { cn } from '../../lib/cn';
+import { getMoveSortOptions, MOVE_STATUS_FILTER_OPTIONS } from '../../lib/moveListControls';
 import styles from './MoveListControls.module.css';
 
 export default function MoveListControls({
@@ -14,13 +14,18 @@ export default function MoveListControls({
   onSearchClear,
   statusFilter = 'any',
   onStatusFilterChange,
+  scopeOptions = [],
+  scopeValue,
+  onScopeChange,
   sortBy = 'alpha-asc',
   onSortByChange,
+  sortOptions = getMoveSortOptions(),
   searchPlaceholder = 'Search moves',
   searchInputRef,
   className,
   searchClassName,
   searchInputClassName,
+  scopeClassName,
 }) {
   const [isStatusOpen, setIsStatusOpen] = useState(false);
   const menuRef = useRef(null);
@@ -41,7 +46,16 @@ export default function MoveListControls({
   const activeStatusLabel =
     MOVE_STATUS_FILTER_OPTIONS.find((option) => option.value === statusFilter)?.label ?? 'Any status';
 
-  const isAscending = sortBy !== 'alpha-desc';
+  const sortControl = onSortByChange ? (
+    <Select
+      id={`${idPrefix}-sort`}
+      name={`${idPrefix}-sort`}
+      value={sortBy}
+      onChange={(e) => onSortByChange(e.target.value)}
+      options={sortOptions}
+      className={styles.sortSelect}
+    />
+  ) : null;
 
   return (
     <div className={cn(styles.wrapper, className)}>
@@ -57,45 +71,53 @@ export default function MoveListControls({
         inputClassName={searchInputClassName}
       />
 
-      <div className={styles.row}>
-        <div className={styles.statusWrap} ref={menuRef}>
-          <Pill
-            active={statusFilter !== 'any'}
-            className={styles.statusPill}
-            onClick={() => setIsStatusOpen((open) => !open)}
-          >
-            <span className={styles.statusPillLabel}>{activeStatusLabel}</span>
-            <ChevronDown size={14} className={cn(styles.statusChevron, isStatusOpen && styles.statusChevronOpen)} />
-          </Pill>
+      <div className={styles.pillRow}>
+        {Array.isArray(scopeOptions) && scopeOptions.length > 0 && (
+          <div className={cn(styles.scopeRow, scopeClassName)}>
+            {scopeOptions.map((option) => (
+              <Pill
+                key={option.value}
+                active={scopeValue === option.value}
+                onClick={() => onScopeChange(option.value)}
+              >
+                {option.label}
+              </Pill>
+            ))}
+          </div>
+        )}
 
-          {isStatusOpen && (
-            <div className={styles.statusMenu} role="listbox" aria-label="Status filters">
-              {MOVE_STATUS_FILTER_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  className={cn(styles.statusOption, option.value === statusFilter && styles.statusOptionActive)}
-                  onClick={() => {
-                    onStatusFilterChange(option.value);
-                    setIsStatusOpen(false);
-                  }}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          )}
+        <div className={styles.actionsRow}>
+          {sortControl}
+
+          <div className={styles.statusWrap} ref={menuRef}>
+            <Pill
+              active={statusFilter !== 'any'}
+              className={styles.statusFilterPill}
+              onClick={() => setIsStatusOpen((open) => !open)}
+            >
+              <span className={styles.statusPillLabel}>{activeStatusLabel}</span>
+              <ChevronDown size={14} className={cn(styles.statusChevron, isStatusOpen && styles.statusChevronOpen)} />
+            </Pill>
+
+            {isStatusOpen && (
+              <div className={styles.statusMenu} role="listbox" aria-label="Status filters">
+                {MOVE_STATUS_FILTER_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={cn(styles.statusOption, option.value === statusFilter && styles.statusOptionActive)}
+                    onClick={() => {
+                      onStatusFilterChange(option.value);
+                      setIsStatusOpen(false);
+                    }}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-
-        <Button
-          type="button"
-          variant="subtle"
-          size="sm"
-          className={styles.sortButton}
-          onClick={() => onSortByChange(isAscending ? 'alpha-desc' : 'alpha-asc')}
-        >
-          {isAscending ? 'A→Z' : 'Z→A'}
-        </Button>
       </div>
     </div>
   );

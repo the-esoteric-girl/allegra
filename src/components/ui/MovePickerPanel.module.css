@@ -8,15 +8,29 @@
   flex-shrink: 0;
 }
 
-.scopeRow {
+.pillRow {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-2);
-  flex-shrink: 0;
+  flex-wrap: wrap;
+  margin-top: var(--space-3);
 }
 
 .list {
   min-height: 0;
   flex: 1;
+}
+
+.sortRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-3);
+}
+
+.sortSelect {
+  width: 10rem;
+  min-width: 10rem;
 }
 
 .divider {

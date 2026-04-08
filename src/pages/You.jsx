@@ -75,11 +75,12 @@ export default function You() {
             name="sessions-sort"
             value={sortOrder}
             onChange={e => setSortOrder(e.target.value)}
+            options={[
+              { value: 'newest', label: 'Newest first' },
+              { value: 'oldest', label: 'Oldest first' },
+            ]}
             className={styles.sortSelect}
-          >
-            <option value="newest">Newest first</option>
-            <option value="oldest">Oldest first</option>
-          </Select>
+          />
         </div>
 
         {sortedSessions.length === 0 ? (

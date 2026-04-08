@@ -73,6 +73,11 @@ export default function ComboEditorPanels({ editor, mode = 'create' }) {
     moveMap,
   } = editor;
 
+  const scopeOptions = [
+    { value: 'all', label: 'All' },
+    ...(pendingIds.length > 0 ? [{ value: 'selected', label: 'Selected' }] : []),
+  ];
+
   const inEditMode = mode === 'edit';
   const emptyHeading = inEditMode ? 'Build your sequence' : 'Feeling your flow?';
   const emptyBody = inEditMode
@@ -172,10 +177,7 @@ export default function ComboEditorPanels({ editor, mode = 'create' }) {
               searchPlaceholder="Search moves..."
               scopeValue={showSelected ? 'selected' : 'all'}
               onScopeChange={(next) => setShowSelected(next === 'selected')}
-              scopeOptions={[
-                { value: 'all', label: 'All moves' },
-                { value: 'selected', label: 'Selected' },
-              ]}
+              scopeOptions={scopeOptions}
               scopeClassName={styles.filterRow}
               items={filteredMoves.map((move) => ({
                 id: move.id,

@@ -59,6 +59,11 @@
   text-transform: uppercase;
 }
 
+.sortSelect {
+  width: 10rem;
+  min-width: 10rem;
+}
+
 .moveCard {
   padding: var(--card-padding) !important;
   margin-bottom: var(--card-gap);

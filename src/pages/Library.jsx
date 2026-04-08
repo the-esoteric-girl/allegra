@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../hooks/useApp';
-import { StatusPill, Card, MoveListControls, EmptyState } from '../components/ui';
+import { StatusPill, Card, Select, MoveListControls, EmptyState } from '../components/ui';
 import { filterMovesBySearchAndStatus, sortMoves } from '../lib/moveListControls';
 import styles from './Library.module.css';
 
@@ -30,8 +30,6 @@ export default function Library() {
         onSearchClear={() => setSearch('')}
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
-        sortBy={sortBy}
-        onSortByChange={setSortBy}
         searchPlaceholder="Search moves..."
         className={styles.controls}
         searchClassName={styles.searchWrapper}
@@ -42,6 +40,20 @@ export default function Library() {
         <div className={styles.moveCount}>
           {filtered.length} move{filtered.length !== 1 ? 's' : ''}
         </div>
+        <Select
+          id="library-sort"
+          name="library-sort"
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          options={[
+            { value: 'alpha-asc', label: 'A→Z' },
+            { value: 'alpha-desc', label: 'Z→A' },
+            { value: 'status', label: 'Status' },
+            { value: 'created-desc', label: 'Newest created' },
+            { value: 'created-asc', label: 'Oldest created' },
+          ]}
+          className={styles.sortSelect}
+        />
       </div>
 
       {filtered.length === 0 ? (
