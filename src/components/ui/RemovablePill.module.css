@@ -1,0 +1,48 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: var(--color-surface-blue);
+  border-radius: var(--radius-pill);
+  padding: 0.375rem 0.875rem;
+}
+
+.content {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font: var(--text-body-sm-medium);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-decoration: none;
+  outline: none;
+}
+
+.content:hover,
+.content:focus-visible {
+  text-decoration: none;
+}
+
+.remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-radius: 50%;
+  cursor: pointer;
+  outline: none;
+}
+
+.remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.remove:hover:not(:disabled),
+.remove:focus-visible:not(:disabled) {
+  background: var(--color-light-blue);
+}

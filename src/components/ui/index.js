@@ -2,6 +2,7 @@ export { default as StatusDot } from './StatusDot';
 export { default as StatusPill } from './StatusPill';
 export { default as Button } from './Button';
 export { default as Pill } from './Pill';
+export { default as RemovablePill } from './RemovablePill';
 export { default as Card } from './Card';
 export { default as Input } from './Input';
 export { default as SectionLabel } from './SectionLabel';

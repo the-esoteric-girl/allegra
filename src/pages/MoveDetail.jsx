@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronLeft, Edit3, Plus, X } from 'lucide-react';
+import { ChevronLeft, Edit3, Plus } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Button, StatusPill, StatusOptionButton, ConfirmDialog, Input, IconButton, PageHeader, Card, ComboCard, BottomSheet, MovePickerPanel, EmptyState, PageState } from '../components/ui';
+import { Button, StatusPill, StatusOptionButton, ConfirmDialog, Input, IconButton, PageHeader, Card, ComboCard, BottomSheet, MovePickerPanel, EmptyState, PageState, RemovablePill } from '../components/ui';
 import { filterMovesBySearchAndStatus, sortMoves } from '../lib/moveListControls';
 import { MOVE_STATUS_VALUES, getStatusLabel } from '../lib/statusConfig';
 import styles from './MoveDetail.module.css';
@@ -325,15 +325,14 @@ export default function MoveDetail() {
         <>
           <div className={styles.statusRow}>
             <div className={styles.statusPickerWrap} ref={statusMenuRef}>
-              <button
-                type="button"
-                className={styles.statusPickerBtn}
+              <Button
+                variant="ghost"
+                size="sm"
+                className={styles.statusPillBtn}
                 onClick={() => setShowStatusMenu((prev) => !prev)}
               >
                 <StatusPill status={move.status || ''} size="sm" />
-                <span className={styles.statusPickerLabel}>{getStatusLabel(move.status || '').toLowerCase()}</span>
-                <ChevronDown size={14} className={styles.statusPickerChevron} />
-              </button>
+              </Button>
               {showStatusMenu && (
                 <div className={styles.statusPickerDropdown}>
                   {['', ...MOVE_STATUS_VALUES].map((status) => (
@@ -361,16 +360,13 @@ export default function MoveDetail() {
               {move.aliases && move.aliases.length > 0 ? (
                 <div className={styles.aliasTags}>
                   {move.aliases.map((alias, index) => (
-                    <span key={index} className={styles.aliasTag}>
+                    <RemovablePill
+                      key={index}
+                      onRemove={() => handleRemoveAlias(index)}
+                      label={`Remove alias: ${alias}`}
+                    >
                       {alias}
-                      <button
-                        className={styles.aliasRemove}
-                        onClick={() => handleRemoveAlias(index)}
-                        type="button"
-                      >
-                        ×
-                      </button>
-                    </span>
+                    </RemovablePill>
                   ))}
                   <Button
                     variant="ghost"
@@ -491,24 +487,15 @@ export default function MoveDetail() {
             {exits.length > 0 ? (
               <div className={styles.exitPills}>
                 {exits.map((exitMove) => (
-                  <div key={exitMove.id} className={styles.exitPillItem}>
-                    <button
-                      type="button"
-                      className={styles.exitPill}
-                      onClick={() => navigate(`/move/${exitMove.id}`)}
-                    >
-                      {exitMove.name}
-                    </button>
-                    <button
-                      type="button"
-                      className={styles.exitPillRemove}
-                      onClick={() => handleRemoveExit(exitMove.id)}
-                      aria-label={`Remove exit to ${exitMove.name}`}
-                      disabled={removingExitIds.includes(exitMove.id)}
-                    >
-                      <X size={12} />
-                    </button>
-                  </div>
+                  <RemovablePill
+                    key={exitMove.id}
+                    onClick={() => navigate(`/move/${exitMove.id}`)}
+                    onRemove={() => handleRemoveExit(exitMove.id)}
+                    disabled={removingExitIds.includes(exitMove.id)}
+                    label={`Remove exit to ${exitMove.name}`}
+                  >
+                    {exitMove.name}
+                  </RemovablePill>
                 ))}
               </div>
             ) : (
