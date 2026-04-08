@@ -2,14 +2,15 @@ import { useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowDown, Layers, Pencil, ChevronLeft, Trash2 } from 'lucide-react';
 import { useApp } from '../hooks/useApp';
-import { Card, Button, SectionLabel, IconButton, ConfirmDialog, DetailPageShell, PageState } from '../components/ui';
+import { Button, StatusPill, StatusOptionButton, Card, SectionLabel, IconButton, ConfirmDialog, DetailPageShell, PageState } from '../components/ui';
+import { MOVE_STATUS_VALUES, getStatusLabel } from '../lib/statusConfig';
 import styles from './ComboDetail.module.css';
 
 export default function ComboDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { combos, moves, loading, updateCombo, deleteCombo } = useApp();
+  const { combos, moves, loading, updateCombo, updateMove, deleteCombo } = useApp();
 
   const combo = combos.find((item) => String(item.id) === id);
   const moveMap = useMemo(() => Object.fromEntries(moves.map((move) => [move.id, move])), [moves]);
@@ -18,6 +19,8 @@ export default function ComboDetail() {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('');
   const [notes, setNotes] = useState('');
+  const [editedMoveStatuses, setEditedMoveStatuses] = useState({});
+  const [statusPickerFor, setStatusPickerFor] = useState(null);
   const [saving, setSaving] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -25,19 +28,42 @@ export default function ComboDetail() {
   function handleEditEnter() {
     setName(combo?.name ?? '');
     setNotes(combo?.notes ?? '');
+    const initialStatuses = {};
+    sequence.forEach(moveId => {
+      initialStatuses[moveId] = moveMap[moveId]?.status;
+    });
+    setEditedMoveStatuses(initialStatuses);
     setIsEditing(true);
   }
 
   function handleEditCancel() {
     setIsEditing(false);
+    setStatusPickerFor(null);
+    setEditedMoveStatuses({});
   }
 
   async function handleSave() {
     if (!combo) return;
     setSaving(true);
+    
+    // Update combo name and notes
     const result = await updateCombo(combo.id, { name, notes });
+    
+    // Handle move status changes
+    for (const moveId of sequence) {
+      const oldStatus = moveMap[moveId]?.status;
+      const newStatus = editedMoveStatuses[moveId];
+      if (oldStatus !== newStatus) {
+        await updateMove(moveId, { status: newStatus });
+      }
+    }
+    
     setSaving(false);
-    if (result.ok) setIsEditing(false);
+    if (result.ok) {
+      setIsEditing(false);
+      setStatusPickerFor(null);
+      setEditedMoveStatuses({});
+    }
   }
 
   async function handleDeleteConfirm() {
@@ -110,21 +136,63 @@ export default function ComboDetail() {
           </Card>
         ) : (
           <div className={styles.sequenceList}>
-            {sequence.map((moveId, index) => (
-              <div key={`${moveId}-${index}`}>
-                <div className={styles.sequenceRow}>
-                  <span className={styles.sequenceNumber}>{index + 1}</span>
-                  <Card className={styles.sequenceCard}>
-                    <span className={styles.sequenceName}>{moveMap[moveId]?.name || 'Unknown move'}</span>
-                  </Card>
-                </div>
-                {index < sequence.length - 1 && (
-                  <div className={styles.connector}>
-                    <ArrowDown size={16} />
+            {sequence.map((moveId, index) => {
+              const move = moveMap[moveId];
+              const status = editedMoveStatuses[moveId] ?? move?.status;
+              return (
+                <div key={`${moveId}-${index}`}>
+                  <div className={styles.sequenceRow}>
+                    <span className={styles.sequenceNumber}>{index + 1}</span>
+                    <Card className={styles.sequenceCard}>
+                      <span className={styles.sequenceName}>{move?.name || 'Unknown move'}</span>
+                      {isEditing ? (
+                        <div className={styles.statusPickerWrap}>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className={styles.statusPillBtn}
+                            onClick={() => setStatusPickerFor(
+                              prev => prev === moveId ? null : moveId
+                            )}
+                          >
+                            <StatusPill status={status} size="sm" />
+                          </Button>
+                          {statusPickerFor === moveId && (
+                            <div className={styles.pickerDropdown}>
+                              {['', ...MOVE_STATUS_VALUES].map(s => (
+                                <StatusOptionButton
+                                  key={s}
+                                  status={s}
+                                  label={getStatusLabel(s)}
+                                  selected={s === status}
+                                  variant="menu"
+                                  showCheck
+                                  onClick={() => {
+                                    setEditedMoveStatuses(prev => ({
+                                      ...prev,
+                                      [moveId]: s || null
+                                    }));
+                                    setStatusPickerFor(null);
+                                  }}
+                                />
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        status && <StatusPill status={status} size="sm" />
+                      )}
+                    </Card>
                   </div>
-                )}
-              </div>
-            ))}
+                  {index < sequence.length - 1 && (
+                    <div className={styles.connector}>
+                      <ArrowDown size={16} />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
@@ -143,9 +211,9 @@ export default function ComboDetail() {
               rows={4}
             />
           ) : (
-            <Card>
+            <div className={styles.notesCard}>
               <p className={styles.notesText}>{combo.notes}</p>
-            </Card>
+            </div>
           )}
         </div>
       )}

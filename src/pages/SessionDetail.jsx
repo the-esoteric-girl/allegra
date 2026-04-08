@@ -10,8 +10,10 @@ import {
   ConfirmDialog,
   DetailPageShell,
   StatusPill,
+  StatusOptionButton,
   PageState,
 } from '../components/ui';
+import { MOVE_STATUS_VALUES, getStatusLabel } from '../lib/statusConfig';
 import styles from './SessionDetail.module.css';
 
 function formatDate(isoString) {
@@ -23,7 +25,7 @@ function formatDate(isoString) {
 export default function SessionDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { sessions, moves, loading, updateSession, deleteSession } = useApp();
+  const { sessions, moves, loading, updateSession, deleteSession, deleteSessionEntry, addSessionEntry } = useApp();
 
   const session = sessions.find((s) => String(s.id) === id);
   const moveMap = useMemo(
@@ -33,25 +35,55 @@ export default function SessionDetail() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [notes, setNotes] = useState('');
+  const [editedStatuses, setEditedStatuses] = useState({});
+  const [statusPickerFor, setStatusPickerFor] = useState(null);
   const [saving, setSaving] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   function handleEditEnter() {
     setNotes(session?.notes ?? '');
+    const initialStatuses = {};
+    entries.forEach(entry => {
+      initialStatuses[entry.move_id] = entry.new_status || moveMap[entry.move_id]?.status;
+    });
+    setEditedStatuses(initialStatuses);
     setIsEditing(true);
   }
 
   function handleEditCancel() {
     setIsEditing(false);
+    setStatusPickerFor(null);
+    setEditedStatuses({});
   }
 
   async function handleSave() {
     if (!session) return;
     setSaving(true);
+    
+    // Update session notes
     const result = await updateSession(session.id, { notes });
+    
+    // Handle status changes
+    const statusChanges = entries.filter(entry => {
+      const oldStatus = entry.new_status || moveMap[entry.move_id]?.status;
+      const newStatus = editedStatuses[entry.move_id];
+      return oldStatus !== newStatus;
+    });
+    
+    for (const entry of statusChanges) {
+      await deleteSessionEntry(session.id, entry.move_id);
+      const previousStatus = entry.previous_status;
+      const newStatus = editedStatuses[entry.move_id];
+      await addSessionEntry(session.id, entry.move_id, previousStatus, newStatus, entry.notes_added);
+    }
+    
     setSaving(false);
-    if (result.ok) setIsEditing(false);
+    if (result.ok) {
+      setIsEditing(false);
+      setStatusPickerFor(null);
+      setEditedStatuses({});
+    }
   }
 
   async function handleDeleteConfirm() {
@@ -120,9 +152,9 @@ export default function SessionDetail() {
               rows={4}
             />
           ) : (
-            <Card>
+            <div className={styles.notesCard}>
               <p className={styles.notesText}>{session.notes}</p>
-            </Card>
+            </div>
           )}
         </div>
       )}
@@ -137,13 +169,50 @@ export default function SessionDetail() {
           <div className={styles.moveList}>
             {entries.map((entry) => {
               const move = moveMap[entry.move_id];
-              const status = entry.new_status || move?.status;
+              const status = editedStatuses[entry.move_id] ?? entry.new_status ?? move?.status;
               return (
                 <Card key={entry.move_id} className={styles.moveCard}>
                   <span className={styles.moveName}>
                     {move?.name ?? 'Unknown move'}
                   </span>
-                  {status && <StatusPill status={status} />}
+                  {isEditing ? (
+                    <div className={styles.statusPickerWrap}>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className={styles.statusPillBtn}
+                        onClick={() => setStatusPickerFor(
+                          prev => prev === entry.move_id ? null : entry.move_id
+                        )}
+                      >
+                        <StatusPill status={status} size="sm" />
+                      </Button>
+                      {statusPickerFor === entry.move_id && (
+                        <div className={styles.pickerDropdown}>
+                          {['', ...MOVE_STATUS_VALUES].map(s => (
+                            <StatusOptionButton
+                              key={s}
+                              status={s}
+                              label={getStatusLabel(s)}
+                              selected={s === status}
+                              variant="menu"
+                              showCheck
+                              onClick={() => {
+                                setEditedStatuses(prev => ({
+                                  ...prev,
+                                  [entry.move_id]: s || null
+                                }));
+                                setStatusPickerFor(null);
+                              }}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    status && <StatusPill status={status} />
+                  )}
                 </Card>
               );
             })}

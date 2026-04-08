@@ -88,6 +88,7 @@
   display: flex;
   align-items: center;
   border: 1px solid var(--color-border);
+  gap: var(--space-2);
 }
 
 .sequenceNumber {
@@ -120,4 +121,35 @@
   font: var(--text-body);
   color: var(--color-text-primary);
   white-space: pre-wrap;
+}
+
+.notesCard {
+  padding: var(--card-padding);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-blue);
+}
+
+.statusPickerWrap {
+  position: relative;
+  margin-left: auto;
+}
+
+.statusPillBtn {
+  height: auto;
+  min-height: 0;
+  padding: 0 !important;
+  border-radius: var(--radius-pill);
+}
+
+.pickerDropdown {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card-hover);
+  z-index: 10;
+  min-width: 148px;
+  overflow: hidden;
 }
