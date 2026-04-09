@@ -117,7 +117,7 @@
 
 .cardName {
   flex: 1;
-  font: var(--text-body-sm-medium);
+  font: var(--text-body-semibold);
   color: var(--color-text-primary);
 }
 

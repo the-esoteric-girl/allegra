@@ -98,7 +98,7 @@
 }
 
 .sequenceName {
-  font: var(--text-body);
+  font: var(--text-body-semibold);
   color: var(--color-text-primary);
 }
 
