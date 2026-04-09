@@ -55,7 +55,7 @@ export default function Combos() {
                 { value: 'moves-desc', label: 'Most moves' },
                 { value: 'moves-asc', label: 'Fewest moves' },
               ]}
-              className={styles.sortSelect}
+              variant="sort"
             />
           </div>
           <div className={styles.comboList}>

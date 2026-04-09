@@ -26,3 +26,15 @@
   box-shadow: 0 0 0 1.5px var(--color-border-subtle);
 }
 
+.wrapperSort {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.selectSort {
+  width: auto;
+  min-width: 8rem;
+}
+

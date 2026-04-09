@@ -65,13 +65,15 @@ export default function Library() {
             className={styles.moveCard}
             onClick={() => navigate(`/move/${move.id}`)}
           >
-            <div className={styles.moveName}>{move.name}</div>
+            <div className={styles.moveCardHeader}>
+              <div className={styles.moveName}>{move.name}</div>
+              {move.status && <StatusPill status={move.status} />}
+            </div>
             {move.aliases && move.aliases.length > 0 && (
               <div className={styles.moveAliases}>
                 {move.aliases.join(', ')}
               </div>
             )}
-            {move.status && <StatusPill status={move.status} />}
           </Card>
         ))
       )}

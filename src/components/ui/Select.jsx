@@ -1,7 +1,9 @@
 import styles from './Select.module.css';
 import { cn } from '../../lib/cn';
 
-export default function Select({ id, name, value, onChange, className, label, options, children, ...props }) {
+export default function Select({ id, name, value, onChange, className, label, options, children, variant, ...props }) {
+  const isSort = variant === 'sort';
+
   const selectElement = (
     <select
       id={id}
@@ -9,7 +11,7 @@ export default function Select({ id, name, value, onChange, className, label, op
       value={value}
       onChange={onChange}
       {...props}
-      className={cn(styles.select, className)}
+      className={cn(styles.select, isSort && styles.selectSort, className)}
     >
       {options ? (
         options.map(option => (
@@ -25,7 +27,7 @@ export default function Select({ id, name, value, onChange, className, label, op
 
   if (label) {
     return (
-      <div className={styles.wrapper}>
+      <div className={isSort ? styles.wrapperSort : styles.wrapper}>
         <label htmlFor={id} className={styles.label}>
           {label}
         </label>

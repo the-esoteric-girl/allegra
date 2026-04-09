@@ -79,7 +79,7 @@ export default function You() {
               { value: 'newest', label: 'Newest first' },
               { value: 'oldest', label: 'Oldest first' },
             ]}
-            className={styles.sortSelect}
+            variant="sort"
           />
         </div>
 

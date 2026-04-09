@@ -69,10 +69,15 @@
   margin-bottom: var(--card-gap);
 }
 
+.moveCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .moveName {
   font: var(--text-body-semibold);
   color: var(--color-text-primary);
-  margin-bottom: 0.25rem;
 }
 
 .moveAliases {

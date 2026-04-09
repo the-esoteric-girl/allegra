@@ -53,11 +53,6 @@
   color: var(--color-text-secondary);
 }
 
-.sortSelect {
-  width: 10rem;
-  min-width: 10rem;
-}
-
 /* ── Combo list ── */
 .comboList {
   display: flex;
